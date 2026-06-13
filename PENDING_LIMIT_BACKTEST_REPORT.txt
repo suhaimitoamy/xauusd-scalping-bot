@@ -1,0 +1,42 @@
+PENDING LIMIT BACKTEST REPORT
+Patch: High-WR V3 + BUY_LIMIT / SELL_LIMIT
+
+Logic:
+- 9 high-WR methods remain active.
+- Every valid high-WR signal becomes pending limit order:
+  BUY  -> BUY_LIMIT below signal close, waiting retest/pullback.
+  SELL -> SELL_LIMIT above signal close, waiting retest/pullback.
+- Pending price uses shallow pullback formula:
+  offset = max(1.0, min(3.0, abs(signal_close - reference_level) * 0.45))
+- Expiry: 60 bars.
+- SL: 6.0 points.
+- TP1: 3.0 points.
+- TP2: 6.0 points.
+- TP1 is counted as partial win/protected.
+
+M1 CSV BACKTEST 202501-202509:
+202501: 29 trades, 20W / 9L, WR 68.97%
+202502: 41 trades, 28W / 13L, WR 68.29%
+202503: 49 trades, 34W / 15L, WR 69.39%
+202504: 115 trades, 78W / 37L, WR 67.83%
+202505: 95 trades, 68W / 27L, WR 71.58%
+202506: 63 trades, 48W / 15L, WR 76.19%
+202507: 62 trades, 49W / 13L, WR 79.03%
+202508: 44 trades, 30W / 14L, WR 68.18%
+202509: 93 trades, 64W / 29L, WR 68.82%
+TOTAL: 591 trades, 419W / 172L, WR 70.90%
+
+M5 CSV BACKTEST 202605:
+202605: 9 trades, 7W / 2L, WR 77.78%
+TOTAL: 9 trades, 7W / 2L, WR 77.78%
+
+Added Telegram features:
+- /market_context
+- /bias
+- /intraday_bias
+- /supply_demand
+- /sd
+- /ask [question]
+- Free text fallback uses AI only after local bot has no direct answer.
+- AI answer is grounded by bot data only: price, intraday bias, supply, demand, liquidity, range.
+- AI answers are cached in data/telegram_ai_cache.json by same question + same market snapshot.

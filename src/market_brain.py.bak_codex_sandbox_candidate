@@ -1,0 +1,550 @@
+"""Adaptive trading brain for XAUUSD.
+
+This file is intentionally small and editable by the AI Trainer.
+Public API that must stay stable:
+    BrainEngine(storage, symbol='XAU/USD', config=None)
+    BrainEngine.analyze(current_price, m5_candles, m15_candles, h1_candles, data_health=None)
+"""
+from __future__ import annotations
+
+from statistics import mean
+from typing import Any, Dict, List, Optional, Tuple
+from .fvg_engine import detect_fvgs
+from .market_structure import analyze_structure
+
+from src.market_memory import MarketMemory
+
+
+def _no_trade(reason: str, confidence: float = 0, pattern_key: str = "") -> Dict[str, Any]:
+    return {
+        'symbol': 'XAU/USD',
+        'direction': 'NO_TRADE',
+        'entry_low': None,
+        'entry_high': None,
+        'sl': None,
+        'tp1': None,
+        'tp2': None,
+        'tp3': None,
+        'invalid_level': None,
+        'confidence': confidence,
+        'reason': reason,
+        'status': 'NO_TRADE',
+        'pattern_key': pattern_key,
+        'source': 'ADAPTIVE_BRAIN'
+    }
+
+
+def _cval(candle: Dict[str, Any], key: str, default: float = 0.0) -> float:
+    try:
+        return float(candle.get(key, default) or default)
+    except Exception:
+        return default
+
+
+class BrainEngine:
+    def __init__(self, storage, symbol: str = 'XAU/USD', config: Optional[Dict[str, Any]] = None):
+        self.storage = storage
+        self.symbol = symbol
+        self.config = config or {}
+        self.memory = MarketMemory(storage)
+        adaptive_cfg = (self.config or {}).get('adaptive_brain', {})
+        self.min_confidence = float(adaptive_cfg.get('min_confidence', 10))
+        self.max_recent_events = int(adaptive_cfg.get('max_recent_events', 30))
+        self.sl_atr_mult = float(adaptive_cfg.get('sl_atr_mult', 1.15))
+        self.tp1_rr = float(adaptive_cfg.get('tp1_rr', 1.0))
+        self.tp2_rr = float(adaptive_cfg.get('tp2_rr', 2.0))
+        self.tp3_rr = 0.0
+        self.pips_per_price_point = float(adaptive_cfg.get('pips_per_price_point', 10))
+        self.max_sl_pips = float(adaptive_cfg.get('max_sl_pips', 100))
+        self.max_sl_price_distance = self.max_sl_pips / max(self.pips_per_price_point, 0.01)
+
+    def analyze(self, current_price: float, m5_candles: List[Dict[str, Any]],
+                m15_candles: Optional[List[Dict[str, Any]]] = None,
+                h1_candles: Optional[List[Dict[str, Any]]] = None,
+                data_health: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        if data_health and not data_health.get('is_healthy', True):
+            sig = _no_trade('Data belum sehat / masih warming up')
+            self.memory.save_decision(sig)
+            return sig
+
+        if not current_price or len(m5_candles or []) < 8:
+            sig = _no_trade('Data M5 belum cukup untuk adaptive brain')
+            self.memory.save_decision(sig)
+            return sig
+
+        active = self.memory.active_signal()
+        if active:
+            sig = _no_trade(f"Ada signal ACTIVE #{active.get('id')} {active.get('direction')}. Brain menahan signal baru.")
+            self.memory.save_decision(sig)
+            return sig
+
+        price = float(current_price)
+        context = self._read_market_context(price, m5_candles, m15_candles or [], h1_candles or [])
+        self._record_context_events(context, price)
+
+        direction, reason, pattern_key, base_conf = self._decide(context)
+        if direction == 'NO_TRADE':
+            sig = _no_trade(reason, base_conf, pattern_key)
+            sig['current_price'] = price
+            sig['brain_context'] = context
+            self.memory.save_decision(sig)
+            return sig
+
+        pattern = self.memory.get_pattern(pattern_key)
+        if self.memory.is_pattern_in_cooldown(pattern_key):
+            sig = _no_trade(f'Pattern {pattern_key} sedang cooldown setelah hasil buruk.', 0, pattern_key)
+            sig['current_price'] = price
+            sig['brain_context'] = context
+            self.memory.save_decision(sig)
+            return sig
+
+        learned_score = float(pattern.get('score') or 0)
+        confidence = max(1, min(95, base_conf + learned_score))
+        
+        wins = int(pattern.get('wins') or 0)
+        losses = int(pattern.get('losses') or 0)
+        total_trades = wins + losses
+        
+        if total_trades < 10:
+            confidence = max(confidence, self.min_confidence)
+            
+        if confidence < self.min_confidence:
+            sig = _no_trade(f'Confidence adaptive masih rendah: {confidence:.0f}%', confidence, pattern_key)
+            sig['current_price'] = price
+            sig['brain_context'] = context
+            self.memory.save_decision(sig)
+            return sig
+
+        signal = self._build_signal(direction, price, context, confidence, reason, pattern_key, pattern)
+        if not signal:
+            sig = _no_trade(f'Signal batal: SL terlalu lebar/Risk tidak masuk kriteria', confidence, pattern_key)
+            sig['current_price'] = price
+            sig['brain_context'] = context
+            self.memory.save_decision(sig)
+            return sig
+
+        self.memory.save_decision(signal)
+        return signal
+
+    def _read_market_context(self, price: float, m5: List[Dict[str, Any]], m15: List[Dict[str, Any]], h1: List[Dict[str, Any]]) -> Dict[str, Any]:
+        last = m5[-1]
+        lookback = m5[-8:-1] if len(m5) >= 8 else m5[:-1]
+        highs = [_cval(c, 'high') for c in lookback]
+        lows = [_cval(c, 'low') for c in lookback]
+        prev_high = max(highs) if highs else _cval(last, 'high')
+        prev_low = min(lows) if lows else _cval(last, 'low')
+        close = _cval(last, 'close', price)
+        open_ = _cval(last, 'open', close)
+        high = _cval(last, 'high', close)
+        low = _cval(last, 'low', close)
+        atr = self._atr(m5, 14)
+        body = abs(close - open_)
+        rng = max(high - low, 0.01)
+        body_ratio = body / rng
+        momentum = 'bullish' if close > open_ else 'bearish' if close < open_ else 'neutral'
+        break_bull = close > prev_high
+        break_bear = close < prev_low
+        sentuh_high = high >= prev_high
+        sentuh_low = low <= prev_low
+        choppy = self._is_choppy(m5)
+        recent_events = self.memory.recent_events(
+            self.symbol,
+            self.max_recent_events,
+            current_price=price,
+            max_age_minutes=180,
+            max_distance_points=25.0,
+        )
+        fvgs = self.memory.storage.get_active_fvgs(self.symbol, 'M5')
+        structure = analyze_structure(m5, m15, h1)
+
+        return {
+            'price': price,
+            'prev_high': prev_high,
+            'prev_low': prev_low,
+            'last_open': open_,
+            'last_high': high,
+            'last_low': low,
+            'last_close': close,
+            'atr': atr,
+            'body_ratio': body_ratio,
+            'momentum': momentum,
+            'break_bull': break_bull,
+            'break_bear': break_bear,
+            'sentuh_high': sentuh_high,
+            'sentuh_low': sentuh_low,
+            'choppy': choppy,
+            'recent_events': recent_events[:12],
+            'm15_bias': self._bias(m15),
+            'h1_bias': self._bias(h1),
+            'fvgs': fvgs,
+            'structure': structure,
+            'candles': m5,
+        }
+
+    def _record_context_events(self, ctx: Dict[str, Any], price: float) -> None:
+        if ctx.get('sentuh_high'):
+            self.memory.record_event(self.symbol, 'M5', 'SENTUH_HIGH', 'bearish_watch', ctx.get('prev_high'), price, 1.0, raw=ctx)
+        if ctx.get('sentuh_low'):
+            self.memory.record_event(self.symbol, 'M5', 'SENTUH_LOW', 'bullish_watch', ctx.get('prev_low'), price, 1.0, raw=ctx)
+        if ctx.get('break_bull'):
+            self.memory.record_event(self.symbol, 'M5', 'BREAK_BULLISH', 'bullish', ctx.get('prev_high'), price, 1.4, raw=ctx)
+        if ctx.get('break_bear'):
+            self.memory.record_event(self.symbol, 'M5', 'BREAK_BEARISH', 'bearish', ctx.get('prev_low'), price, 1.4, raw=ctx)
+        if ctx.get('choppy'):
+            self.memory.record_event(self.symbol, 'M5', 'CHOPPY', 'neutral', None, price, 0.5, raw=ctx, dedupe_window_minutes=30)
+
+    def _evaluate_dynamic_rules(self, ctx: Dict[str, Any]) -> __import__('typing').Optional[Tuple[str, str, str, float]]:
+        conn = self.memory.storage.get_connection()
+        conn.row_factory = __import__('sqlite3').Row
+        cur = conn.cursor()
+        try:
+            cur.execute("SELECT * FROM dynamic_rules")
+            rules = cur.fetchall()
+        except Exception:
+            rules = []
+        finally:
+            conn.close()
+            
+        for r in rules:
+            try:
+                rj = __import__('json').loads(r['rule_json'])
+                rule_conds = rj.get('rules', {})
+                match = True
+                
+                if 'momentum_bias' in rule_conds:
+                    if ctx.get('momentum') != rule_conds['momentum_bias']: match = False
+                if 'max_body_ratio' in rule_conds:
+                    if float(ctx.get('body_ratio') or 0) > float(rule_conds['max_body_ratio']): match = False
+                if 'min_body_ratio' in rule_conds:
+                    if float(ctx.get('body_ratio') or 0) < float(rule_conds['min_body_ratio']): match = False
+                if rule_conds.get('requires_sentuh_high') and not ctx.get('sentuh_high'): match = False
+                if rule_conds.get('requires_sentuh_low') and not ctx.get('sentuh_low'): match = False
+                if rule_conds.get('requires_break_bull') and not ctx.get('break_bull'): match = False
+                if rule_conds.get('requires_break_bear') and not ctx.get('break_bear'): match = False
+                
+                if match:
+                    return (rj.get('direction', 'BUY').upper(), f"AI Dynamic: {rj.get('description', '')}", r['pattern_key'], 55.0)
+            except Exception:
+                pass
+        return None
+
+    def _evaluate_sandbox_rules(self, ctx: Dict[str, Any]) -> __import__('typing').Optional[Tuple[str, str, str, float]]:
+        import sys
+        if 'run_simulator' not in sys.modules:
+            return None
+            
+        run_sim = sys.modules['run_simulator']
+        sandbox_data = getattr(run_sim, 'SANDBOX_RULES', None)
+        if not sandbox_data:
+            return None
+            
+        for m in sandbox_data.get('methods', []):
+            match = True
+            
+            # Prepare safe evaluation context
+            safe_ctx = dict(ctx)
+            safe_ctx['True'] = True
+            safe_ctx['False'] = False
+            safe_ctx['true'] = True
+            safe_ctx['false'] = False
+            
+            # Map complex properties
+            if 'fvgs' in safe_ctx:
+                safe_ctx['fvgs'] = len(safe_ctx['fvgs']) > 0
+            if 'ob' not in safe_ctx: safe_ctx['ob'] = False
+            if 'ote' not in safe_ctx: safe_ctx['ote'] = False
+            
+            # Evaluate Conditions
+            for cond in m.get('conditions', []):
+                cond_py = cond.replace('== true', '== True').replace('== false', '== False')
+                if 'contains' in cond_py:
+                    parts = cond_py.split('contains')
+                    cond_py = f"{parts[1].strip()} in str({parts[0].strip()})"
+                
+                try:
+                    if not eval(cond_py, {"__builtins__": {}}, safe_ctx):
+                        match = False
+                        break
+                except Exception as e:
+                    match = False
+                    break
+                    
+            if not match: continue
+            
+            # Evaluate Invalid_If
+            for inv in m.get('invalid_if', []):
+                inv_py = inv.replace('== true', '== True').replace('== false', '== False')
+                if 'contains' in inv_py:
+                    parts = inv_py.split('contains')
+                    inv_py = f"{parts[1].strip()} in str({parts[0].strip()})"
+                
+                try:
+                    if eval(inv_py, {"__builtins__": {}}, safe_ctx):
+                        match = False
+                        break
+                except Exception:
+                    pass
+                    
+            if match:
+                return (m['direction'].upper(), f"AI Sandbox: {m['name']}", m['name'], 55.0)
+                
+        return None
+
+    def _decide(self, ctx: Dict[str, Any]) -> Tuple[str, str, str, float]:
+        price = ctx.get('price', 0)
+        close = ctx.get('last_close', 0)
+        open_ = ctx.get('last_open', 0)
+        high = ctx.get('last_high', 0)
+        low = ctx.get('last_low', 0)
+        momentum = ctx.get('momentum')
+        body_ratio = float(ctx.get('body_ratio') or 0)
+        m15_bias = ctx.get('m15_bias')
+        h1_bias = ctx.get('h1_bias')
+        fvgs = ctx.get('fvgs', [])
+        atr = ctx.get('atr', 2.0)
+        
+        body_top = max(open_, close)
+        body_bottom = min(open_, close)
+        upper_wick = high - body_top
+        lower_wick = body_bottom - low
+        body_size = max(body_top - body_bottom, 0.01)
+
+        struct = ctx.get('structure', {})
+
+        # 0. Check Sandbox rules first (Highest priority during simulations)
+        sandbox_match = self._evaluate_sandbox_rules(ctx)
+        if sandbox_match:
+            return sandbox_match
+
+        # 1. Check Dynamic DB Rules
+        dynamic_match = self._evaluate_dynamic_rules(ctx)
+        break_type = struct.get('break_type')
+        reclaim_valid = struct.get('reclaim_valid')
+        sweep_type = struct.get('sweep_type')
+        is_extreme = struct.get('is_extreme_volatility', False)
+
+        candidates = []
+
+        # [NATIVE PRICE ACTION PATTERNS]
+        candles = ctx.get('candles', [])
+        if len(candles) >= 5:
+            c1 = candles[-1]
+            c2 = candles[-2]
+            
+            c1_body = max(abs(c1['open'] - c1['close']), 0.01)
+            c1_upper = c1['high'] - max(c1['open'], c1['close'])
+            c1_lower = min(c1['open'], c1['close']) - c1['low']
+            
+            c2_body = max(abs(c2['open'] - c2['close']), 0.01)
+            c2_upper = c2['high'] - max(c2['open'], c2['close'])
+            c2_lower = min(c2['open'], c2['close']) - c2['low']
+
+            # Context-Aware Variables
+            c2_is_bearish = c2['close'] < c2['open']
+            c2_is_bullish = c2['close'] > c2['open']
+            choppy = ctx.get('choppy', False)
+
+            # 1. Hammer / Pin Bar
+            if c1_lower >= c1_body * 2 and c1_upper <= c1_body * 0.5 and c1_lower > (atr * 0.5):
+                if c2_is_bearish:
+                    candidates.append(('BUY', 'PATTERN: Hammer / Bullish Pin Bar', 'METHOD_PATTERN_HAMMER', 88.0))
+            
+            # 2. Shooting Star
+            if c1_upper >= c1_body * 2 and c1_lower <= c1_body * 0.5 and c1_upper > (atr * 0.5):
+                if c2_is_bullish:
+                    candidates.append(('SELL', 'PATTERN: Shooting Star / Bearish Pin Bar', 'METHOD_PATTERN_SHOOTING_STAR', 88.0))
+                
+            # 3. Exhaustion Upper Wick
+            if c2_upper >= c2_body * 1.5 and c1['close'] < c1['open'] and c2_upper > (atr * 0.5):
+                if c2_is_bullish:
+                    candidates.append(('SELL', 'PATTERN: Exhaustion Upper Wick & Bearish Close', 'METHOD_PATTERN_EXHAUST_UP', 86.0))
+                
+            # 4. Exhaustion Lower Wick
+            if c2_lower >= c2_body * 1.5 and c1['close'] > c1['open'] and c2_lower > (atr * 0.5):
+                if c2_is_bearish:
+                    candidates.append(('BUY', 'PATTERN: Exhaustion Lower Wick & Bullish Close', 'METHOD_PATTERN_EXHAUST_DOWN', 86.0))
+                
+            # 5. Body Compression Breakout
+            c3 = candles[-3]
+            c4 = candles[-4]
+            b1, b2, b3, b4 = c1_body, c2_body, abs(c3['open']-c3['close']), abs(c4['open']-c4['close'])
+            if b3 <= b4 and b2 <= b3 and b1 > b2 * 1.5:
+                if not choppy:
+                    if c1['close'] > c1['open']:
+                        candidates.append(('BUY', 'PATTERN: Bullish Compression Breakout', 'METHOD_PATTERN_COMPRESS_BULL', 85.0))
+                    elif c1['close'] < c1['open']:
+                        candidates.append(('SELL', 'PATTERN: Bearish Compression Breakout', 'METHOD_PATTERN_COMPRESS_BEAR', 85.0))
+
+        # [Model 1] Turtle Soup / Liquidity Sweep Reclaim
+        # Swept a high/low but immediately reclaimed the level (Fakeout)
+        if sweep_type == 'bearish' and reclaim_valid:
+            candidates.append(('SELL', 'ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim', 'METHOD_ICT_TURTLE_SOUP_SELL', 85.0))
+        elif sweep_type == 'bullish' and reclaim_valid:
+            candidates.append(('BUY', 'ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim', 'METHOD_ICT_TURTLE_SOUP_BUY', 85.0))
+
+        # [Model 2] ICT 2022 Mentorship Model
+        # Sweep -> MSS -> FVG Retest
+        for fvg in fvgs:
+            if fvg['direction'] == 'Bearish' and high >= fvg['low'] and close < fvg['high']:
+                # Price is inside Bearish FVG and rejected
+                if sweep_type == 'bearish' and break_type == 'MSS':
+                    candidates.append(('SELL', 'ICT 2022 MODEL: Sweep -> MSS -> Bearish FVG Retest', 'METHOD_ICT_2022_SELL', 95.0))
+                elif upper_wick > body_size * 1.5:
+                    # Basic FVG Retest / Unicorn Substitute
+                    candidates.append(('SELL', 'ICT UNICORN / FVG: Bearish FVG Retest', 'METHOD_ICT_UNICORN_SELL', 80.0))
+
+            elif fvg['direction'] == 'Bullish' and low <= fvg['high'] and close > fvg['low']:
+                # Price is inside Bullish FVG and rejected
+                if sweep_type == 'bullish' and break_type == 'MSS':
+                    candidates.append(('BUY', 'ICT 2022 MODEL: Sweep -> MSS -> Bullish FVG Retest', 'METHOD_ICT_2022_BUY', 95.0))
+                elif lower_wick > body_size * 1.5:
+                    candidates.append(('BUY', 'ICT UNICORN / FVG: Bullish FVG Retest', 'METHOD_ICT_UNICORN_BUY', 80.0))
+
+        # [Model 3] AMD (Accumulation, Manipulation, Distribution)
+        # If market was choppy (Accumulation), then Swept (Manipulation), we enter on reversal (Distribution)
+        if struct.get('choppy') and sweep_type == 'bearish' and upper_wick > body_size * 2:
+            candidates.append(('SELL', 'ICT AMD: Choppy -> Bearish Sweep -> Distribution', 'METHOD_ICT_AMD_SELL', 90.0))
+        elif struct.get('choppy') and sweep_type == 'bullish' and lower_wick > body_size * 2:
+            candidates.append(('BUY', 'ICT AMD: Choppy -> Bullish Sweep -> Distribution', 'METHOD_ICT_AMD_BUY', 90.0))
+
+        if candidates:
+            candidates.sort(key=lambda x: x[3], reverse=True)
+            return candidates[0]
+
+        return 'NO_TRADE', 'Belum ada metode yang terpicu', 'WAITING', 0
+
+    def _build_signal(self, direction: str, price: float, ctx: Dict[str, Any], confidence: float,
+                      reason: str, pattern_key: str, pattern: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        # Structural SL and TP based on ICT DOL
+        struct = ctx.get('structure', {})
+        atr = ctx.get('atr', 2.0)
+        sl = price
+        tp2 = price
+
+        if direction == 'BUY':
+            # SL is nearest support or swing low
+            support = struct.get('nearest_support') or ctx.get('prev_low') or (price - 6.0)
+            sl_dist = price - support
+            # ATR Rubber Band SL for Patterns
+            if 'PATTERN' in reason:
+                sl_dist = max(atr * 1.5, 6.0) # SL is 1.5x ATR, min 60 pips
+            else:
+                # Enforce 6.0 to 15.0 constraints for Pure ICT
+                if sl_dist > 15.0:
+                    return None  # ABORT, SL too wide
+            sl_dist = max(sl_dist, 6.0)  # Min 60 pips
+            sl = price - sl_dist
+
+            # TP is Draw On Liquidity (Liquidity Above or Resistance)
+            dol = struct.get('liquidity_above') or struct.get('nearest_resistance') or (price + 8.0)
+            tp_dist = dol - price
+            if 'PATTERN' in reason:
+                tp_dist = sl_dist * 1.5 # Dynamic TP based on SL (1:1.5 RR)
+            else:
+                # Enforce 8.0 to 30.0 constraints
+                tp_dist = max(tp_dist, 8.0)  # Min 80 pips
+                tp_dist = min(tp_dist, 30.0) # Max 300 pips
+                
+            tp2 = price + tp_dist
+
+        else: # SELL
+            # SL is nearest resistance or swing high
+            resistance = struct.get('nearest_resistance') or ctx.get('prev_high') or (price + 6.0)
+            sl_dist = resistance - price
+            # ATR Rubber Band SL for Patterns
+            if 'PATTERN' in reason:
+                sl_dist = max(atr * 1.5, 6.0)
+            else:
+                if sl_dist > 15.0:
+                    return None  # ABORT, SL too wide
+            sl_dist = max(sl_dist, 6.0)
+            sl = price + sl_dist
+
+            # TP is Draw On Liquidity (Liquidity Below or Support)
+            dol = struct.get('liquidity_below') or struct.get('nearest_support') or (price - 8.0)
+            tp_dist = price - dol
+            if 'PATTERN' in reason:
+                tp_dist = sl_dist * 1.5
+            else:
+                tp_dist = max(tp_dist, 8.0)
+                tp_dist = min(tp_dist, 30.0)
+                
+            tp2 = price - tp_dist
+
+        entry_pad = 0.5
+        entry_low = price - entry_pad
+        entry_high = price + entry_pad
+        invalid = sl
+        tp1 = tp2 # Strict mode, TP1=TP2
+        tp3 = None
+
+        learned_note = ''
+        wins = int(pattern.get('wins') or 0)
+        losses = int(pattern.get('losses') or 0)
+        score = float(pattern.get('score') or 0)
+        if wins or losses or score:
+            learned_note = f" | Memory: {wins}W/{losses}L, score {score:.0f}."
+
+        return {
+            'symbol': self.symbol,
+            'direction': direction,
+            'entry_low': round(entry_low, 3),
+            'entry_high': round(entry_high, 3),
+            'sl': round(sl, 3),
+            'tp1': round(tp1, 3),
+            'tp2': round(tp2, 3),
+            'tp3': None,
+            'invalid_level': round(invalid, 3),
+            'confidence': round(confidence, 1),
+            'reason': reason + learned_note,
+            'status': 'ACTIVE',
+            'current_price': price,
+            'pattern_key': pattern_key,
+            'source': 'ADAPTIVE_BRAIN',
+            'brain_context': {
+                'prev_high': ctx.get('prev_high'),
+                'prev_low': ctx.get('prev_low'),
+                'atr': ctx.get('atr'),
+                'momentum': ctx.get('momentum'),
+                'choppy': ctx.get('choppy'),
+                'm15_bias': ctx.get('m15_bias'),
+                'h1_bias': ctx.get('h1_bias'),
+            }
+        }
+
+    def _atr(self, candles: List[Dict[str, Any]], period: int = 14) -> float:
+        if len(candles) < 2:
+            return 1.5
+        trs = []
+        recent = candles[-period:]
+        prev_close = _cval(candles[-period - 1], 'close') if len(candles) > period else _cval(candles[0], 'close')
+        for c in recent:
+            high = _cval(c, 'high')
+            low = _cval(c, 'low')
+            tr = max(high - low, abs(high - prev_close), abs(low - prev_close))
+            trs.append(max(tr, 0.01))
+            prev_close = _cval(c, 'close')
+        return mean(trs) if trs else 1.5
+
+    def _bias(self, candles: List[Dict[str, Any]]) -> str:
+        if not candles or len(candles) < 5:
+            return 'unknown'
+        closes = [_cval(c, 'close') for c in candles[-5:]]
+        if closes[-1] > closes[0]:
+            return 'bullish'
+        if closes[-1] < closes[0]:
+            return 'bearish'
+        return 'flat'
+
+    def _is_choppy(self, candles: List[Dict[str, Any]]) -> bool:
+        if len(candles) < 8:
+            return False
+        recent = candles[-8:]
+        ranges = [max(_cval(c, 'high') - _cval(c, 'low'), 0.01) for c in recent]
+        avg_range = mean(ranges)
+        high = max(_cval(c, 'high') for c in recent)
+        low = min(_cval(c, 'low') for c in recent)
+        total_range = max(high - low, 0.01)
+        closes = [_cval(c, 'close') for c in recent]
+        net_move = abs(closes[-1] - closes[0])
+        return (net_move < avg_range * 0.8 and total_range < avg_range * 3.2)

@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bullish menembus high sebelumnya dengan konfirmasi momentum bullish.",
+            "sl_logic": "Stop loss ditempatkan di bawah low terbaru atau di bawah level sentuh_low, dengan buffer ATR.",
+            "why_this_method": "Metode ini menggabungkan konfirmasi sentuh_low (sweep likuiditas) dengan break_bull (pembalikan) dan FVG (ketidakseimbangan harga) pada bias bullish M15, yang menunjukkan potensi pembalikan kuat.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena sinyal palsu.",
+                "Hindari saat h1_bias bearish karena bias lebih besar bertentangan."
+            ],
+            "confidence_reason": "Kombinasi sentuh_low + break_bull + FVG pada bias bullish memberikan konfirmasi multiple time frame yang kuat untuk entry buy."
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_RETEST_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "sentuh_high == true",
+                "break_bear == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah candle bearish menembus low sebelumnya dengan momentum bearish.",
+            "sl_logic": "Stop loss ditempatkan di atas high terbaru atau di atas level sentuh_high, dengan buffer ATR.",
+            "why_this_method": "Metode ini memanfaatkan retest FVG setelah sentuh_high (sweep likuiditas) dan break_bear (konfirmasi penolakan) pada bias bearish M15, menunjukkan tekanan jual berkelanjutan.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena sinyal palsu.",
+                "Hindari saat h1_bias bullish karena bias lebih besar bertentangan."
+            ],
+            "confidence_reason": "Kombinasi FVG + sentuh_high + break_bear pada bias bearish memberikan konfirmasi multiple time frame yang kuat untuk entry sell."
+        },
+        {
+            "name": "AI_METHOD_2025_003_OB_BOUNCE_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ob == true",
+                "ote == true",
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "momentum == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bullish menembus high sebelumnya dengan konfirmasi momentum bullish.",
+            "sl_logic": "Stop loss ditempatkan di bawah low terbaru atau di bawah level sentuh_low, dengan buffer ATR.",
+            "why_this_method": "Metode ini menggabungkan konfirmasi Order Block (OB) di area Optimal Trade Entry (OTE) dengan sentuh_low (sweep likuiditas) dan break_bull (pembalikan) pada bias bullish M15, menunjukkan potensi pantulan kuat dari area support kunci.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena sinyal palsu.",
+                "Hindari saat momentum bearish karena bertentangan dengan entry buy."
+            ],
+            "confidence_reason": "Kombinasi OB + OTE + sentuh_low + break_bull pada bias bullish memberikan konfirmasi multiple time frame yang kuat untuk entry buy."
+        }
+    ]
+}

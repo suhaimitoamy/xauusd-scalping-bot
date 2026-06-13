@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "fvgs == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BEARISH'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2 candle bullish berturut-turut setelah entry",
+            "sl_logic": "Stop loss di bawah low terbaru sebelum entry (1 ATR)",
+            "why_this_method": "Menggabungkan sentuh_low (sweep likuiditas) dengan break_bull (reclaim) dan konfirmasi momentum bullish serta bias M15 bullish, didukung adanya FVG untuk entry optimal. Ini menangkap reversal dari sell-side liquidity grab.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena sinyal palsu",
+                "Hindari jika recent_events menunjukkan BREAK_BEARISH"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan konsep smart money: sweep likuiditas di low, kemudian harga kembali ke atas (reclaim) dengan konfirmasi momentum dan bias, serta adanya FVG sebagai area imbalance yang sering diisi harga."
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "momentum == 'bearish'",
+                "h1_bias == 'bearish'",
+                "sentuh_high == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BULLISH'"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah 2 candle bearish berturut-turut setelah entry",
+            "sl_logic": "Stop loss di atas high terbaru sebelum entry (1 ATR)",
+            "why_this_method": "Menggabungkan break_bear (penembusan bearish) dengan sentuh_high (sweep likuiditas sisi atas) dan konfirmasi momentum bearish serta bias H1 bearish, didukung FVG untuk entry presisi. Ini menangkap kelanjutan tren bearish setelah likuiditas terkumpul di high.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi",
+                "Hindari jika recent_events menunjukkan BREAK_BULLISH"
+            ],
+            "confidence_reason": "Metode ini mengikuti prinsip smart money: harga menyentuh high (mengumpulkan likuiditas), kemudian break bear (distribusi) dengan konfirmasi momentum dan bias, serta FVG sebagai area yang akan diisi oleh harga."
+        },
+        {
+            "name": "AI_METHOD_2025_003_OTE_MOMENTUM_BREAK_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ote == true",
+                "break_bull == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "body_ratio > 0.5"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BEARISH'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2 candle bullish berturut-turut setelah entry",
+            "sl_logic": "Stop loss di bawah low candle entry (1 ATR)",
+            "why_this_method": "Menggabungkan OTE (Optimal Trade Entry) dengan break_bull (konfirmasi breakout) dan momentum bullish serta bias M15 bullish, ditambah body_ratio > 0.5 untuk memastikan candle kuat. Ini menangkap entry optimal setelah retest area order block.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi",
+                "Hindari jika recent_events menunjukkan BREAK_BEARISH"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan konsep OTE sebagai area retest optimal, dikonfirmasi oleh break_bull dan momentum bullish, dengan body ratio besar menunjukkan kekuatan candle."
+        }
+    ]
+}

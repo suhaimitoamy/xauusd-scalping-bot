@@ -1,0 +1,19 @@
+V8 Antigravity Method Agent Upgrade
+
+Yang diubah:
+1. config.yaml > adaptive_brain.main_methods diganti ke 22 metode utama terakhir.
+2. Semua metode utama dimasukkan ke method_governance.locked_methods.
+3. Mode governance = report_only.
+4. AI/Antigravity tidak auto-edit metode; hanya audit dan rekomendasi.
+5. RR report memakai TP2-only RR 1:2.
+6. tools/schedule_method_report.py ditambahkan untuk laporan weekly/monthly.
+7. antigravity_schedules/ berisi prompt weekly/monthly untuk Scheduled Tasks.
+8. RR2_GROUP_SELL ditambahkan sebagai metode terkunci.
+9. Exit calculation untuk method utama diarahkan ke TP1=1R dan TP2=2R.
+
+Yang tidak diubah:
+- Struktur live runner.
+- Telegram interactive.
+- Storage schema.
+- Existing notifier.
+- Existing simulator files.

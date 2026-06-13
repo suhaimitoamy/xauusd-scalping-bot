@@ -1,0 +1,79 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_003_FVG_RECLAIM_BREAK_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "sentuh_low == true",
+                "break_bull == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "body_ratio > 0.5"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BEARISH'",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah 2x ATR dari entry.",
+            "sl_logic": "Stop loss di bawah swing low terbaru atau 1x ATR dari entry.",
+            "why_this_method": "Menggabungkan sentuhan low, break bullish, dan FVG aktif dengan bias M15 bullish untuk konfirmasi reversal kuat.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi atau ada break bearish baru."
+            ],
+            "confidence_reason": "Konfirmasi multiple time frame dan price action solid."
+        },
+        {
+            "name": "AI_METHOD_2025_004_BREAKER_FVG_BEAR_MOMENTUM_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "sentuh_high == true",
+                "break_bear == true",
+                "momentum == 'bearish'",
+                "m15_bias == 'bearish'",
+                "body_ratio > 0.6"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BULLISH'",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah 2x ATR dari entry.",
+            "sl_logic": "Stop loss di atas swing high terbaru atau 1x ATR dari entry.",
+            "why_this_method": "Memanfaatkan sentuhan high, break bear, dan FVG dengan momentum bearish serta bias M15 bearish untuk entry sell berkualitas.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi atau ada break bullish baru."
+            ],
+            "confidence_reason": "Konfirmasi multiple time frame dan price action kuat."
+        },
+        {
+            "name": "AI_METHOD_2025_005_SWEEP_RECLAIM_FVG_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "sentuh_low == true",
+                "break_bull == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "h1_bias == 'bullish'",
+                "body_ratio > 0.4"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BEARISH'"
+            ],
+            "tp_logic": "Take profit pada level resistance berikutnya atau 2.5x ATR.",
+            "sl_logic": "Stop loss di bawah low terbaru atau 1.5x ATR.",
+            "why_this_method": "Menggabungkan sweep low, reclaim bullish, dan FVG dengan bias bullish di M15 dan H1 untuk entry buy dengan probabilitas tinggi.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi atau ada break bearish baru."
+            ],
+            "confidence_reason": "Konfirmasi multiple time frame dan price action solid."
+        }
+    ]
+}

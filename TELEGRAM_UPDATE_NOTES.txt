@@ -1,0 +1,16 @@
+TELEGRAM UPDATE
+
+Command baru:
+/start atau /menu  = tampilkan tombol menu
+/chat_id atau /id  = cek Chat ID dan User ID
+/methods           = list 9 method high-WR aktif
+/bot_health        = cek status bot, Telegram, high-WR mode
+/telegram_status   = cek token, chat id, admin id, target kirim
+/test_telegram     = tes kirim pesan
+
+ENV Telegram:
+TELEGRAM_BOT_TOKEN=token dari BotFather
+TELEGRAM_CHAT_ID=chat utama
+TELEGRAM_DISCUSSION_CHAT_ID=opsional, target kirim utama jika diisi
+TELEGRAM_ADMIN_IDS=opsional, isi user id admin dipisah koma
+TELEGRAM_PARSE_MODE=opsional, kosongkan agar aman

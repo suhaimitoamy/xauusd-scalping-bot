@@ -1,0 +1,23 @@
+MAIN METHODS UPDATE
+
+Promoted to main methods:
+- METHOD_CRT_H4_SWEEP_BUY
+- METHOD_CRT_H4_SWEEP_SELL
+- METHOD_CRT_D1_SWEEP_BUY
+- METHOD_CRT_D1_SWEEP_SELL
+- METHOD_H1_BREAK_BUY
+- METHOD_H1_BREAK_SELL
+- METHOD_HW_BREAK_12_BUY
+- METHOD_HW_BREAK_12_SELL
+- METHOD_HW_BREAK_20_BUY
+- METHOD_HW_BREAK_20_SELL
+- METHOD_M1_SWEEP_6
+- METHOD_M1_SWEEP_8
+- METHOD_M5_BREAK_6
+- METHOD_M5_BREAK_8
+- METHOD_M5_BREAK_12
+
+Notes:
+- Only methods inside adaptive_brain.main_methods are allowed to create signals.
+- Methods not in main_methods remain in the code but are not promoted as main active methods.
+- 100% WR methods were selected from may_methods_report.csv with closed trades > 0.

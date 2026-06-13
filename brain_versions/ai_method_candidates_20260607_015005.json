@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bullish konfirmasi",
+            "sl_logic": "Stop loss di bawah low terbaru setelah entry",
+            "why_this_method": "Menggabungkan sentuh_low (sweep likuiditas) dengan break_bull (reclaim) dan konfirmasi FVG serta bias bullish, meningkatkan probabilitas reversal",
+            "avoid_conditions": [
+                "saat choppy tinggi",
+                "saat h1_bias bearish"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan kombinasi konfirmasi price action yang kuat (sweep + reclaim + FVG) dengan bias timeframe lebih tinggi, mirip dengan pola sukses ICT Unicorn Buy (50% WR) namun dengan filter tambahan"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAKER_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "ob == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah candle bearish konfirmasi",
+            "sl_logic": "Stop loss di atas high terbaru setelah entry",
+            "why_this_method": "Menggabungkan break_bear (penembusan support) dengan FVG dan Order Block sebagai konfirmasi supply, serta bias bearish, meningkatkan probabilitas kelanjutan downtrend",
+            "avoid_conditions": [
+                "saat choppy tinggi",
+                "saat h1_bias bullish"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan kombinasi konfirmasi supply (break_bear + FVG + OB) dengan bias bearish, mirip dengan pola sukses ICT Turtle Soup Sell (45.23% WR) namun dengan filter tambahan FVG dan OB"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OTE_MOMENTUM_REVERSAL_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ote == true",
+                "momentum == 'bullish'",
+                "sentuh_low == true",
+                "body_ratio > 1.5",
+                "m15_bias == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bullish konfirmasi",
+            "sl_logic": "Stop loss di bawah low terbaru setelah entry",
+            "why_this_method": "Menggabungkan OTE (Optimal Trade Entry) dengan momentum bullish dan sentuh_low (sweep likuiditas) serta body_ratio besar (kekuatan candle), meningkatkan probabilitas reversal",
+            "avoid_conditions": [
+                "saat choppy tinggi",
+                "saat break_bear terjadi"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan kombinasi konfirmasi reversal (OTE + momentum bullish + sentuh_low) dengan kekuatan candle, mirip dengan pola sukses Pattern Exhaust Down (56.25% WR) namun dengan filter OTE"
+        }
+    ]
+}

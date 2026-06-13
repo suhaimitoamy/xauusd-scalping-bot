@@ -1,0 +1,443 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di bawah low yang baru terbentuk atau 1x ATR",
+            "why_this_method": "Menggabungkan penyapuan likuiditas (sentuh_low) dengan reklamasi bullish (break_bull) dan konfirmasi FVG serta momentum, meningkatkan probabilitas kemenangan dibanding metode individual.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Menggunakan konfirmasi multi-timeframe dan price action yang kuat"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "sentuh_high == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau ketika momentum berubah menjadi bullish.",
+            "sl_logic": "Stop loss di atas high terbaru setelah entry.",
+            "why_this_method": "Memanfaatkan penembusan bearish yang dikonfirmasi oleh FVG dan sentuhan level tinggi, dengan bias bearish pada timeframe 15 menit. Pola ini sering menghasilkan kelanjutan tren bearish.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bullish"
+            ],
+            "confidence_reason": "Break bear + FVG + sentuh_high + m15_bearish memberikan konfirmasi kuat untuk entry sell dengan probabilitas tinggi."
+        },
+        {
+            "name": "AI_METHOD_2025_003_OTE_REVERSAL_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ote == true",
+                "sentuh_low == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "body_ratio > 0.5"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau ketika momentum berubah menjadi bearish.",
+            "sl_logic": "Stop loss di bawah low terbaru setelah entry.",
+            "why_this_method": "Menggabungkan entry optimal (OTE) dengan sentuhan level rendah dan konfirmasi momentum bullish serta bias timeframe 15 menit. Body ratio yang besar menunjukkan kekuatan candle.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat terjadi break bearish"
+            ],
+            "confidence_reason": "OTE + sentuh_low + momentum bullish + m15_bullish + body_ratio besar memberikan sinyal reversal yang kuat dengan risiko rendah."
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "break_bear == true",
+                "h1_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "ote == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "m15_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau saat momentum berubah menjadi bullish.",
+            "sl_logic": "Stop loss di atas high terbaru setelah break_bear.",
+            "why_this_method": "Memanfaatkan FVG sebagai area imbalance yang sering diisi, dikonfirmasi oleh break_bear dan bias bearish pada H1 serta OTE, mirip dengan pola turtle soup sell yang efektif.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena pergerakan tidak terarah."
+            ],
+            "confidence_reason": "FVG + break_bear + OTE + bias bearish H1 memberikan sinyal kuat untuk kelanjutan bearish."
+        },
+        {
+            "name": "AI_METHOD_2025_003_OTE_MOMENTUM_REVERSAL",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ote == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "body_ratio > 1.5",
+                "recent_events contains 'SENTUH_LOW'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bearish'",
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bearish pertama setelah entry.",
+            "sl_logic": "Stop loss di bawah level OTE atau di bawah swing low terbaru.",
+            "why_this_method": "Menggabungkan entry optimal (OTE) dengan momentum bullish dan bias M15, serta konfirmasi body candle yang besar untuk menunjukkan kekuatan reversal.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi atau bias H1 bearish."
+            ],
+            "confidence_reason": "Metode ini memanfaatkan area optimal entry yang didukung oleh momentum dan bias timeframe lebih rendah, meningkatkan probabilitas reversal yang sukses."
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_RETEST_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "sentuh_high == true",
+                "break_bear == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah momentum melemah",
+            "sl_logic": "Stop loss di atas high terbaru sebelum entry",
+            "why_this_method": "Memanfaatkan retest FVG setelah sentuhan level tinggi dan penembusan bearish, dengan konfirmasi bias bearish pada timeframe 15 menit, meningkatkan probabilitas kelanjutan tren turun",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bullish"
+            ],
+            "confidence_reason": "Kombinasi FVG + sentuh_high + break_bear + momentum bearish memberikan konfirmasi multiple yang kuat untuk entry sell"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OB_BOUNCE_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ob == true",
+                "ote == true",
+                "m15_bias == 'bullish'",
+                "momentum == 'bullish'",
+                "body_ratio > 1.5"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bearish signifikan muncul",
+            "sl_logic": "Stop loss di bawah order block atau di bawah level OTE dikurangi 1 ATR",
+            "why_this_method": "Menggabungkan konfirmasi order block dan optimal trade entry dengan bias bullish pada M15 dan momentum bullish, serta body candle yang besar menunjukkan kekuatan buyer",
+            "avoid_conditions": [
+                "Saat choppy tinggi (>0.7)",
+                "Saat terjadi break_bear yang membatalkan struktur bullish"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan area order block yang merupakan level support kuat dalam Smart Money, dikombinasikan dengan OTE dan konfirmasi momentum bullish, memberikan entry dengan risk-reward yang baik"
+        },
+        {
+            "name": "AI_METHOD_2025_003_UNICORN_MOMENTUM_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_high == true",
+                "break_bear == true",
+                "momentum == 'bearish'",
+                "ob == true",
+                "m15_bias == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau saat momentum berubah menjadi bullish.",
+            "sl_logic": "Stop loss di atas high terbaru setelah sentuh_high.",
+            "why_this_method": "Menggabungkan sentuh_high (sweep likuiditas) dengan break_bear (rejection) dan konfirmasi momentum bearish serta adanya Order Block, meniru pola ICT Unicorn Sell yang memiliki winrate tinggi.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena sinyal palsu sering terjadi."
+            ],
+            "confidence_reason": "Sentuh_high + break_bear + OB + momentum bearish memberikan konfirmasi kuat pembalikan bearish."
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "sentuh_high == true"
+            ],
+            "invalid_if": [
+                "choppy > 0.6",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah candle bullish signifikan muncul",
+            "sl_logic": "Stop loss di atas high terbaru atau di atas level sentuh_high ditambah 1 ATR",
+            "why_this_method": "Menggabungkan penembusan bearish dengan konfirmasi FVG dan bias bearish pada M15, serta penyentuhan level tinggi (sweep) yang menambah keyakinan akan kelanjutan penurunan",
+            "avoid_conditions": [
+                "Saat choppy sedang (>0.6)",
+                "Saat bias H1 bullish"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan aksi harga yang menyapu likuiditas (sentuh_high) dan langsung turun dengan konfirmasi break_bear dan FVG, yang sering menjadi sinyal kelanjutan tren bearish dalam konsep Smart Money"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAKER_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_high == true",
+                "break_bear == true",
+                "h1_bias == 'bearish'",
+                "fvgs == true",
+                "momentum == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "m15_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di atas high yang baru terbentuk atau 1x ATR",
+            "why_this_method": "Memanfaatkan penyapuan high (sentuh_high) diikuti breakdown bearish (break_bear) dengan konfirmasi FVG dan bias H1 bearish, meningkatkan keandalan sinyal jual.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias M15 bullish"
+            ],
+            "confidence_reason": "Konfirmasi dari bias H1 dan price action bearish yang kuat"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OB_RETEST_MOMENTUM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ob == true",
+                "ote == true",
+                "momentum == 'bullish'",
+                "body_ratio > 0.5",
+                "m15_bias == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di bawah order block atau 1x ATR",
+            "why_this_method": "Menggabungkan retest order block (ob) dengan optimal trade entry (ote) dan momentum bullish, serta body_ratio besar menunjukkan kekuatan candle, meningkatkan probabilitas kemenangan.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Konfirmasi dari order block, OTE, dan momentum yang kuat"
+        },
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY_SANDBOX_RELAXED",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_low == true",
+                "momentum == 'bullish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di bawah low yang baru terbentuk atau 1x ATR",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAKER_SELL_SANDBOX_RELAXED",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_high == true",
+                "momentum == 'bearish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bull == true"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di atas high yang baru terbentuk atau 1x ATR",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        },
+        {
+            "name": "AI_METHOD_2025_003_FVG_BREAKER_RECLAIM_SELL_SANDBOX_RELAXED",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_high == true",
+                "momentum == 'bearish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bull == true"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah harga turun 1.5x ATR",
+            "sl_logic": "Stop loss di atas swing high terbaru + spread",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        },
+        {
+            "name": "AI_METHOD_2025_004_SWEEP_RECLAIM_FVG_BUY_SANDBOX_RELAXED",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_low == true",
+                "momentum == 'bullish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah harga naik 1.5x ATR",
+            "sl_logic": "Stop loss di bawah swing low terbaru - spread",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        },
+        {
+            "name": "AI_METHOD_2025_003_FVG_RECLAIM_BREAK_BUY_SANDBOX_RELAXED",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_low == true",
+                "momentum == 'bullish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah 2x ATR dari entry.",
+            "sl_logic": "Stop loss di bawah swing low terbaru atau 1x ATR dari entry.",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        },
+        {
+            "name": "AI_METHOD_2025_004_BREAKER_FVG_BEAR_MOMENTUM_SELL_SANDBOX_RELAXED",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_high == true",
+                "momentum == 'bearish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bull == true"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah 2x ATR dari entry.",
+            "sl_logic": "Stop loss di atas swing high terbaru atau 1x ATR dari entry.",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        },
+        {
+            "name": "AI_METHOD_2025_005_SWEEP_RECLAIM_FVG_BUY_SANDBOX_RELAXED",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_low == true",
+                "momentum == 'bullish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance berikutnya atau 2.5x ATR.",
+            "sl_logic": "Stop loss di bawah low terbaru atau 1.5x ATR.",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        },
+        {
+            "name": "AI_METHOD_2025_004_BREAK_BEAR_FVG_SELL_SANDBOX_RELAXED",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026_sandbox_relaxed",
+            "conditions": [
+                "sentuh_high == true",
+                "momentum == 'bearish'",
+                "body_ratio >= 0.20"
+            ],
+            "invalid_if": [
+                "break_bull == true"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah momentum berubah (momentum != bearish)",
+            "sl_logic": "Stop loss di atas high terbaru sebelum entry (ditambah 1 ATR)",
+            "why_this_method": "Sandbox relaxed variant: memakai variabel yang benar-benar tersedia di BrainEngine dan mengurangi konfirmasi wajib agar candidate bisa menghasilkan trade awal.",
+            "avoid_conditions": [
+                "Tidak memakai ob/ote karena belum tersedia di sandbox BrainEngine",
+                "Tidak memakai choppy sebagai invalid_if awal agar tidak memblokir semua entry"
+            ],
+            "confidence_reason": "Validasi awal sandbox: sweep level + momentum candle + body_ratio minimum"
+        }
+    ],
+    "sandbox_meta": {
+        "updated_at": "2026-06-09T07:15:05.453495",
+        "source_candidate_file": "/storage/emulated/0/Download/aplikasi/xauusd-scalping-bot/brain_versions/ai_method_candidates_20260609_071505.json",
+        "mode": "append_relaxed_candidates",
+        "added_relaxed_methods": [
+            "AI_METHOD_2025_004_BREAK_BEAR_FVG_SELL_SANDBOX_RELAXED"
+        ],
+        "skipped_candidates": []
+    }
+}

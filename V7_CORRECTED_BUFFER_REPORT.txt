@@ -1,0 +1,25 @@
+V7 CORRECTED BUFFER REPORT
+
+Correction:
+- CRT H4 buffer changed from 10-20 point to 1-2 point.
+- CRT D1 buffer changed from 10-20 point to 1-2 point.
+- H1 Break remains 5-10 point as requested.
+- 1 point = $1.
+
+Corrected raw simulation on M1 202501-202509, no bias filter:
+
+CRT H4 buffer 1-2 point:
+471 trades
+428W / 43L
+WR 90.87%
+BUY: 232 trades, 213W / 19L, WR 91.81%
+SELL: 239 trades, 215W / 24L, WR 89.96%
+
+CRT D1 buffer 1-2 point:
+221 trades
+207W / 14L
+WR 93.67%
+BUY: 98 trades, 89W / 9L, WR 90.82%
+SELL: 123 trades, 118W / 5L, WR 95.93%
+
+Previous 10-20 point simulation is invalid for CRT H4/D1.

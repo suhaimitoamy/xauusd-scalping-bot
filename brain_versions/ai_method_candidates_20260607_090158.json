@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di bawah low yang baru terbentuk atau 1x ATR",
+            "why_this_method": "Menggabungkan penyapuan likuiditas (sentuh_low) dengan reklamasi bullish (break_bull) dan konfirmasi FVG serta momentum, meningkatkan probabilitas kemenangan dibanding metode individual.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Menggunakan konfirmasi multi-timeframe dan price action yang kuat"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAKER_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_high == true",
+                "break_bear == true",
+                "h1_bias == 'bearish'",
+                "fvgs == true",
+                "momentum == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "m15_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di atas high yang baru terbentuk atau 1x ATR",
+            "why_this_method": "Memanfaatkan penyapuan high (sentuh_high) diikuti breakdown bearish (break_bear) dengan konfirmasi FVG dan bias H1 bearish, meningkatkan keandalan sinyal jual.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias M15 bullish"
+            ],
+            "confidence_reason": "Konfirmasi dari bias H1 dan price action bearish yang kuat"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OB_RETEST_MOMENTUM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ob == true",
+                "ote == true",
+                "momentum == 'bullish'",
+                "body_ratio > 0.5",
+                "m15_bias == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2x ATR",
+            "sl_logic": "Stop loss di bawah order block atau 1x ATR",
+            "why_this_method": "Menggabungkan retest order block (ob) dengan optimal trade entry (ote) dan momentum bullish, serta body_ratio besar menunjukkan kekuatan candle, meningkatkan probabilitas kemenangan.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Konfirmasi dari order block, OTE, dan momentum yang kuat"
+        }
+    ]
+}

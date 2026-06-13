@@ -1,0 +1,215 @@
+{
+  "started_at": "2026-06-08T16:42:43.107169+00:00",
+  "start_month": "202501",
+  "end_month": "202605",
+  "cycles": [
+    {
+      "cycle": 1,
+      "months": [
+        {
+          "month": "202501",
+          "ending_balance": 4154.9,
+          "net_pl": 1154.9,
+          "profit_factor": 2.0797,
+          "max_dd_pct": 6.1035,
+          "total_trades": 28
+        },
+        {
+          "month": "202502",
+          "ending_balance": 3390.83,
+          "net_pl": 390.83,
+          "profit_factor": 1.2264,
+          "max_dd_pct": 8.3079,
+          "total_trades": 41
+        },
+        {
+          "month": "202503",
+          "ending_balance": 5139.93,
+          "net_pl": 2139.93,
+          "profit_factor": 2.5126,
+          "max_dd_pct": 6.2147,
+          "total_trades": 41
+        },
+        {
+          "month": "202504",
+          "ending_balance": 2705.51,
+          "net_pl": -294.49,
+          "profit_factor": 0.8728,
+          "max_dd_pct": 23.3706,
+          "total_trades": 61
+        },
+        {
+          "month": "202505",
+          "ending_balance": 3733.52,
+          "net_pl": 733.52,
+          "profit_factor": 1.3913,
+          "max_dd_pct": 9.6079,
+          "total_trades": 48
+        },
+        {
+          "month": "202506",
+          "ending_balance": 2947.16,
+          "net_pl": -52.84,
+          "profit_factor": 0.9717,
+          "max_dd_pct": 10.3544,
+          "total_trades": 45
+        },
+        {
+          "month": "202507",
+          "ending_balance": 2721.59,
+          "net_pl": -278.41,
+          "profit_factor": 0.8564,
+          "max_dd_pct": 20.3054,
+          "total_trades": 46
+        },
+        {
+          "month": "202508",
+          "ending_balance": 3882.86,
+          "net_pl": 882.86,
+          "profit_factor": 1.4705,
+          "max_dd_pct": 13.1874,
+          "total_trades": 49
+        },
+        {
+          "month": "202509",
+          "ending_balance": 3390.83,
+          "net_pl": 390.83,
+          "profit_factor": 1.2345,
+          "max_dd_pct": 7.7632,
+          "total_trades": 41
+        },
+        {
+          "month": "202510",
+          "ending_balance": 4526.28,
+          "net_pl": 1526.28,
+          "profit_factor": 1.5886,
+          "max_dd_pct": 18.4861,
+          "total_trades": 62
+        },
+        {
+          "month": "202511",
+          "ending_balance": 3667.53,
+          "net_pl": 667.53,
+          "profit_factor": 1.3845,
+          "max_dd_pct": 9.8218,
+          "total_trades": 43
+        },
+        {
+          "month": "202512",
+          "ending_balance": 4135.25,
+          "net_pl": 1135.25,
+          "profit_factor": 1.6865,
+          "max_dd_pct": 9.6079,
+          "total_trades": 40
+        },
+        {
+          "month": "202601",
+          "ending_balance": 4047.75,
+          "net_pl": 1047.75,
+          "profit_factor": 1.5809,
+          "max_dd_pct": 9.6079,
+          "total_trades": 44
+        },
+        {
+          "month": "202602",
+          "ending_balance": 2996.64,
+          "net_pl": -3.36,
+          "profit_factor": 0.9984,
+          "max_dd_pct": 17.8995,
+          "total_trades": 53
+        },
+        {
+          "month": "202603",
+          "ending_balance": 4409.83,
+          "net_pl": 1409.83,
+          "profit_factor": 1.2478,
+          "max_dd_pct": 16.7239,
+          "total_trades": 128
+        },
+        {
+          "month": "202604",
+          "ending_balance": 19166.24,
+          "net_pl": 16166.24,
+          "profit_factor": 1.3473,
+          "max_dd_pct": 20.2109,
+          "total_trades": 420
+        },
+        {
+          "month": "202605",
+          "ending_balance": 53453.52,
+          "net_pl": 50453.52,
+          "profit_factor": 1.8012,
+          "max_dd_pct": 21.714,
+          "total_trades": 431
+        }
+      ],
+      "best_method_by_pnl": {
+        "method": "METHOD_ICT_UNICORN_SELL",
+        "trades": 111,
+        "wins": 59,
+        "losses": 52,
+        "net_pl": 20245.4,
+        "gross_profit": 30956.809999999998,
+        "gross_loss": 10711.41,
+        "max_dd_pct": 21.714,
+        "profit_factor": 2.890077963592095
+      },
+      "worst_method_by_drawdown": {
+        "method": "METHOD_PATTERN_HAMMER",
+        "trades": 719,
+        "wins": 293,
+        "losses": 426,
+        "net_pl": 13088.909999999996,
+        "gross_profit": 44451.49999999999,
+        "gross_loss": 31362.61,
+        "max_dd_pct": 23.3706,
+        "profit_factor": 1.4173405848556606
+      },
+      "status_changes": [
+        {
+          "method": "METHOD_PATTERN_HAMMER",
+          "from": "COOLDOWN",
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY_SANDBOX_RELAXED",
+          "from": "COOLDOWN",
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "AI_METHOD_2025_002_FVG_BREAKER_SELL_SANDBOX_RELAXED",
+          "from": "COOLDOWN",
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_ICT_TURTLE_SOUP_SELL",
+          "from": "COOLDOWN",
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_PATTERN_EXHAUST_UP",
+          "from": "COOLDOWN",
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_ICT_UNICORN_SELL",
+          "from": "COOLDOWN",
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_PATTERN_COMPRESS_BEAR",
+          "from": "COOLDOWN",
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        }
+      ]
+    }
+  ],
+  "db_backup": "/storage/emulated/0/Download/aplikasi/xauusd-scalping-bot/data/xauusd_bot.sqlite.bak_pnl_loop_20260609_004242"
+}

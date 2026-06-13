@@ -1,0 +1,17 @@
+TERMUX RUN COMMANDS - V7
+
+cd ~
+rm -rf xauusd-scalping-bot
+unzip -o /sdcard/Download/xauusd_scalping_bot_v7_full.zip -d .
+cd xauusd-scalping-bot
+pip install -r requirements.txt
+nano .env
+python3 main.py
+
+Commands:
+/methods
+/m1_signal
+/m5_signal
+/alerts
+/market_context
+/supply_demand

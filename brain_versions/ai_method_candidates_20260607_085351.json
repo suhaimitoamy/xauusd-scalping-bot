@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah momentum melemah",
+            "sl_logic": "Stop loss di bawah low terbaru setelah entry",
+            "why_this_method": "Menggabungkan sentuh_low (sweep likuiditas) dengan break_bull dan konfirmasi FVG serta bias bullish, mengikuti pola sukses dari metode ICT Unicorn dan Turtle Soup yang memiliki winrate lebih tinggi",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Kombinasi konfirmasi price action yang kuat dengan bias multi-timeframe mendukung"
+        },
+        {
+            "name": "AI_METHOD_2025_002_BREAK_BEAR_FVG_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "sentuh_high == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah momentum melemah",
+            "sl_logic": "Stop loss di atas high terbaru setelah entry",
+            "why_this_method": "Menggabungkan break_bear (penembusan bearish) dengan FVG dan sentuh_high (sweep likuiditas) serta bias bearish, mengikuti pola sukses dari metode ICT Turtle Soup Sell dan Compress Bear yang memiliki winrate di atas 45%",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bullish"
+            ],
+            "confidence_reason": "Konfirmasi multiple price action yang kuat dengan bias multi-timeframe mendukung"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OTE_FVG_MOMENTUM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ote == true",
+                "fvgs == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "body_ratio > 0.5"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah momentum melemah",
+            "sl_logic": "Stop loss di bawah low terbaru setelah entry",
+            "why_this_method": "Menggabungkan OTE (Optimal Trade Entry) dengan FVG dan momentum bullish serta body_ratio yang besar, mengikuti pola sukses dari metode ICT Unicorn Buy dan Compress Bull yang memiliki winrate di atas 47%",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat terjadi break_bear"
+            ],
+            "confidence_reason": "Kombinasi entry optimal dengan konfirmasi price action yang kuat"
+        }
+    ]
+}

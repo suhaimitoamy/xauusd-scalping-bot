@@ -1,0 +1,21 @@
+{
+    "cycle": 3,
+    "month": "202503",
+    "simulation_id": "sim_20260607_075238",
+    "starting_balance": 3000.0,
+    "ending_balance": 3000.0,
+    "net_pl": 0.0,
+    "net_pl_pct": 0.0,
+    "max_dd_pct": 0,
+    "winrate": 0.0,
+    "total_trades": 0,
+    "wins": 0,
+    "losses": 0,
+    "generated_candidates_file": "brain_versions/ai_method_candidates_20260607_080329.json",
+    "valid_candidates_added": [
+        "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+        "AI_METHOD_2025_002_FVG_RETEST_SELL",
+        "AI_METHOD_2025_003_OB_BOUNCE_BUY"
+    ],
+    "rejected_candidates": []
+}

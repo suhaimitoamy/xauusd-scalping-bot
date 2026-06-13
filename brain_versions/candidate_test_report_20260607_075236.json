@@ -1,0 +1,440 @@
+{
+  "generated_at": "2026-06-07T07:52:36.696146",
+  "files_tested": 8,
+  "total_candidates": 24,
+  "testable_count": 21,
+  "unsupported_count": 3,
+  "invalid_count": 0,
+  "results": [
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_010119.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_REVERSE_TURTLE_SOUP_SELL",
+          "status": "UNSUPPORTED_CONDITION",
+          "reason": "Candidate menggunakan indikator/timeframe yang tidak tersedia di bot engine",
+          "valid_conditions": [
+            "Harga telah menembus level support yang jelas dan kemudian dengan cepat kembali ke atas level tersebut dalam 3 candle",
+            "Harga gagal kembali ke atas level support dalam 5 candle setelah breakout"
+          ],
+          "unsupported_conditions": [
+            "Terbentuk pola TURTLE_SOUP_SELL pada timeframe 1H atau 4H",
+            "Volume meningkat saat harga kembali ke atas support",
+            "RSI pada timeframe 1H berada di bawah 30 (oversold)",
+            "Volume menurun saat harga kembali ke atas support",
+            "Trend jangka panjang (daily) masih bearish kuat"
+          ],
+          "recommendation": "Revisi candidate: Hapus kondisi yang tidak didukung atau tolak secara manual"
+        },
+        {
+          "name": "AI_METHOD_2025_002_REVERSE_HAMMER",
+          "status": "UNSUPPORTED_CONDITION",
+          "reason": "Candidate menggunakan indikator/timeframe yang tidak tersedia di bot engine",
+          "valid_conditions": [
+            "Harga telah mencapai level resistance signifikan (swing high atau fibo 61.8%-78.6%)",
+            "Candle HAMMER diikuti oleh candle bullish kuat yang menembus resistance"
+          ],
+          "unsupported_conditions": [
+            "Terbentuk pola HAMMER pada timeframe 1H atau 4H",
+            "Volume menurun saat candle HAMMER terbentuk",
+            "RSI pada timeframe 1H di atas 70 (overbought)",
+            "Volume meningkat signifikan pada candle HAMMER (menandakan akumulasi)",
+            "Trend jangka panjang (daily) masih bullish kuat"
+          ],
+          "recommendation": "Revisi candidate: Hapus kondisi yang tidak didukung atau tolak secara manual"
+        },
+        {
+          "name": "AI_METHOD_2025_003_FILTERED_UNICORN_SELL",
+          "status": "UNSUPPORTED_CONDITION",
+          "reason": "Candidate menggunakan indikator/timeframe yang tidak tersedia di bot engine",
+          "valid_conditions": [
+            "Tidak ada divergence bearish yang jelas"
+          ],
+          "unsupported_conditions": [
+            "Terbentuk pola ICT_UNICORN_SELL pada timeframe 1H atau 4H",
+            "Konfirmasi dengan divergence bearish pada RSI atau MACD",
+            "Harga berada di atas MA200 pada timeframe 4H (trend bearish jangka menengah)",
+            "Volume meningkat saat candle pola terbentuk",
+            "Harga berada di bawah MA200 pada timeframe daily (trend bullish jangka panjang)",
+            "Volume menurun saat pola terbentuk"
+          ],
+          "recommendation": "Revisi candidate: Hapus kondisi yang tidak didukung atau tolak secara manual"
+        }
+      ]
+    },
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_010454.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "sentuh_low == true",
+            "break_bull == true",
+            "m15_bias == 'bullish'",
+            "fvgs == true",
+            "momentum == 'bullish'",
+            "choppy == true",
+            "recent_events contains 'BREAK_BEARISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR_SELL",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "break_bear == true",
+            "fvgs == true",
+            "m15_bias == 'bearish'",
+            "momentum == 'bearish'",
+            "body_ratio > 1.5",
+            "choppy == true",
+            "recent_events contains 'SENTUH_HIGH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_003_OTE_MOMENTUM_BREAK_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "ote == true",
+            "momentum == 'bullish'",
+            "break_bull == true",
+            "h1_bias == 'bullish'",
+            "sentuh_low == true",
+            "choppy == true",
+            "recent_events contains 'BREAK_BEARISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        }
+      ]
+    },
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_012325.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "sentuh_low == true",
+            "break_bull == true",
+            "momentum == 'bullish'",
+            "m15_bias == 'bullish'",
+            "fvgs == true",
+            "choppy == true",
+            "recent_events contains 'CHOPPY'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_002_FVG_RETEST_SELL",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "fvgs == true",
+            "momentum == 'bearish'",
+            "h1_bias == 'bearish'",
+            "break_bear == true",
+            "body_ratio > 0.5",
+            "choppy == true",
+            "recent_events contains 'SENTUH_HIGH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_003_OB_BOUNCE_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "ob == true",
+            "momentum == 'bullish'",
+            "m15_bias == 'bullish'",
+            "sentuh_low == true",
+            "body_ratio < 0.3",
+            "choppy == true",
+            "recent_events contains 'BREAK_BEARISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        }
+      ]
+    },
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_012932.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "sentuh_low == true",
+            "break_bull == true",
+            "momentum == 'bullish'",
+            "m15_bias == 'bullish'",
+            "fvgs == true",
+            "choppy == true",
+            "recent_events contains 'BREAK_BEARISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR_SELL",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "break_bear == true",
+            "fvgs == true",
+            "momentum == 'bearish'",
+            "h1_bias == 'bearish'",
+            "sentuh_high == true",
+            "choppy == true",
+            "recent_events contains 'BREAK_BULLISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_003_OTE_MOMENTUM_BREAK_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "ote == true",
+            "break_bull == true",
+            "momentum == 'bullish'",
+            "m15_bias == 'bullish'",
+            "body_ratio > 0.5",
+            "choppy == true",
+            "recent_events contains 'BREAK_BEARISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        }
+      ]
+    },
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_015005.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "sentuh_low == true",
+            "break_bull == true",
+            "m15_bias == 'bullish'",
+            "fvgs == true",
+            "momentum == 'bullish'",
+            "choppy == true",
+            "h1_bias == 'bearish'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_002_FVG_BREAKER_SELL",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "break_bear == true",
+            "fvgs == true",
+            "ob == true",
+            "m15_bias == 'bearish'",
+            "momentum == 'bearish'",
+            "choppy == true",
+            "h1_bias == 'bullish'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_003_OTE_MOMENTUM_REVERSAL_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "ote == true",
+            "momentum == 'bullish'",
+            "sentuh_low == true",
+            "body_ratio > 1.5",
+            "m15_bias == 'bullish'",
+            "choppy == true",
+            "break_bear == true"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        }
+      ]
+    },
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_015742.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "sentuh_low == true",
+            "break_bull == true",
+            "m15_bias == 'bullish'",
+            "fvgs == true",
+            "momentum == 'bullish'",
+            "choppy == true",
+            "h1_bias == 'bearish'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_002_FVG_BREAK_SELL",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "break_bear == true",
+            "fvgs == true",
+            "m15_bias == 'bearish'",
+            "momentum == 'bearish'",
+            "sentuh_high == true",
+            "choppy == true",
+            "h1_bias == 'bullish'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_003_OTE_REVERSAL_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "ote == true",
+            "sentuh_low == true",
+            "momentum == 'bullish'",
+            "m15_bias == 'bullish'",
+            "body_ratio > 0.5",
+            "choppy == true",
+            "break_bear == true"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        }
+      ]
+    },
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_074225.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "sentuh_low == true",
+            "break_bull == true",
+            "m15_bias == 'bullish'",
+            "fvgs == true",
+            "momentum == 'bullish'",
+            "choppy == true",
+            "h1_bias == 'bearish'",
+            "recent_events contains 'BREAK_BEARISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "break_bear == true",
+            "fvgs == true",
+            "m15_bias == 'bearish'",
+            "momentum == 'bearish'",
+            "sentuh_high == true",
+            "choppy == true",
+            "h1_bias == 'bullish'",
+            "recent_events contains 'BREAK_BULLISH'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_003_OTE_MOMENTUM_REVERSAL",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "ote == true",
+            "momentum == 'bullish'",
+            "m15_bias == 'bullish'",
+            "body_ratio > 1.5",
+            "recent_events contains 'SENTUH_LOW'",
+            "choppy == true",
+            "h1_bias == 'bearish'",
+            "break_bear == true"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        }
+      ]
+    },
+    {
+      "file": "brain_versions/ai_method_candidates_20260607_075236.json",
+      "candidates": [
+        {
+          "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "sentuh_low == true",
+            "break_bull == true",
+            "m15_bias == 'bullish'",
+            "fvgs == true",
+            "momentum == 'bullish'",
+            "choppy == true",
+            "h1_bias == 'bearish'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_002_FVG_RETEST_SELL",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "fvgs == true",
+            "sentuh_high == true",
+            "break_bear == true",
+            "m15_bias == 'bearish'",
+            "momentum == 'bearish'",
+            "choppy == true",
+            "h1_bias == 'bullish'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        },
+        {
+          "name": "AI_METHOD_2025_003_OB_BOUNCE_BUY",
+          "status": "TESTABLE",
+          "reason": "Format valid dan semua kondisi menggunakan variabel yang didukung",
+          "valid_conditions": [
+            "ob == true",
+            "ote == true",
+            "sentuh_low == true",
+            "break_bull == true",
+            "m15_bias == 'bullish'",
+            "choppy == true",
+            "momentum == 'bearish'"
+          ],
+          "unsupported_conditions": [],
+          "recommendation": "Lanjut test manual atau masukkan ke brain"
+        }
+      ]
+    }
+  ]
+}

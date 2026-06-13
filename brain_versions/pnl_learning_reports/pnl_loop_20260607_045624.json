@@ -1,0 +1,87 @@
+{
+  "started_at": "2026-06-07T04:53:44.866526",
+  "start_month": "202605",
+  "end_month": "202605",
+  "cycles": [
+    {
+      "cycle": 1,
+      "months": [
+        {
+          "month": "202605",
+          "ending_balance": 13306.4,
+          "net_pl": 10306.4,
+          "profit_factor": 1.7222,
+          "max_dd_pct": 11.4143,
+          "total_trades": 431
+        }
+      ],
+      "best_method_by_pnl": {
+        "method": "METHOD_ICT_UNICORN_SELL",
+        "trades": 57,
+        "wins": 33,
+        "losses": 24,
+        "net_pl": 3124.0009683132257,
+        "gross_profit": 3124.0009683132257,
+        "gross_loss": 0.0,
+        "max_dd_pct": 11.4143,
+        "profit_factor": 999.0
+      },
+      "worst_method_by_drawdown": {
+        "method": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY_SANDBOX_RELAXED",
+        "trades": 83,
+        "wins": 32,
+        "losses": 51,
+        "net_pl": 1264.479234973564,
+        "gross_profit": 1264.479234973564,
+        "gross_loss": 0.0,
+        "max_dd_pct": 11.4143,
+        "profit_factor": 999.0
+      },
+      "status_changes": [
+        {
+          "method": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY_SANDBOX_RELAXED",
+          "from": null,
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "AI_METHOD_2025_002_FVG_BREAKER_SELL_SANDBOX_RELAXED",
+          "from": null,
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_ICT_TURTLE_SOUP_SELL",
+          "from": null,
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_ICT_UNICORN_SELL",
+          "from": null,
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_PATTERN_COMPRESS_BEAR",
+          "from": null,
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_PATTERN_EXHAUST_UP",
+          "from": null,
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        },
+        {
+          "method": "METHOD_PATTERN_HAMMER",
+          "from": null,
+          "to": "PROBATION",
+          "note": "PNL positif, masih butuh validasi stabilitas"
+        }
+      ]
+    }
+  ],
+  "db_backup": "/storage/self/primary/Download/Aplikasi/xauusd-scalping-bot/data/xauusd_bot.sqlite.bak_pnl_loop_20260607_045344"
+}

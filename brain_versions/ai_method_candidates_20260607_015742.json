@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau ketika momentum berubah menjadi bearish.",
+            "sl_logic": "Stop loss di bawah low terbaru setelah entry.",
+            "why_this_method": "Menggabungkan sentuhan level rendah (sweep) dengan konfirmasi penembusan bullish dan FVG, didukung bias bullish pada timeframe 15 menit. Pola ini sering menghasilkan reversal yang kuat.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Kombinasi sentuh_low + break_bull + FVG + m15_bullish memberikan konfirmasi multiple yang meningkatkan probabilitas kemenangan."
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "sentuh_high == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau ketika momentum berubah menjadi bullish.",
+            "sl_logic": "Stop loss di atas high terbaru setelah entry.",
+            "why_this_method": "Memanfaatkan penembusan bearish yang dikonfirmasi oleh FVG dan sentuhan level tinggi, dengan bias bearish pada timeframe 15 menit. Pola ini sering menghasilkan kelanjutan tren bearish.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bullish"
+            ],
+            "confidence_reason": "Break bear + FVG + sentuh_high + m15_bearish memberikan konfirmasi kuat untuk entry sell dengan probabilitas tinggi."
+        },
+        {
+            "name": "AI_METHOD_2025_003_OTE_REVERSAL_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ote == true",
+                "sentuh_low == true",
+                "momentum == 'bullish'",
+                "m15_bias == 'bullish'",
+                "body_ratio > 0.5"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau ketika momentum berubah menjadi bearish.",
+            "sl_logic": "Stop loss di bawah low terbaru setelah entry.",
+            "why_this_method": "Menggabungkan entry optimal (OTE) dengan sentuhan level rendah dan konfirmasi momentum bullish serta bias timeframe 15 menit. Body ratio yang besar menunjukkan kekuatan candle.",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat terjadi break bearish"
+            ],
+            "confidence_reason": "OTE + sentuh_low + momentum bullish + m15_bullish + body_ratio besar memberikan sinyal reversal yang kuat dengan risiko rendah."
+        }
+    ]
+}

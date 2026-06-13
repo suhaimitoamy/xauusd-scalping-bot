@@ -1,0 +1,29 @@
+CONTROLLED AVERAGING BACKTEST REPORT
+
+Setting:
+- Max layers: 3
+- Layer spacing: 2.0 points
+- SL buffer after last layer: 4.0 points
+- TP1 from average entry: 1.5 points
+- TP2 from average entry: 3.0 points
+- Lot model: same lot, no martingale
+- Max total risk: 1.0%
+
+M1 202501-202509:
+202501: 35 trades, 32W / 3L, WR 91.43%, avg layers 1.49, L2+ 14, L3 3
+202502: 53 trades, 48W / 5L, WR 90.57%, avg layers 1.47, L2+ 17, L3 8
+202503: 66 trades, 62W / 4L, WR 93.94%, avg layers 1.48, L2+ 22, L3 10
+202504: 145 trades, 136W / 9L, WR 93.79%, avg layers 1.41, L2+ 40, L3 20
+202505: 121 trades, 113W / 8L, WR 93.39%, avg layers 1.40, L2+ 33, L3 16
+202506: 73 trades, 70W / 3L, WR 95.89%, avg layers 1.33, L2+ 19, L3 5
+202507: 90 trades, 86W / 4L, WR 95.56%, avg layers 1.27, L2+ 17, L3 7
+202508: 52 trades, 49W / 3L, WR 94.23%, avg layers 1.37, L2+ 14, L3 5
+202509: 119 trades, 114W / 5L, WR 95.80%, avg layers 1.37, L2+ 28, L3 16
+TOTAL: 754 trades, 710W / 44L, WR 94.16%, avg layers 1.39, L2+ 204, L3 90
+
+M5 202605:
+202605: 9 trades, 9W / 0L, WR 100.00%, avg layers 1.22, L2+ 2, L3 0
+TOTAL: 9 trades, 9W / 0L, WR 100.00%, avg layers 1.22, L2+ 2, L3 0
+
+Note:
+Backtest counts TP1 protected / partial win as win, same as bot training logic.

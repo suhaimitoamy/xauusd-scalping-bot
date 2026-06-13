@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BEARISH'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah 2 candle bullish berturut-turut",
+            "sl_logic": "Stop loss di bawah low terbaru atau di bawah level sentuh_low",
+            "why_this_method": "Menggabungkan sentuh_low (sweep likuiditas) dengan break_bull (reclaim) dan konfirmasi bias bullish M15 serta FVG untuk entry buy berkualitas tinggi",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi",
+                "Hindari saat ada break bearish baru"
+            ],
+            "confidence_reason": "Konfirmasi multiple time frame dan price action yang solid meningkatkan probabilitas keberhasilan"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "body_ratio > 1.5"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'SENTUH_HIGH'"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah 2 candle bearish berturut-turut",
+            "sl_logic": "Stop loss di atas high terbaru atau di atas level break_bear",
+            "why_this_method": "Break bearish yang dikonfirmasi oleh FVG dan bias bearish M15 serta momentum bearish memberikan sinyal sell yang kuat dengan body_ratio besar menunjukkan tekanan jual",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi",
+                "Hindari saat ada sentuh high baru"
+            ],
+            "confidence_reason": "Konfirmasi multiple faktor price action meningkatkan keandalan sinyal sell"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OTE_MOMENTUM_BREAK_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ote == true",
+                "momentum == 'bullish'",
+                "break_bull == true",
+                "h1_bias == 'bullish'",
+                "sentuh_low == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "recent_events contains 'BREAK_BEARISH'"
+            ],
+            "tp_logic": "Take profit di level resistance berikutnya atau setelah 2 candle bullish berturut-turut",
+            "sl_logic": "Stop loss di bawah low terbaru atau di bawah level OTE",
+            "why_this_method": "Menggabungkan OTE (optimal trade entry) dengan momentum bullish, break_bull, dan bias H1 bullish serta sentuh_low untuk entry buy presisi tinggi",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi",
+                "Hindari saat ada break bearish baru"
+            ],
+            "confidence_reason": "Konfirmasi multiple time frame dan price action yang kuat meningkatkan probabilitas keberhasilan"
+        }
+    ]
+}

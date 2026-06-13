@@ -1,0 +1,73 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau saat momentum berubah menjadi bearish.",
+            "sl_logic": "Stop loss di bawah low terbaru setelah sentuh_low.",
+            "why_this_method": "Menggabungkan sentuh_low (sweep likuiditas) dengan break_bull (reclaim) dan konfirmasi bias bullish pada M15 serta adanya FVG, meniru pola turtle soup buy yang sukses.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena sinyal palsu sering terjadi."
+            ],
+            "confidence_reason": "Kombinasi sentuh_low + break_bull + FVG + bias bullish memberikan konfirmasi kuat pembalikan arah."
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "break_bear == true",
+                "h1_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "ote == true"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "m15_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau saat momentum berubah menjadi bullish.",
+            "sl_logic": "Stop loss di atas high terbaru setelah break_bear.",
+            "why_this_method": "Memanfaatkan FVG sebagai area imbalance yang sering diisi, dikonfirmasi oleh break_bear dan bias bearish pada H1 serta OTE, mirip dengan pola turtle soup sell yang efektif.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena pergerakan tidak terarah."
+            ],
+            "confidence_reason": "FVG + break_bear + OTE + bias bearish H1 memberikan sinyal kuat untuk kelanjutan bearish."
+        },
+        {
+            "name": "AI_METHOD_2025_003_UNICORN_MOMENTUM_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_high == true",
+                "break_bear == true",
+                "momentum == 'bearish'",
+                "ob == true",
+                "m15_bias == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau saat momentum berubah menjadi bullish.",
+            "sl_logic": "Stop loss di atas high terbaru setelah sentuh_high.",
+            "why_this_method": "Menggabungkan sentuh_high (sweep likuiditas) dengan break_bear (rejection) dan konfirmasi momentum bearish serta adanya Order Block, meniru pola ICT Unicorn Sell yang memiliki winrate tinggi.",
+            "avoid_conditions": [
+                "Hindari saat choppy tinggi karena sinyal palsu sering terjadi."
+            ],
+            "confidence_reason": "Sentuh_high + break_bear + OB + momentum bearish memberikan konfirmasi kuat pembalikan bearish."
+        }
+    ]
+}

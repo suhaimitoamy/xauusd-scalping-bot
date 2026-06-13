@@ -1,0 +1,218 @@
+"""
+Signal Tracker for XAUUSD Scalping Signal Bot.
+Evaluates open/protected signals against current ticks to detect SL/TP hits.
+
+Lifecycle:
+ACTIVE -> PROTECTED on TP1 (PARTIAL_WIN is counted as WIN)
+PROTECTED -> CLOSED_PARTIAL_WIN if price returns to BE/protect before TP2
+ACTIVE/PROTECTED -> CLOSED_WIN on TP2
+ACTIVE -> CLOSED_LOSS only if SL is hit before TP1
+"""
+from datetime import datetime, timezone
+import logging
+import time
+from src.telegram_notifier import send_telegram_message, telegram_is_configured
+
+logger = logging.getLogger("SignalTracker")
+
+
+def notify_telegram_event(event_type, signal, current_price):
+    if not telegram_is_configured():
+        return
+
+    direction = signal['direction']
+
+    if event_type == 'SL_HIT':
+        msg = (
+            f"🛑 XAUUSD {direction} SL HIT\n"
+            f"Entry: {signal['entry_low']}-{signal['entry_high']}\n"
+            f"Current: {current_price}\n"
+            f"Result: LOSS"
+        )
+    elif event_type == 'PROTECTED':
+        msg = (
+            f"🛡️ XAUUSD {direction} PROTECT / BE HIT\n"
+            f"Current: {current_price}\n"
+            f"Result: PARTIAL_WIN (counted as WIN)"
+        )
+    elif event_type == 'TP1_HIT':
+        msg = (
+            f"🎯 XAUUSD {direction} TP1 HIT\n"
+            f"Target: {signal.get('tp1')}\n"
+            f"Current: {current_price}\n\n"
+            f"✅ **Segera geser SL ke titik Entry (Break-even)** agar posisi 100% Risk Free!\n"
+            f"Result sementara: PARTIAL_WIN (counted as WIN)"
+        )
+    elif event_type == 'TP2_HIT':
+        msg = (
+            f"🏁 XAUUSD {direction} TP2 HIT\n"
+            f"Target: {signal.get('tp2')}\n"
+            f"Current: {current_price}\n"
+            f"Result: WIN"
+        )
+    elif event_type == 'INVALIDATED':
+        msg = f"⚠️ XAUUSD SIGNAL INVALIDATED\nSignal: {direction}\nCurrent Price: {current_price}"
+    elif event_type == 'EXPIRED':
+        msg = f"⏳ XAUUSD SIGNAL EXPIRED\nSignal: {direction}\nCurrent Price: {current_price}"
+    else:
+        return
+
+    send_telegram_message(msg)
+
+
+def _event_already_fired(storage, signal_id, event_type):
+    conn = storage.get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            'SELECT 1 FROM signal_events WHERE signal_id = ? AND event_type = ?',
+            (signal_id, event_type)
+        )
+        return bool(cursor.fetchone())
+    finally:
+        conn.close()
+
+
+def _entry_price(signal):
+    low = float(signal.get('entry_low') or 0)
+    high = float(signal.get('entry_high') or 0)
+    if low and high:
+        return (low + high) / 2
+    return float(signal.get('entry') or low or high or 0)
+
+
+def _review_signal(storage, signal, sid, current_price):
+    try:
+        from src.ai_trainer import AdaptiveTrainer
+        trainer_msg = AdaptiveTrainer(storage, signal.get('symbol', 'XAU/USD')).review_closed_signal(sid, current_price)
+        logger.info(trainer_msg)
+        if telegram_is_configured():
+            send_telegram_message(trainer_msg)
+    except Exception as e:
+        logger.error(f"Adaptive trainer error: {e}")
+
+
+def _fire_event(storage, signal, event, new_status, result, current_price, dt_utc, final_for_training=False):
+    sid = signal['id']
+    if _event_already_fired(storage, sid, event):
+        return
+
+    logger.info(f"Signal {sid} ({signal['direction']}) generated event {event} at {current_price}")
+    storage.add_signal_event(sid, event, current_price, f"Price hit {current_price}", dt_utc)
+    notify_telegram_event(event, signal, current_price)
+
+    if new_status:
+        storage.update_signal_status(sid, new_status, result, dt_utc)
+        if final_for_training and result in ('WIN', 'FULL_WIN', 'LOSS', 'PARTIAL_WIN'):
+            _review_signal(storage, signal, sid, current_price)
+
+
+def track_signals(storage, current_price, timestamp_ms):
+    try:
+        open_signals = storage.get_trackable_signals()
+    except AttributeError:
+        conn = storage.get_connection()
+        try:
+            conn.row_factory = __import__('sqlite3').Row
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT * FROM signals
+                WHERE status IN ('ACTIVE', 'PROTECTED', 'TP1_HIT')
+            ''')
+            open_signals = [dict(r) for r in cursor.fetchall()]
+        finally:
+            conn.close()
+
+    if not open_signals:
+        _evaluate_no_trade_if_due(storage, current_price)
+        return
+
+    try:
+        ts = int(timestamp_ms)
+        # Incoming websocket timestamps are seconds in this project.
+        dt_utc = datetime.fromtimestamp(ts, timezone.utc).isoformat()
+    except (ValueError, TypeError, OSError):
+        dt_utc = datetime.now(timezone.utc).isoformat()
+
+    price = float(current_price)
+
+    for signal in open_signals:
+        direction = (signal.get('direction') or '').upper()
+        sl = signal.get('sl')
+        tp1 = signal.get('tp1')
+        tp2 = signal.get('tp2')
+        status = signal.get('status')
+        entry = _entry_price(signal)
+
+        if direction == 'BUY':
+            if status == 'ACTIVE' and sl is not None and price <= float(sl):
+                _fire_event(storage, signal, 'SL_HIT', 'CLOSED_LOSS', 'LOSS', price, dt_utc, final_for_training=True)
+                continue
+            if tp2 is not None and price >= float(tp2) and status in ('ACTIVE', 'PROTECTED', 'TP1_HIT'):
+                _fire_event(storage, signal, 'TP2_HIT', 'CLOSED_WIN', 'WIN', price, dt_utc, final_for_training=True)
+                continue
+            if status == 'ACTIVE' and tp1 is not None and price >= float(tp1):
+                import run_simulator
+                if getattr(run_simulator, 'STRICT_RR', False):
+                    # Do nothing, wait for TP2 or SL
+                    pass
+                else:
+                    storage.update_signal_sl(signal.get('id'), entry)
+                    signal['sl'] = entry
+                    sl = entry
+                    _fire_event(storage, signal, 'TP1_HIT', 'PROTECTED', 'PARTIAL_WIN', price, dt_utc, final_for_training=True)
+                    continue
+            if status in ('PROTECTED', 'TP1_HIT'):
+                risk_dist = abs(float(tp1) - float(entry)) if tp1 and entry else 2.0
+                trail_sl = price - (risk_dist * 0.5)
+                if sl is None or trail_sl > float(sl):
+                    storage.update_signal_sl(signal.get('id'), trail_sl)
+                    sl = trail_sl
+                    signal['sl'] = trail_sl
+                if sl is not None and price <= float(sl):
+                    _fire_event(storage, signal, 'PROTECTED', 'CLOSED_PARTIAL_WIN', 'PARTIAL_WIN', price, dt_utc, final_for_training=True)
+                    continue
+
+        elif direction == 'SELL':
+            if status == 'ACTIVE' and sl is not None and price >= float(sl):
+                _fire_event(storage, signal, 'SL_HIT', 'CLOSED_LOSS', 'LOSS', price, dt_utc, final_for_training=True)
+                continue
+            if tp2 is not None and price <= float(tp2) and status in ('ACTIVE', 'PROTECTED', 'TP1_HIT'):
+                _fire_event(storage, signal, 'TP2_HIT', 'CLOSED_WIN', 'WIN', price, dt_utc, final_for_training=True)
+                continue
+            if status == 'ACTIVE' and tp1 is not None and price <= float(tp1):
+                import run_simulator
+                if getattr(run_simulator, 'STRICT_RR', False):
+                    pass
+                else:
+                    storage.update_signal_sl(signal.get('id'), entry)
+                    signal['sl'] = entry
+                    sl = entry
+                    _fire_event(storage, signal, 'TP1_HIT', 'PROTECTED', 'PARTIAL_WIN', price, dt_utc, final_for_training=True)
+                    continue
+            if status in ('PROTECTED', 'TP1_HIT'):
+                risk_dist = abs(float(entry) - float(tp1)) if tp1 and entry else 2.0
+                trail_sl = price + (risk_dist * 0.5)
+                if sl is None or trail_sl < float(sl):
+                    storage.update_signal_sl(signal.get('id'), trail_sl)
+                    sl = trail_sl
+                    signal['sl'] = trail_sl
+                if sl is not None and price >= float(sl):
+                    _fire_event(storage, signal, 'PROTECTED', 'CLOSED_PARTIAL_WIN', 'PARTIAL_WIN', price, dt_utc, final_for_training=True)
+                    continue
+
+    _evaluate_no_trade_if_due(storage, current_price)
+
+
+def _evaluate_no_trade_if_due(storage, current_price):
+    # --- NO_TRADE retroactive evaluation (throttled: max 1x per 5 min) ---
+    if not hasattr(track_signals, '_last_no_trade_eval'):
+        track_signals._last_no_trade_eval = 0
+    now_ts = time.time()
+    if now_ts - track_signals._last_no_trade_eval > 300:
+        track_signals._last_no_trade_eval = now_ts
+        try:
+            from src.ai_trainer import AdaptiveTrainer
+            AdaptiveTrainer(storage, 'XAU/USD').evaluate_no_trade(current_price)
+        except Exception as e:
+            logger.error(f"NO_TRADE eval error: {e}")

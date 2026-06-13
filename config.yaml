@@ -1,0 +1,291 @@
+symbol: XAU/USD
+timezone: Asia/Jakarta
+websocket:
+  url: wss://ws.twelvedata.com/v1/quotes/price
+  reconnect_delay_seconds: 5
+  max_reconnect_delay_seconds: 60
+  heartbeat_seconds: 20
+storage:
+  sqlite_path: data/xauusd_bot.sqlite
+  save_raw_ticks: true
+  raw_tick_retention_days: 30
+  candle_retention_days: 730
+timeframes:
+- M1
+- M5
+- M15
+- H1
+- H4
+- D1
+warmup:
+  early_mode:
+    m5_min_candles: 24
+    m15_min_candles: 8
+  full_mode:
+    m5_min_candles: 50
+    m15_min_candles: 32
+    h1_min_candles: 12
+trading:
+  instrument: XAUUSD
+  mode: medium
+  min_confidence: 65
+  preferred_min_confidence: 70
+  high_confidence: 80
+  max_signals_per_day: 6
+  cooldown_minutes_same_direction: 45
+  cooldown_minutes_any_signal: 20
+risk:
+  min_sl_points: 4.0
+  ideal_sl_min_points: 5.0
+  ideal_sl_max_points: 8.0
+  max_sl_points: 10.0
+  tp1_min_points: 4.0
+  tp1_ideal_points: 5.0
+  tp2_min_points: 8.0
+  tp2_ideal_points: 12.0
+  min_rr_to_tp1: 1.0
+  min_rr_to_tp2: 2.0
+session:
+  priority_sessions:
+    london:
+      start: '14:00'
+      end: '17:00'
+    new_york:
+      start: '19:00'
+      end: '23:30'
+  avoid_sessions:
+    rollover:
+      start: 04:45
+      end: 06:15
+ai:
+  enabled: true
+  provider: deepseek
+  max_tokens: 500
+  temperature: 0.2
+rest_bootstrap:
+  enabled: true
+  run_on_startup: true
+  max_requests_per_startup: 4
+  use_closed_candles_only: true
+  m5_outputsize: 200
+  m15_outputsize: 200
+  h1_outputsize: 100
+  h4_outputsize: 50
+  d1_outputsize: 80
+poi:
+  enabled: true
+  timeframes:
+  - H4
+  - H1
+  - M15
+  - M5
+alerts:
+  telegram_sweep: false
+  telegram_break: false
+  telegram_entry: true
+  telegram_tp_sl: true
+ai_smart_token:
+  enabled: true
+  allow_ai_for_sweep_break_important: true
+  allow_ai_for_poi_report: true
+  allow_ai_for_premium_signal: true
+  block_ai_for_no_trade_auto: true
+  block_ai_for_duplicate_event: true
+adaptive_rules:
+  enabled: true
+  require_yes_no: true
+  trial_mode: true
+  trial_target_signals: 50
+  allow_auto_permanent_change: false
+tp_protection:
+  move_to_be_after_tp1: true
+  loss_after_tp1_counts_as_partial_win: true
+poi_summary:
+  enabled: true
+  telegram_interval_minutes: 60
+  use_ai: false
+  use_rest: false
+ai_hourly_review:
+  enabled: false
+  interval_minutes: 60
+  max_tokens: 700
+  use_rest: false
+  send_to_telegram: true
+adaptive_brain:
+  enabled: true
+  high_wr_only: false
+  main_methods:
+  - METHOD_M5_BREAK_6
+  - METHOD_M5_BREAK_12
+  - METHOD_HW_BREAK_12_SELL
+  - METHOD_M1_SWEEP_12
+  - METHOD_M1_BREAK_6
+  - METHOD_M1_BREAK_8
+  - METHOD_M5_BREAK_8
+  - METHOD_PATTERN_SHOOTING_STAR
+  - RR2_GROUP_SELL
+  - METHOD_ICT_TURTLE_SOUP_SELL
+  - METHOD_HW_BREAK_12_BUY
+  - METHOD_ICT_TURTLE_SOUP_BUY
+  - METHOD_CRT_H4_SWEEP_BUY
+  - METHOD_CRT_H4_SWEEP_SELL
+  - METHOD_HW_BREAK_20_BUY
+  - METHOD_HW_BREAK_20_SELL
+  - METHOD_M1_SWEEP_6
+  - METHOD_M5_SWEEP_12
+  - METHOD_M5_SWEEP_8
+  - METHOD_CRT_D1_SWEEP_SELL
+  - METHOD_HW_SWEEP_12_SELL
+  - METHOD_HW_SWEEP_32_SELL
+  method_governance:
+    enabled: true
+    mode: report_only
+    rr_policy: TP2_ONLY_RR_1_TO_2
+    auto_edit_methods: false
+    require_owner_approval: true
+    locked_methods:
+    - METHOD_M5_BREAK_6
+    - METHOD_M5_BREAK_12
+    - METHOD_HW_BREAK_12_SELL
+    - METHOD_M1_SWEEP_12
+    - METHOD_M1_BREAK_6
+    - METHOD_M1_BREAK_8
+    - METHOD_M5_BREAK_8
+    - METHOD_PATTERN_SHOOTING_STAR
+    - RR2_GROUP_SELL
+    - METHOD_ICT_TURTLE_SOUP_SELL
+    - METHOD_HW_BREAK_12_BUY
+    - METHOD_ICT_TURTLE_SOUP_BUY
+    - METHOD_CRT_H4_SWEEP_BUY
+    - METHOD_CRT_H4_SWEEP_SELL
+    - METHOD_HW_BREAK_20_BUY
+    - METHOD_HW_BREAK_20_SELL
+    - METHOD_M1_SWEEP_6
+    - METHOD_M5_SWEEP_12
+    - METHOD_M5_SWEEP_8
+    - METHOD_CRT_D1_SWEEP_SELL
+    - METHOD_HW_SWEEP_12_SELL
+    - METHOD_HW_SWEEP_32_SELL
+    watch_methods: []
+    notes: Metode utama dikunci. AI/Antigravity hanya boleh evaluasi, membuat laporan, dan memberi rekomendasi. Tidak boleh auto-edit rule.
+  high_wr_safe_hours_utc: []
+  dual_signal_mode: true
+  v6_lookbacks:
+  - 6
+  - 8
+  - 12
+  v6_timeframe_filters:
+    M1:
+      atr_min: 0.2
+      atr_max: 6.0
+      body_ratio_min: 0.35
+      max_span_by_lookback:
+        6: 3.5
+        8: 4.5
+        12: 6.0
+    M5:
+      atr_min: 0.65
+      atr_max: 6.0
+      body_ratio_min: 0.35
+      max_span_by_lookback:
+        6: 7.0
+        8: 9.0
+        12: 12.0
+  pending_orders:
+    enabled: true
+    mode: limit_retest
+    expiry_minutes: 60
+    min_pullback_points: 1.0
+    max_pullback_points: 3.0
+    pullback_factor: 0.45
+    cancel_if_break_level: true
+  user_methods:
+    crt_h4:
+      enabled: true
+      buffer_min_points: 1.0
+      buffer_max_points: 2.0
+      pending_order: true
+      averaging: true
+      expiry_minutes: 240
+      bias_filter: false
+    crt_d1:
+      enabled: true
+      buffer_min_points: 1.0
+      buffer_max_points: 2.0
+      pending_order: true
+      averaging: true
+      expiry_minutes: 720
+      bias_filter: false
+    h1_break:
+      enabled: true
+      min_break_points: 0.45
+      buffer_min_points: 2.0
+      buffer_max_points: 10.0
+      entry_buffer_points: 2.0
+      sl_buffer_points: 2.0
+      next_candle_window_minutes: 15
+      pending_order: true
+      averaging: false
+      expiry_minutes: 90
+      bias_filter: false
+  averaging:
+    enabled: true
+    max_layers: 3
+    layer_spacing_points: 2.0
+    sl_buffer_after_last_layer_points: 4.0
+    tp1_from_average_points: 1.5
+    tp2_from_average_points: 3.0
+    lot_model: same_lot
+    max_total_risk_percent: 1.0
+  pips_per_price_point: 10
+  max_sl_pips: 100
+  min_confidence: 10
+  max_recent_events: 30
+  sl_atr_mult: 1.15
+  tp1_rr: 1.0
+  tp2_rr: 2.0
+  tp3_rr: 0.0
+  use_sentuh_label: true
+  blocked_methods:
+  - AI_METHOD_2025_002_FVG_BREAKER_SELL_SANDBOX_RELAXED
+  trainer:
+    auto_ai_review: true
+    auto_brain_draft: true
+    loss_cooldown_minutes: 30
+    require_yes_no_before_activate: true
+  relaxed_sweep_reclaim: true
+  pattern_ict_scalp_exit:
+    enabled: true
+    sl_points: 6.0
+    tp1_points: 6.0
+    tp2_points: 12.0
+    move_to_be_after_tp1: true
+  sl_intelligence:
+    enabled: true
+    main_methods_only: true
+    warning_sl_count: 10
+    critical_sl_count: 20
+    repeat_after_critical_every: 10
+    send_to_telegram: true
+    storage_path: data/sl_method_audit.json
+    max_examples_per_method: 25
+market_alerts:
+  enabled: true
+  touch_tolerance_points: 0.35
+  break_buffer_points: 0.25
+  sweep_buffer_points: 0.15
+  retest_tolerance_points: 0.6
+  dedupe_minutes: 60
+  session_utc_offset_hours: 7
+  min_priority: MEDIUM
+v7_features:
+  total_features: 26
+  technical_methods: 15
+  news_filter: false
+  market_alert_count: 21
+  entry_features:
+  - M1 signal
+  - M5 signal
+  - BUY LIMIT
+  - SELL LIMIT
+  - Controlled averaging

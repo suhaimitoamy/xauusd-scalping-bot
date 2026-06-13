@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-06-10T02:26:49.503809",
+  "simulation_id": "sim_20260610_022649",
+  "dataset_keys": [
+    "202605"
+  ],
+  "sim_type": "TEST_RUN",
+  "initial_balance": 3000.0,
+  "ending_balance": 2992.9,
+  "net_pl": -7.1,
+  "net_pl_pct": -0.2367,
+  "risk_percent": 2.0,
+  "risk_model": {
+    "loss_r": -1.0,
+    "partial_win_r": 0.5,
+    "win_r": 2.0,
+    "full_win_r": 3.0,
+    "compounding": true
+  },
+  "total_trades": 6,
+  "wins": 2,
+  "losses": 4,
+  "tp2_wins": 2,
+  "partial_wins": 0,
+  "full_wins": 0,
+  "winrate": 33.3333,
+  "profit_factor": 0.9701,
+  "gross_profit": 230.4,
+  "gross_loss": 237.5,
+  "average_win": 115.2,
+  "average_loss": 59.38,
+  "max_drawdown": 176.42,
+  "max_dd_pct": 5.8808,
+  "largest_win_streak": 2,
+  "largest_loss_streak": 3,
+  "monthly": {
+    "202605": {
+      "trades": 6,
+      "wins": 2,
+      "losses": 4,
+      "net_pl": -7.099794431999996
+    }
+  },
+  "patterns": {
+    "METHOD_ICT_TURTLE_SOUP_BUY": {
+      "trades": 2,
+      "wins": 1,
+      "losses": 1,
+      "net_pl": 57.46,
+      "gross_profit": 117.46,
+      "gross_loss": 60.0,
+      "profit_factor": 1.9577
+    },
+    "METHOD_ICT_UNICORN_BUY": {
+      "trades": 1,
+      "wins": 0,
+      "losses": 1,
+      "net_pl": -57.62,
+      "gross_profit": 0.0,
+      "gross_loss": 57.62,
+      "profit_factor": 0.0
+    },
+    "METHOD_ICT_UNICORN_SELL": {
+      "trades": 1,
+      "wins": 1,
+      "losses": 0,
+      "net_pl": 112.94,
+      "gross_profit": 112.94,
+      "gross_loss": 0.0,
+      "profit_factor": 999.0
+    },
+    "METHOD_PATTERN_COMPRESS_BULL": {
+      "trades": 1,
+      "wins": 0,
+      "losses": 1,
+      "net_pl": -61.08,
+      "gross_profit": 0.0,
+      "gross_loss": 61.08,
+      "profit_factor": 0.0
+    },
+    "METHOD_PATTERN_SHOOTING_STAR": {
+      "trades": 1,
+      "wins": 0,
+      "losses": 1,
+      "net_pl": -58.8,
+      "gross_profit": 0.0,
+      "gross_loss": 58.8,
+      "profit_factor": 0.0
+    }
+  },
+  "equity_curve": [
+    {
+      "signal_id": 1,
+      "result": "LOSS",
+      "r_multiple": -1.0,
+      "pnl": -60.0,
+      "balance": 2940.0,
+      "drawdown_pct": 2.0,
+      "pattern_key": "METHOD_ICT_TURTLE_SOUP_BUY",
+      "dataset_key": "202605"
+    },
+    {
+      "signal_id": 2,
+      "result": "LOSS",
+      "r_multiple": -1.0,
+      "pnl": -58.8,
+      "balance": 2881.2,
+      "drawdown_pct": 3.96,
+      "pattern_key": "METHOD_PATTERN_SHOOTING_STAR",
+      "dataset_key": "202605"
+    },
+    {
+      "signal_id": 3,
+      "result": "LOSS",
+      "r_multiple": -1.0,
+      "pnl": -57.62,
+      "balance": 2823.58,
+      "drawdown_pct": 5.8808,
+      "pattern_key": "METHOD_ICT_UNICORN_BUY",
+      "dataset_key": "202605"
+    },
+    {
+      "signal_id": 4,
+      "result": "WIN",
+      "r_multiple": 2.0,
+      "pnl": 112.94,
+      "balance": 2936.52,
+      "drawdown_pct": 2.116,
+      "pattern_key": "METHOD_ICT_UNICORN_SELL",
+      "dataset_key": "202605"
+    },
+    {
+      "signal_id": 5,
+      "result": "WIN",
+      "r_multiple": 2.0,
+      "pnl": 117.46,
+      "balance": 3053.98,
+      "drawdown_pct": 0.0,
+      "pattern_key": "METHOD_ICT_TURTLE_SOUP_BUY",
+      "dataset_key": "202605"
+    },
+    {
+      "signal_id": 6,
+      "result": "LOSS",
+      "r_multiple": -1.0,
+      "pnl": -61.08,
+      "balance": 2992.9,
+      "drawdown_pct": 2.0,
+      "pattern_key": "METHOD_PATTERN_COMPRESS_BULL",
+      "dataset_key": "202605"
+    }
+  ]
+}

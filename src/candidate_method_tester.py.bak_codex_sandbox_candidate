@@ -1,0 +1,122 @@
+import os
+import json
+import glob
+import re
+from datetime import datetime
+
+SUPPORTED_VARS = [
+    'price', 'atr', 'choppy', 'momentum', 'break_bull', 'break_bear', 
+    'sentuh_high', 'sentuh_low', 'fvgs', 'ob', 'ote', 'm15_bias', 'h1_bias', 'recent_events'
+]
+
+UNSUPPORTED_KEYWORDS = [
+    r'\brsi\b', r'\bmacd\b', r'\bvolume\b', r'\bstochastic\b', r'\b1h\b', r'\b4h\b', 
+    r'\bdaily\b', r'moving average', r'bollinger', r'\bema\b', r'\bsma\b'
+]
+
+REQUIRED_FIELDS = ['name', 'direction', 'conditions', 'invalid_if', 'tp_logic', 'sl_logic', 'based_on']
+
+def test_candidate(method):
+    for field in REQUIRED_FIELDS:
+        if field not in method:
+            return {
+                'name': method.get('name', 'UNKNOWN'),
+                'status': 'INVALID_FORMAT',
+                'reason': f"Missing required field: {field}",
+                'valid_conditions': [],
+                'unsupported_conditions': [],
+                'recommendation': "Buang candidate atau perbaiki format JSON"
+            }
+            
+    unsupported_conds = []
+    valid_conds = []
+    
+    all_conds = method.get('conditions', []) + method.get('invalid_if', [])
+    for cond in all_conds:
+        cond_lower = cond.lower()
+        is_unsupported = False
+        for kw in UNSUPPORTED_KEYWORDS:
+            if re.search(kw, cond_lower):
+                unsupported_conds.append(cond)
+                is_unsupported = True
+                break
+        if not is_unsupported:
+            valid_conds.append(cond)
+            
+    if unsupported_conds:
+        return {
+            'name': method['name'],
+            'status': 'UNSUPPORTED_CONDITION',
+            'reason': "Candidate menggunakan indikator/timeframe yang tidak tersedia di bot engine",
+            'valid_conditions': valid_conds,
+            'unsupported_conditions': unsupported_conds,
+            'recommendation': "Revisi candidate: Hapus kondisi yang tidak didukung atau tolak secara manual"
+        }
+        
+    return {
+        'name': method['name'],
+        'status': 'TESTABLE',
+        'reason': "Format valid dan semua kondisi menggunakan variabel yang didukung",
+        'valid_conditions': valid_conds,
+        'unsupported_conditions': [],
+        'recommendation': "Lanjut test manual atau masukkan ke brain"
+    }
+
+def main():
+    candidate_files = glob.glob("brain_versions/ai_method_candidates_*.json")
+    if not candidate_files:
+        print("Tidak ada file candidate method ditemukan.")
+        return
+        
+    report = {
+        'generated_at': datetime.now().isoformat(),
+        'files_tested': len(candidate_files),
+        'total_candidates': 0,
+        'testable_count': 0,
+        'unsupported_count': 0,
+        'invalid_count': 0,
+        'results': []
+    }
+    
+    for cfile in candidate_files:
+        try:
+            with open(cfile, 'r') as f:
+                data = json.load(f)
+        except Exception as e:
+            print(f"Error reading {cfile}: {e}")
+            continue
+            
+        methods = data.get('methods', [])
+        report['total_candidates'] += len(methods)
+        
+        file_result = {
+            'file': cfile,
+            'candidates': []
+        }
+        
+        for m in methods:
+            res = test_candidate(m)
+            file_result['candidates'].append(res)
+            if res['status'] == 'TESTABLE':
+                report['testable_count'] += 1
+            elif res['status'] == 'UNSUPPORTED_CONDITION':
+                report['unsupported_count'] += 1
+            else:
+                report['invalid_count'] += 1
+                
+        report['results'].append(file_result)
+        
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_file = f"brain_versions/candidate_test_report_{timestamp}.json"
+    
+    with open(report_file, 'w') as f:
+        json.dump(report, f, indent=2)
+        
+    print(f"Candidate testing complete! Laporan disimpan di {report_file}")
+    print(f"Total Candidates: {report['total_candidates']}")
+    print(f"TESTABLE: {report['testable_count']}")
+    print(f"UNSUPPORTED: {report['unsupported_count']}")
+    print(f"INVALID: {report['invalid_count']}")
+
+if __name__ == "__main__":
+    main()

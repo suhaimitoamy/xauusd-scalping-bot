@@ -1,0 +1,40 @@
+{
+  "5ccccef1b00dc2bad442157359d6862e8873689b": {
+    "question": "Apa yang terjadi pada market selama seminggu kebelakang",
+    "answer": "🧠 Dijawab oleh AI berdasarkan data bot\nSource: AI + BOT DATA\n\nWah bro, seminggu terakhir ini XAUUSD lumayan seru pergerakannya. Dari data yang ada, harga sekarang di 4215.318, dan posisinya lagi di area premium alias agak mahal.\n\nKalau liat dari bias-nya, dalam timeframe pendek (15 menit dan 1 jam) masih bearish, tapi di H4 masih bullish. Artinya dalam seminggu ini, market sempat naik cukup tinggi sampai range high di 4237.394, terus turun balik ke range low 4168.767. Sekarang lagi di sekitar equilibrium 4203.081, tapi udah agak naik dikit.\n\nYang menarik, ada supply zone di 4208.75 - 4215.31 (dari kemarin siang) dan demand zone fresh di 4202.21 - 4209.23 (baru beberapa jam lalu). Jadi kayaknya dalam seminggu ini market lagi konsolidasi di kisaran 4168 - 4237, dan sekarang lagi uji-ujian di area supply.\n\nIntinya sih, minggu ini XAUUSD naik dulu, terus koreksi, dan sekarang lagi bingung mau lanjut turun atau balik naik lagi. Tapi secara intraday masih bearish, jadi hati-hati kalau mau entry long dulu bro.",
+    "snapshot_signature": "7449e00bbbfe",
+    "created_at": "2026-06-13T00:06:24.750131+00:00",
+    "snapshot": {
+      "symbol": "XAU/USD",
+      "price": 4215.318,
+      "updated_utc": "2026-06-13T00:06:18+00:00",
+      "bias": {
+        "m15": "bearish",
+        "h1": "bearish",
+        "h4": "bullish",
+        "intraday": "bearish",
+        "price_position": "premium"
+      },
+      "levels": {
+        "range_high": 4237.394,
+        "range_low": 4168.767,
+        "equilibrium": 4203.081,
+        "liquidity_above": 4215.471,
+        "liquidity_below": 4215.23
+      },
+      "supply_demand": {
+        "supply": {
+          "low": 4208.75421,
+          "high": 4215.31847,
+          "time": "2026-06-12T14:30:04.748635+00:00"
+        },
+        "demand": {
+          "low": 4202.21036,
+          "high": 4209.23951,
+          "time": "2026-06-13T00:00:03.433077+00:00"
+        }
+      },
+      "signature": "7449e00bbbfe"
+    }
+  }
+}

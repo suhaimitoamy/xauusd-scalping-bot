@@ -1,0 +1,103 @@
+{
+  "started_at": "2026-06-07T12:43:56.030052+00:00",
+  "start_month": "202601",
+  "end_month": "202603",
+  "cycles": [
+    {
+      "cycle": 1,
+      "months": [
+        {
+          "month": "202601",
+          "ending_balance": 8361.64,
+          "net_pl": 5361.64,
+          "profit_factor": 1.1183,
+          "max_dd_pct": 37.3882,
+          "total_trades": 464
+        },
+        {
+          "month": "202602",
+          "ending_balance": 14987.65,
+          "net_pl": 11987.65,
+          "profit_factor": 1.2562,
+          "max_dd_pct": 25.1696,
+          "total_trades": 491
+        },
+        {
+          "month": "202603",
+          "ending_balance": 20975.94,
+          "net_pl": 17975.94,
+          "profit_factor": 1.5377,
+          "max_dd_pct": 18.8715,
+          "total_trades": 342
+        }
+      ],
+      "best_method_by_pnl": {
+        "method": "METHOD_PATTERN_COMPRESS_BEAR",
+        "trades": 206,
+        "wins": 93,
+        "losses": 113,
+        "net_pl": 11144.210000000001,
+        "gross_profit": 29554.600000000002,
+        "gross_loss": 18410.39,
+        "max_dd_pct": 37.3882,
+        "profit_factor": 1.6053217775397481
+      },
+      "worst_method_by_drawdown": {
+        "method": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY_SANDBOX_RELAXED",
+        "trades": 177,
+        "wins": 67,
+        "losses": 110,
+        "net_pl": 2746.09,
+        "gross_profit": 21741.83,
+        "gross_loss": 18995.76,
+        "max_dd_pct": 37.3882,
+        "profit_factor": 1.144562260209647
+      },
+      "status_changes": [
+        {
+          "method": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY_SANDBOX_RELAXED",
+          "from": "PROBATION",
+          "to": "COOLDOWN",
+          "note": "Drawdown/PNL buruk, masuk cooldown sementara"
+        },
+        {
+          "method": "AI_METHOD_2025_002_FVG_BREAKER_SELL_SANDBOX_RELAXED",
+          "from": "PROBATION",
+          "to": "COOLDOWN",
+          "note": "Drawdown/PNL buruk, masuk cooldown sementara"
+        },
+        {
+          "method": "METHOD_ICT_TURTLE_SOUP_SELL",
+          "from": "PROBATION",
+          "to": "COOLDOWN",
+          "note": "Drawdown/PNL buruk, masuk cooldown sementara"
+        },
+        {
+          "method": "METHOD_ICT_UNICORN_SELL",
+          "from": "PROBATION",
+          "to": "COOLDOWN",
+          "note": "Drawdown/PNL buruk, masuk cooldown sementara"
+        },
+        {
+          "method": "METHOD_PATTERN_COMPRESS_BEAR",
+          "from": "PROBATION",
+          "to": "COOLDOWN",
+          "note": "Drawdown/PNL buruk, masuk cooldown sementara"
+        },
+        {
+          "method": "METHOD_PATTERN_EXHAUST_UP",
+          "from": "PROBATION",
+          "to": "COOLDOWN",
+          "note": "Drawdown/PNL buruk, masuk cooldown sementara"
+        },
+        {
+          "method": "METHOD_PATTERN_HAMMER",
+          "from": "PROBATION",
+          "to": "COOLDOWN",
+          "note": "Drawdown/PNL buruk, masuk cooldown sementara"
+        }
+      ]
+    }
+  ],
+  "db_backup": "/storage/emulated/0/Download/Aplikasi/xauusd-scalping-bot/data/xauusd_bot.sqlite.bak_pnl_loop_20260607_204355"
+}

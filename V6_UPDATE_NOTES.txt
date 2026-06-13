@@ -1,0 +1,57 @@
+XAUUSD Scalping Bot V6
+
+Status:
+- Dibuat dari full ZIP V5.
+- News filter tidak ditambahkan.
+- Total fitur utama: 26.
+
+Market Alert Telegram: 21
+1. FVG detected
+2. FVG break/jebol
+3. Impulsive move
+4. OB touched
+5. Support/Resistance touched
+6. Break level
+7. Sweep level
+8. M15 pinbar/engulfing
+9. Double top
+10. Double bottom
+11. Head and shoulder
+12. SSL touched
+13. BSL touched
+14. BOS
+15. CHoCH
+16. Retest alert
+17. Rejection alert
+18. Displacement candle
+19. Session high/low alert
+20. Judas swing alert
+21. Premium/discount + OTE area
+
+Entry features:
+22. M1 signal aggressive
+23. M5 signal recommended
+24. BUY LIMIT
+25. SELL LIMIT
+26. Controlled averaging
+
+Signal structure:
+- M1 and M5 run independently.
+- M1 has its own entry, SL, TP, pending, averaging, and signal ID.
+- M5 has its own entry, SL, TP, pending, averaging, and signal ID.
+- Bias filter remains M15 + H1.
+- Lookback: 6 / 8 / 12 candle.
+
+Telegram commands:
+/help
+/methods
+/alerts
+/m1_signal
+/m5_signal
+/signal
+/market_context
+/supply_demand
+/ask
+/bot_health
+/telegram_status
+/test_telegram

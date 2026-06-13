@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah momentum melemah",
+            "sl_logic": "Stop loss di bawah low terbaru sebelum entry",
+            "why_this_method": "Menggabungkan sentuhan level rendah (sweep) dengan konfirmasi penembusan bullish dan FVG, didukung bias bullish pada timeframe 15 menit, meningkatkan probabilitas reversal yang kuat",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Kombinasi sentuh_low + break_bull + FVG + momentum bullish memberikan konfirmasi multiple yang kuat untuk entry buy"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_RETEST_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "fvgs == true",
+                "sentuh_high == true",
+                "break_bear == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah momentum melemah",
+            "sl_logic": "Stop loss di atas high terbaru sebelum entry",
+            "why_this_method": "Memanfaatkan retest FVG setelah sentuhan level tinggi dan penembusan bearish, dengan konfirmasi bias bearish pada timeframe 15 menit, meningkatkan probabilitas kelanjutan tren turun",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bullish"
+            ],
+            "confidence_reason": "Kombinasi FVG + sentuh_high + break_bear + momentum bearish memberikan konfirmasi multiple yang kuat untuk entry sell"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OB_BOUNCE_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ob == true",
+                "ote == true",
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah momentum melemah",
+            "sl_logic": "Stop loss di bawah low terbaru sebelum entry",
+            "why_this_method": "Menggabungkan order block (OB) dengan optimal trade entry (OTE) dan sentuhan level rendah, dikonfirmasi penembusan bullish dan bias bullish pada timeframe 15 menit, meningkatkan probabilitas pantulan yang kuat",
+            "avoid_conditions": [
+                "Saat choppy tinggi",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Kombinasi OB + OTE + sentuh_low + break_bull memberikan konfirmasi multiple yang kuat untuk entry buy"
+        }
+    ]
+}

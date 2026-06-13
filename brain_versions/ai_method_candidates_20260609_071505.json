@@ -1,0 +1,79 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_003_FVG_RECLAIM_BREAK_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "break_bear == true",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah momentum melemah (momentum != bullish)",
+            "sl_logic": "Stop loss di bawah low terbaru sebelum entry (dikurangi 1 ATR)",
+            "why_this_method": "Menggabungkan sentuhan low (sweep) dengan break bullish dan konfirmasi FVG serta bias M15 bullish, meningkatkan probabilitas reversal yang kuat.",
+            "avoid_conditions": [
+                "Saat choppy tinggi (>0.7) karena sinyal palsu sering terjadi",
+                "Saat break bearish terjadi bersamaan karena menunjukkan tekanan jual dominan"
+            ],
+            "confidence_reason": "Konfirmasi dari 3 sisi: price action (sweep+break), bias timeframe lebih tinggi (M15 bullish), dan adanya FVG sebagai area likuiditas."
+        },
+        {
+            "name": "AI_METHOD_2025_004_BREAK_BEAR_FVG_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "body_ratio > 1.5"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "break_bull == true",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit di level support terdekat atau setelah momentum berubah (momentum != bearish)",
+            "sl_logic": "Stop loss di atas high terbaru sebelum entry (ditambah 1 ATR)",
+            "why_this_method": "Break bearish yang dikonfirmasi oleh FVG dan bias bearish pada M15 serta momentum bearish menunjukkan tekanan jual berkelanjutan. Body ratio besar menandakan candle kuat.",
+            "avoid_conditions": [
+                "Saat choppy tinggi (>0.7) karena sinyal palsu sering terjadi",
+                "Saat break bullish terjadi bersamaan karena menunjukkan tekanan beli dominan"
+            ],
+            "confidence_reason": "Konfirmasi dari break bearish, FVG, bias M15 bearish, momentum bearish, dan body ratio besar memberikan sinyal jual yang kuat."
+        },
+        {
+            "name": "AI_METHOD_2025_005_SWEEP_RECLAIM_FVG_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "fvgs == true",
+                "momentum == 'bullish'",
+                "body_ratio > 1.5"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "break_bear == true",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit di level resistance terdekat atau setelah momentum melemah (momentum != bullish)",
+            "sl_logic": "Stop loss di bawah low terbaru sebelum entry (dikurangi 1 ATR)",
+            "why_this_method": "Menggabungkan sweep low (sentuh_low) dengan break bullish dan FVG serta momentum bullish dan body besar, menandakan pembalikan kuat dengan konfirmasi likuiditas.",
+            "avoid_conditions": [
+                "Saat choppy tinggi (>0.7) karena sinyal palsu sering terjadi",
+                "Saat break bearish terjadi bersamaan karena menunjukkan tekanan jual dominan"
+            ],
+            "confidence_reason": "Empat konfirmasi: sweep low, break bullish, FVG, momentum bullish, dan body besar memberikan sinyal beli dengan probabilitas tinggi."
+        }
+    ]
+}

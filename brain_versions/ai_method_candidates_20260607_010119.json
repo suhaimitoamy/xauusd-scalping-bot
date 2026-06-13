@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_REVERSE_TURTLE_SOUP_SELL",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "Terbentuk pola TURTLE_SOUP_SELL pada timeframe 1H atau 4H",
+                "Harga telah menembus level support yang jelas dan kemudian dengan cepat kembali ke atas level tersebut dalam 3 candle",
+                "Volume meningkat saat harga kembali ke atas support",
+                "RSI pada timeframe 1H berada di bawah 30 (oversold)"
+            ],
+            "invalid_if": [
+                "Harga gagal kembali ke atas level support dalam 5 candle setelah breakout",
+                "Volume menurun saat harga kembali ke atas support",
+                "Trend jangka panjang (daily) masih bearish kuat"
+            ],
+            "tp_logic": "Take profit 1: 1.5x ATR dari entry, Take profit 2: 3x ATR, trailing stop setelah TP1 tercapai",
+            "sl_logic": "Stop loss di bawah level support yang ditembus dikurangi 0.5x ATR",
+            "why_this_method": "Pola TURTLE_SOUP_SELL memiliki winrate 44.37% (di atas rata-rata 41.67%), namun dengan membalikkan arah menjadi BUY saat terjadi false breakout (soup reversal) diharapkan dapat memanfaatkan momentum pembalikan yang lebih kuat, karena banyak trader yang terjebak posisi SELL",
+            "avoid_conditions": [
+                "Hindari saat berita ekonomi besar (NFP, FOMC) dalam 2 jam",
+                "Hindari saat spread melebar lebih dari 2x normal"
+            ],
+            "confidence_reason": "Berdasarkan data ghost 2025-2026, pola TURTLE_SOUP_SELL memiliki jumlah trade terbanyak (142) dengan winrate di atas rata-rata, menunjukkan pola ini sering muncul dan memiliki potensi reversal yang dapat dieksploitasi dengan arah berlawanan"
+        },
+        {
+            "name": "AI_METHOD_2025_002_REVERSE_HAMMER",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "Terbentuk pola HAMMER pada timeframe 1H atau 4H",
+                "Harga telah mencapai level resistance signifikan (swing high atau fibo 61.8%-78.6%)",
+                "Volume menurun saat candle HAMMER terbentuk",
+                "RSI pada timeframe 1H di atas 70 (overbought)"
+            ],
+            "invalid_if": [
+                "Candle HAMMER diikuti oleh candle bullish kuat yang menembus resistance",
+                "Volume meningkat signifikan pada candle HAMMER (menandakan akumulasi)",
+                "Trend jangka panjang (daily) masih bullish kuat"
+            ],
+            "tp_logic": "Take profit 1: 1x ATR dari entry, Take profit 2: 2x ATR, trailing stop setelah TP1 tercapai",
+            "sl_logic": "Stop loss di atas level resistance ditambah 0.5x ATR",
+            "why_this_method": "Pola HAMMER (BUY) memiliki winrate sangat rendah 32.43% (terendah kedua), menunjukkan bahwa sinyal BUY dari pola ini sering gagal. Dengan membalikkan menjadi SELL saat pola HAMMER muncul di resistance, kita dapat memanfaatkan kegagalan pola tersebut sebagai sinyal pembalikan bearish",
+            "avoid_conditions": [
+                "Hindari saat tren harian sedang bullish kuat (harga di atas MA50 dan MA200)",
+                "Hindari saat ada support kuat di bawah (misal fibo 50%)"
+            ],
+            "confidence_reason": "Pola HAMMER memiliki winrate sangat rendah (32.43%) dari 37 trade, menunjukkan kelemahan sinyal BUY. Reverse SELL pada kondisi overbought dan resistance memiliki potensi tinggi karena memanfaatkan kegagalan pola populer"
+        },
+        {
+            "name": "AI_METHOD_2025_003_FILTERED_UNICORN_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "Terbentuk pola ICT_UNICORN_SELL pada timeframe 1H atau 4H",
+                "Konfirmasi dengan divergence bearish pada RSI atau MACD",
+                "Harga berada di atas MA200 pada timeframe 4H (trend bearish jangka menengah)",
+                "Volume meningkat saat candle pola terbentuk"
+            ],
+            "invalid_if": [
+                "Harga berada di bawah MA200 pada timeframe daily (trend bullish jangka panjang)",
+                "Tidak ada divergence bearish yang jelas",
+                "Volume menurun saat pola terbentuk"
+            ],
+            "tp_logic": "Take profit 1: 1.5x ATR, Take profit 2: 3x ATR, trailing stop setelah TP1",
+            "sl_logic": "Stop loss di atas swing high terdekat ditambah 0.5x ATR",
+            "why_this_method": "Pola ICT_UNICORN_SELL memiliki winrate 40.00% (sedikit di bawah rata-rata). Dengan menambahkan filter divergence bearish dan konfirmasi trend, diharapkan winrate dapat meningkat secara signifikan",
+            "avoid_conditions": [
+                "Hindari saat pasar sideways (range bound) karena divergence sering false",
+                "Hindari saat berita ekonomi besar"
+            ],
+            "confidence_reason": "Meskipun winrate asli 40.00%, penambahan filter divergence dan trend dapat meningkatkan kualitas sinyal. Data ghost menunjukkan pola ini cukup sering muncul (60 trade) sehingga memiliki basis statistik yang memadai"
+        }
+    ]
+}

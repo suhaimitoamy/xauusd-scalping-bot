@@ -1,0 +1,76 @@
+{
+    "methods": [
+        {
+            "name": "AI_METHOD_2025_001_SWEEP_RECLAIM_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "sentuh_low == true",
+                "break_bull == true",
+                "m15_bias == 'bullish'",
+                "fvgs == true",
+                "momentum == 'bullish'"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "h1_bias == 'bearish'"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bearish signifikan muncul",
+            "sl_logic": "Stop loss di bawah low terbaru atau di bawah level sentuh_low dikurangi 1 ATR",
+            "why_this_method": "Menggabungkan penyentuhan level rendah (sweep) dengan konfirmasi penembusan bullish dan FVG, didukung bias bullish pada timeframe lebih rendah, menunjukkan potensi reversal kuat",
+            "avoid_conditions": [
+                "Saat choppy tinggi (>0.7)",
+                "Saat bias H1 bearish"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan aksi harga yang menyapu likuiditas (sentuh_low) dan langsung membalik dengan konfirmasi break_bull dan FVG, yang sering menjadi sinyal reversal kuat dalam konsep Smart Money"
+        },
+        {
+            "name": "AI_METHOD_2025_002_FVG_BREAK_BEAR_SELL",
+            "direction": "SELL",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "break_bear == true",
+                "fvgs == true",
+                "m15_bias == 'bearish'",
+                "momentum == 'bearish'",
+                "sentuh_high == true"
+            ],
+            "invalid_if": [
+                "choppy > 0.6",
+                "h1_bias == 'bullish'"
+            ],
+            "tp_logic": "Take profit pada level support terdekat atau setelah candle bullish signifikan muncul",
+            "sl_logic": "Stop loss di atas high terbaru atau di atas level sentuh_high ditambah 1 ATR",
+            "why_this_method": "Menggabungkan penembusan bearish dengan konfirmasi FVG dan bias bearish pada M15, serta penyentuhan level tinggi (sweep) yang menambah keyakinan akan kelanjutan penurunan",
+            "avoid_conditions": [
+                "Saat choppy sedang (>0.6)",
+                "Saat bias H1 bullish"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan aksi harga yang menyapu likuiditas (sentuh_high) dan langsung turun dengan konfirmasi break_bear dan FVG, yang sering menjadi sinyal kelanjutan tren bearish dalam konsep Smart Money"
+        },
+        {
+            "name": "AI_METHOD_2025_003_OB_BOUNCE_BUY",
+            "direction": "BUY",
+            "based_on": "ghost_trade_research_2025_2026",
+            "conditions": [
+                "ob == true",
+                "ote == true",
+                "m15_bias == 'bullish'",
+                "momentum == 'bullish'",
+                "body_ratio > 1.5"
+            ],
+            "invalid_if": [
+                "choppy > 0.7",
+                "break_bear == true"
+            ],
+            "tp_logic": "Take profit pada level resistance terdekat atau setelah candle bearish signifikan muncul",
+            "sl_logic": "Stop loss di bawah order block atau di bawah level OTE dikurangi 1 ATR",
+            "why_this_method": "Menggabungkan konfirmasi order block dan optimal trade entry dengan bias bullish pada M15 dan momentum bullish, serta body candle yang besar menunjukkan kekuatan buyer",
+            "avoid_conditions": [
+                "Saat choppy tinggi (>0.7)",
+                "Saat terjadi break_bear yang membatalkan struktur bullish"
+            ],
+            "confidence_reason": "Metode ini memanfaatkan area order block yang merupakan level support kuat dalam Smart Money, dikombinasikan dengan OTE dan konfirmasi momentum bullish, memberikan entry dengan risk-reward yang baik"
+        }
+    ]
+}

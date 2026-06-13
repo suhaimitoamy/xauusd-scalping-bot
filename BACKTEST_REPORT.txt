@@ -1,0 +1,40 @@
+PATCH: HIGH ENTRY SAME STRICT FILTER V3
+
+Perubahan:
+- Menambah banyak method high-WR dengan filter inti yang sama.
+- Method baru aktif: METHOD_HW_SWEEP_12 BUY/SELL, METHOD_HW_BREAK_12 BUY/SELL, METHOD_HW_BREAK_20 BUY.
+- Method lama METHOD_HIGH_WR_M15_SWEEP_SCALP BUY/SELL tetap dipakai.
+- METHOD_HW_BREAK_20_SELL sengaja diblokir karena hasil scan direction itu di bawah 65%.
+- Semua method high-WR memakai SL 6.0, TP1 3.0, TP2 6.0.
+- Safe hour UTC 08:00-15:59 dipakai supaya M1 monthly dan extra M5 tetap di atas 65% WR.
+
+Filter inti yang sama:
+- ATR 1.10 sampai 6.00
+- body_ratio minimal 0.35
+- M15 bias dan H1 bias harus searah
+- range lookback dibatasi
+- breakout/sweep harus clean close
+
+202501 M1: 59 trades, 41W / 18L, WR 69.49%, TP2 5, TP1/partial 36, R +10.0
+202502 M1: 60 trades, 48W / 12L, WR 80.00%, TP2 7, TP1/partial 41, R +22.5
+202503 M1: 51 trades, 39W / 12L, WR 76.47%, TP2 5, TP1/partial 34, R +15.0
+202504 M1: 42 trades, 30W / 12L, WR 71.43%, TP2 9, TP1/partial 21, R +16.5
+202505 M1: 59 trades, 39W / 20L, WR 66.10%, TP2 9, TP1/partial 30, R +13.0
+202506 M1: 51 trades, 34W / 17L, WR 66.67%, TP2 7, TP1/partial 27, R +10.5
+202507 M1: 66 trades, 52W / 14L, WR 78.79%, TP2 14, TP1/partial 38, R +33.0
+202508 M1: 68 trades, 48W / 20L, WR 70.59%, TP2 6, TP1/partial 42, R +13.0
+202509 M1: 62 trades, 49W / 13L, WR 79.03%, TP2 16, TP1/partial 33, R +35.5
+
+TOTAL M1 202501-202509:
+518 trades, 380W / 138L, WR 73.36%, TP2 78, TP1/partial 302, R +169.0
+
+BY METHOD:
+METHOD_HIGH_WR_M15_SWEEP_SCALP_BUY: 1 trades, 1W/0L, WR 100.00%, R +0.5
+METHOD_HW_BREAK_12_BUY: 265 trades, 190W/75L, WR 71.70%, R +72.5
+METHOD_HW_BREAK_12_SELL: 196 trades, 144W/52L, WR 73.47%, R +68.0
+METHOD_HW_BREAK_20_BUY: 44 trades, 35W/9L, WR 79.55%, R +16.0
+METHOD_HW_SWEEP_12_BUY: 6 trades, 6W/0L, WR 100.00%, R +9.0
+METHOD_HW_SWEEP_12_SELL: 6 trades, 4W/2L, WR 66.67%, R +3.0
+
+Extra file:
+202605 M5: 17 trades, 12W / 5L, WR 70.59%, TP2 5, TP1/partial 7, R +8.5

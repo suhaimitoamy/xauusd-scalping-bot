@@ -1,0 +1,20 @@
+TELEGRAM AI UPDATE NOTES
+
+New behavior:
+1. Telegram first tries local command/knowledge.
+2. If local bot has no answer, AI fallback answers using current bot data only.
+3. AI must not invent levels; prompt contains exact bot data.
+4. The answer is cached in data/telegram_ai_cache.json.
+5. Same question + same market snapshot returns cached answer later.
+
+New commands:
+/market_context - shows intraday bias, M15/H1/H4 bias, supply, demand, EQ, liquidity.
+/bias - alias of /market_context.
+/intraday_bias - alias of /market_context.
+/supply_demand - shows supply and demand level only.
+/sd - alias of /supply_demand.
+/ask [question] - asks AI using bot data snapshot.
+
+Example:
+/ask supply demand sekarang dimana?
+/ask bias intraday sekarang apa?

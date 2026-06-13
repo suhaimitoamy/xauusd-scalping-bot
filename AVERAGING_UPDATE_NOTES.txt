@@ -1,0 +1,15 @@
+AVERAGING V5 UPDATE
+
+Added controlled averaging:
+- BUY_LIMIT / SELL_LIMIT layer 1 remains the main trigger.
+- Layer 2 and Layer 3 are planned with fixed 2.0 point spacing.
+- Same lot only, no martingale.
+- SL is placed after the final layer with 4.0 point buffer.
+- TP1 and TP2 are calculated from average entry.
+- Telegram signal message shows L1/L2/L3, average entry, SL, TP1, TP2.
+
+Config path:
+adaptive_brain.averaging
+
+Backtest tool:
+python3 tools/backtest_averaging_orders.py --csv-dir /sdcard/Download --pattern 'DAT_MT_XAUUSD_M1_2025*.csv'

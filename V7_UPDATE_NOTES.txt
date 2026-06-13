@@ -1,0 +1,24 @@
+XAUUSD Scalping Bot V7
+
+Added user methods:
+1. METHOD_CRT_H4_SWEEP_BUY
+2. METHOD_CRT_H4_SWEEP_SELL
+3. METHOD_CRT_D1_SWEEP_BUY
+4. METHOD_CRT_D1_SWEEP_SELL
+5. METHOD_H1_BREAK_BUY
+6. METHOD_H1_BREAK_SELL
+
+Total technical methods: 15
+News filter: OFF
+Market alerts remain: 21
+Total main features remain: 26
+
+Rules added exactly from user request:
+- CRT H4 uses H4 high/low sweep, buffer 10-20 points, pending order ON, averaging ON, bias filter OFF.
+- CRT D1 uses D1 high/low sweep, buffer 10-20 points, pending order ON, averaging ON, bias filter OFF.
+- H1 Break uses H1 break, next candle window, buffer 5-10 points, pending order ON, averaging OFF, bias filter OFF.
+
+D1 support:
+- D1 timeframe added to CandleBuilder.
+- D1 bootstrap added through Twelve Data 1day.
+- If D1 candles are unavailable, bot derives D1 high/low from H1 candles.

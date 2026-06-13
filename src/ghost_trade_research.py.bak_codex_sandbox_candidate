@@ -1,0 +1,232 @@
+import os
+import sys
+import json
+import sqlite3
+from datetime import datetime
+
+# Add project root to python path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.ai_advisor import get_ai_response
+
+from dotenv import load_dotenv
+load_dotenv()
+
+def load_config():
+    import yaml
+    try:
+        with open('config.yaml', 'r') as f:
+            return yaml.safe_load(f)
+    except FileNotFoundError:
+        return {}
+
+import argparse
+
+def run_research(sim_type_filter='MAIN'):
+    config = load_config()
+    db_path = config.get('db_path', 'data/xauusd_bot.sqlite')
+    ghost_db_path = db_path.replace('.sqlite', '_ghost.sqlite')
+
+    if not os.path.exists(ghost_db_path):
+        print(f"Ghost DB not found at {ghost_db_path}. Please run simulator first.")
+        sys.exit(1)
+
+    print(f"Reading ghost data from {ghost_db_path}...")
+    
+    conn = sqlite3.connect(ghost_db_path)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    
+    # Analyze Signals
+    cur.execute("SELECT * FROM signals")
+    all_signals = cur.fetchall()
+    conn.close()
+    
+    signals = []
+    for sig in all_signals:
+        try:
+            raw = json.loads(sig['raw_context_json'] or '{}')
+        except:
+            raw = {}
+        if sim_type_filter != 'ALL':
+            if raw.get('sim_type', 'MAIN') != sim_type_filter:
+                continue
+        signals.append(sig)
+    
+    if not signals:
+        print("No signals found in ghost DB.")
+        sys.exit(1)
+        
+    print(f"Found {len(signals)} signals. Aggregating statistics...")
+    
+    stats = {}
+    total_trades = 0
+    total_wins = 0
+    total_losses = 0
+    
+    for sig in signals:
+        direction = sig['direction']
+        if direction == 'NO_TRADE':
+            continue
+            
+        result = sig['result'] or 'UNKNOWN'
+        if result not in ('WIN', 'FULL_WIN', 'PARTIAL_WIN', 'LOSS', 'BE'):
+            if result == 'CLOSED_MANUAL' or result == 'ACTIVE':
+                continue # Skip or categorize as needed
+        
+        # We classify FULL_WIN and PARTIAL_WIN as WIN for simplicity
+        is_win = result in ('WIN', 'FULL_WIN', 'PARTIAL_WIN')
+        is_loss = result == 'LOSS'
+        
+        if is_win:
+            total_wins += 1
+        elif is_loss:
+            total_losses += 1
+            
+        total_trades += 1
+        
+        try:
+            raw = json.loads(sig['raw_context_json'] or '{}')
+        except:
+            raw = {}
+            
+        pattern_key = raw.get('pattern_key') or sig['reason'] or 'UNKNOWN'
+        key = f"{pattern_key}_{direction}"
+        
+        if key not in stats:
+            stats[key] = {'wins': 0, 'losses': 0, 'total': 0, 'pattern': pattern_key, 'direction': direction}
+            
+        stats[key]['total'] += 1
+        if is_win:
+            stats[key]['wins'] += 1
+        elif is_loss:
+            stats[key]['losses'] += 1
+
+    if total_trades == 0:
+        print("No valid WIN/LOSS trades found for analysis.")
+        sys.exit(1)
+        
+    # Formatting stats for AI
+    # Sort by total trades descending
+    sorted_stats = sorted(stats.values(), key=lambda x: x['total'], reverse=True)
+    
+    summary = f"SUPER AI TRADE RESEARCH SUMMARY (Ghost 2025-2026)\n"
+    summary += f"Total Valid Trades: {total_trades}\n"
+    summary += f"Total Wins: {total_wins}\n"
+    summary += f"Total Losses: {total_losses}\n"
+    winrate = (total_wins / total_trades * 100) if total_trades > 0 else 0
+    summary += f"Overall Winrate: {winrate:.2f}%\n\n"
+    
+    summary += "Top Patterns Performance:\n"
+    for s in sorted_stats[:20]: # top 20 to avoid token limits
+        w = s['wins']
+        l = s['losses']
+        t = s['total']
+        wr = (w / t * 100) if t > 0 else 0
+        summary += f"- {s['pattern']} ({s['direction']}): {t} trades, {w} wins, {l} losses, {wr:.2f}% WR\n"
+        
+    print(summary)
+    
+    print("Requesting candidate methods from AI...")
+    
+    prompt = (
+        f"Anda adalah Super AI Trade Researcher (Quantitative Analyst).\n"
+        f"Berikut adalah ringkasan performa trading simulator ghost untuk periode 2025-2026:\n\n"
+        f"{summary}\n"
+        f"TUGAS ANDA:\n"
+        f"Buatlah 2-3 kandidat metode trading baru berdasarkan statistik di atas.\n\n"
+        f"ATURAN SANGAT KETAT (CRITICAL):\n"
+        f"1. JANGAN menggunakan indikator eksternal seperti RSI, MACD, Volume, Stochastic, Moving Average, Bollinger Bands, dll. Bot ini TIDAK memiliki data tersebut.\n"
+        f"2. Variabel yang TERSEDIA di bot hanyalah murni Price Action & Smart Money Concepts:\n"
+        f"   - price, atr, body_ratio, choppy\n"
+        f"   - momentum (bullish/bearish/neutral)\n"
+        f"   - break_bull, break_bear (penembusan high/low sebelumnya)\n"
+        f"   - sentuh_high, sentuh_low (menyentuh level penting)\n"
+        f"   - fvgs (Fair Value Gaps), ob (Order Blocks), ote (Optimal Trade Entry)\n"
+        f"   - bias multi-timeframe: m15_bias, h1_bias\n"
+        f"   - recent_events (kejadian terbaru seperti SENTUH_HIGH, BREAK_BEARISH, CHOPPY)\n"
+        f"3. JANGAN sekadar membalik arah (reverse) dari metode yang loss. Analisislah kombinasi konfirmasi Price Action (contoh: Harga sentuh_low + break_bull + M15_bias bullish + masuk FVG).\n"
+        f"4. Beri nama metode yang unik dan mendeskripsikan mekanismenya secara teknikal (misal: AI_METHOD_2025_001_SWEEP_RECLAIM_BUY, bukan sekadar REVERSE_...).\n\n"
+        f"Output WAJIB berupa JSON valid dengan struktur berikut, JANGAN tambahkan markdown atau penjelasan di luar JSON:\n"
+        "{\n"
+        '  "methods": [\n'
+        '    {\n'
+        '      "name": "AI_METHOD_2025_001_...",\n'
+        '      "direction": "BUY atau SELL",\n'
+        '      "based_on": "ghost_trade_research_2025_2026",\n'
+        '      "conditions": ["Kondisi spesifik 1 (HANYA GUNAKAN VARIABEL YANG TERSEDIA)", "Kondisi 2"],\n'
+        '      "invalid_if": ["Kondisi pembatalan 1", "Kondisi 2"],\n'
+        '      "tp_logic": "deskripsi tp",\n'
+        '      "sl_logic": "deskripsi sl",\n'
+        '      "why_this_method": "Alasan logis Price Action",\n'
+        '      "avoid_conditions": ["Kondisi yang dihindari (misal: saat choppy tinggi)"],\n'
+        '      "confidence_reason": "alasan confidence"\n'
+        '    }\n'
+        '  ]\n'
+        "}\n"
+    )
+    
+    messages = [
+        {"role": "system", "content": "You are a quantitative trading researcher. Return ONLY strict valid JSON."},
+        {"role": "user", "content": prompt}
+    ]
+    
+    response_text, used_ai = get_ai_response(messages, fallback_text="", max_tokens=1500, timeout=120)
+    
+    if not used_ai or not response_text:
+        print("Failed to get response from AI.")
+        sys.exit(1)
+        
+    # Clean markdown if present
+    clean_json = response_text
+    if "```json" in clean_json:
+        clean_json = clean_json.split("```json")[1].split("```")[0].strip()
+    elif "```" in clean_json:
+        clean_json = clean_json.split("```")[1].split("```")[0].strip()
+        
+    try:
+        candidates = json.loads(clean_json)
+        # Validation
+        if "methods" not in candidates:
+            raise ValueError("Missing 'methods' array in JSON")
+            
+        for m in candidates["methods"]:
+            for req in ["conditions", "direction", "invalid_if"]:
+                if req not in m:
+                    raise ValueError(f"Missing required field '{req}' in candidate method")
+                    
+        # Save to file
+        os.makedirs("brain_versions", exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = f"brain_versions/ai_method_candidates_{timestamp}.json"
+        
+        with open(output_path, "w") as f:
+            json.dump(candidates, f, indent=4)
+            
+        print(f"\nSUCCESS! AI candidates saved to: {output_path}")
+    
+        # Print candidate snippet
+        try:
+            snippet = json.dumps(candidates, indent=2)
+            if len(snippet) > 500:
+                snippet = snippet[:500] + "..."
+            print(f"\nCandidate snippet:\n{snippet}")
+        except:
+            pass
+            
+        return output_path
+        
+    except json.JSONDecodeError as e:
+        print("AI Output was not valid JSON:")
+        print(response_text)
+        print(f"Error: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Validation Error: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--sim-type', type=str, default='MAIN', help='Filter sim_type (MAIN, TEST_RUN, ALL)')
+    args = parser.parse_args()
+    run_research(args.sim_type)
