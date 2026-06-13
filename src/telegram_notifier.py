@@ -71,6 +71,10 @@ def send_telegram_message(text, chat_id: Optional[str] = None, parse_mode: Optio
     token = _get_token()
     if not token:
         return False
+        
+    import os
+    if os.environ.get('DRY_RUN') == 'true':
+        return True
 
     # Backward compatibility for older calls: send_telegram_message(chat_id, msg)
     if chat_id is not None and _looks_like_chat_id(text):

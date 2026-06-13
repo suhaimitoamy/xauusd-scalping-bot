@@ -9,7 +9,10 @@ Di Versi 8 ini, penglihatan bot (Vision) dirombak total menyamai akurasi *script
 
 Bot ini mengesampingkan indikator tradisional yang lambat (seperti MA/Trend Filters) dan mengandalkan **Price Action murni** serta **Smart Money Concepts (SMC)** di sekitar area likuiditas (*Point of Interest*). 
 
-### 1. The Watchdog (`run_live_auto_reload.py`)
+### 1. Quantitative Data Engine (Mega Backtest 5 Tahun)
+Meniru pendekatan *Jim Simons (Renaissance Technologies)*, bot ini diperkuat dengan skrip `scratch_mega_backtest.py` yang mampu menyedot data **1,9 Juta Candle M1 (2022-2026)** dalam hitungan detik. Menggunakan struktur memori *In-Memory SQLite*, bot ini beroperasi pada skala **ratusan ribu candle per menit**, menguji metode-metodenya secara matematis murni tanpa bias emosional manusia.
+
+### 2. The Watchdog (`run_live_auto_reload.py`)
 Bot tidak perlu lagi di-*restart* manual. Daemon *Watchdog* akan memantau seluruh file `.py` dan `config.yaml` setiap 1 detik. Jika *source code* berubah (misal Antigravity AI menyuntikkan strategi baru), bot akan otomatis merestart dirinya sendiri dalam 0.5 detik tanpa interupsi *trading* (*Hot-Reload*).
 
 ### 2. Market Brain (`market_brain.py`) & 8 Pilar SMC (Mata Dewa)
@@ -72,12 +75,13 @@ Saat berjalan, Anda punya arsenal komando berikut melalui Terminal/Telegram:
 
 ## ⏳ Background Tasks (Cron Jobs & Monitors)
 
-1. **Morning Routine Dev Report (Jam 5 Pagi / 22:00 UTC)**
-   - Cron: `0 22 * * *`
-   - Prompt/Tugas: `1. Review bot performance/mutasi. 2. Mini Backtest: Uji coba mutasi ke data 3 hari terakhir sebelum diterapkan. 3. Daily Bias Outlook: Analisa trend D1/H4 lalu kirim forecast (ramalan cuaca market) ke Telegram.`
+1. **Autonomous Auditor (Jam 5 Pagi WIB / 22:00 UTC)**
+   - Cron: `0 22 * * *` (Via Antigravity AI `/schedule`)
+   - Tugas: Bertindak sebagai "Kepala Peneliti Quant". AI akan membaca `data/sl_method_audit.json` untuk menganalisis penyebab kerugian bot selama 5 tahun terakhir, menambal *bug* kode secara mandiri tanpa izin user, menambah metode/fitur baru secara otonom, dan mengirimkan laporan penemuan paginya ke Telegram.
+   
 2. **Antigravity SL Monitor**
-   - Perintah: `python3 scratch_antigravity_monitor.py` (Berjalan permanen di *background*)
-   - Tugas: Menjadi radar pendeteksi LOSS yang otomatis menyalakan proses Reinkarnasi Metode.
+   - Perintah: `python3 scratch_cron_manager.py` (Menjaga Daemon tetap hidup 24/7)
+   - Tugas: Menjadi radar pendeteksi kerugian beruntun. Jika kondisi memburuk, akan langsung membangkitkan agen AI untuk melakukan reinkarnasi kode saat itu juga.
 
 ---
 *Dokumen ini merupakan "Living Document". Setiap mutasi atau perubahan struktural pada logika AI wajib di-update langsung ke dokumen ini agar tersinkronisasi sempurna dengan otak bot.*
