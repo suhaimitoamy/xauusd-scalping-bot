@@ -35,5 +35,9 @@ def run_simulator():
             print(output.strip())
 
 if __name__ == "__main__":
-    if generate_csv():
+    if os.path.exists(CSV_OUT) and os.path.getsize(CSV_OUT) > 100 * 1024 * 1024:  # > 100 MB
+        print(f"Menggunakan data raksasa CSV yang sudah ada ({CSV_OUT}) agar langsung ngebut...")
         run_simulator()
+    else:
+        if generate_csv():
+            run_simulator()

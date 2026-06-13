@@ -113,7 +113,6 @@ def generate_report():
         
     try:
         from src.telegram_notifier import send_telegram_message, telegram_is_configured
-        import os
         is_simulator = os.environ.get('DRY_RUN', '').lower() == 'true'
         if telegram_is_configured() and not is_simulator:
             send_telegram_message(tg_message)

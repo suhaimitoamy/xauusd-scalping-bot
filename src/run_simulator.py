@@ -31,7 +31,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Disable Telegram
-os.environ["TELEGRAM_API_KEY"] = ""
+os.environ["TELEGRAM_BOT_TOKEN"] = ""
 
 from src.storage import Storage
 from src.candle_builder import CandleBuilder
@@ -415,6 +415,11 @@ def run_simulation(csv_paths, limit=None):
                     if len(row) < 6: continue
                     date_str, time_str, o_str, h_str, l_str, c_str = row[0], row[1], row[2], row[3], row[4], row[5]
                     
+                    import run_simulator
+                    target_day = getattr(run_simulator, 'TARGET_DAY', None)
+                    if target_day and date_str != target_day:
+                        continue
+                    
                     try:
                         dt = datetime.strptime(f"{date_str} {time_str}", "%Y.%m.%d %H:%M")
                         dt = dt.replace(tzinfo=timezone.utc)
@@ -577,6 +582,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="XAUUSD Bot Simulator Backtest")
     parser.add_argument('--file', type=str, help='Spesifik path file CSV yang ingin disimulasikan')
     parser.add_argument('--month', type=str, help='Filter file CSV berdasarkan bulan (misal: 202601)')
+    parser.add_argument('--day', type=str, help='Filter spesifik tanggal (misal: 2026.01.15)')
     parser.add_argument('--from', dest='from_month', type=str, help='Filter mulai dari bulan (misal: 202501)')
     parser.add_argument('--to', dest='to_month', type=str, help='Filter sampai bulan (misal: 202612)')
     parser.add_argument('--limit', type=int, help='Batasi jumlah candle yang diproses (untuk test cepat)')
@@ -641,6 +647,10 @@ if __name__ == "__main__":
     if args.log_file:
         import run_simulator
         run_simulator.SIM_LOG_FILE = args.log_file
+        
+    if args.day:
+        import run_simulator
+        run_simulator.TARGET_DAY = args.day
         
     if args.initial_balance > 0:
         import run_simulator

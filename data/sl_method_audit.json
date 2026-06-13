@@ -771,26 +771,9 @@
       "updated_at": "2026-06-12T14:01:24.990408"
     },
     "METHOD_CRT_H4_SWEEP_SELL": {
-      "total_sl": 23,
+      "total_sl": 26,
       "last_report_level": 20,
       "losses": [
-        {
-          "signal_id": 50,
-          "time": "2026-01-05T22:55:30+00:00",
-          "direction": "SELL",
-          "sl_price": 4467.885,
-          "entry_low": 4459.665,
-          "entry_high": 4463.965,
-          "sl": 4467.815,
-          "tp1": 4460.315,
-          "tp2": 4458.815,
-          "tags": [
-            "CRT sweep/reclaim gagal bertahan",
-            "bias M15/H1 melawan SELL",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "CRT H4: sweep high 4459.81 buffer 1.31 point lalu reclaim/reversal | Memory: 3W/0L, score 36."
-        },
         {
           "signal_id": 68,
           "time": "2026-01-08T10:09:30+00:00",
@@ -1176,9 +1159,61 @@
             "reclaim tidak cukup kuat"
           ],
           "reason": "CRT H4: sweep high 4543.02 buffer 1.80 point lalu reclaim/reversal | Memory: 100W/22L, score 1200."
+        },
+        {
+          "signal_id": 304,
+          "time": "2023-01-06T08:44:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1849.475,
+          "entry_low": 1839.765,
+          "entry_high": 1844.065,
+          "sl": 1847.915,
+          "tp1": 1840.415,
+          "tp2": 1838.915,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep high 1839.91 buffer 1.38 point lalu reclaim/reversal | Memory: 118W/23L, score 1380."
+        },
+        {
+          "signal_id": 183,
+          "time": "2026-02-24T15:27:15+00:00",
+          "direction": "SELL",
+          "sl_price": 5169.965,
+          "entry_low": 5160.955,
+          "entry_high": 5165.255,
+          "sl": 5169.105,
+          "tp1": 5161.605,
+          "tp2": 5160.105,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep high 5161.10 buffer 1.60 point lalu reclaim/reversal | Memory: 103W/23L, score 1236."
+        },
+        {
+          "signal_id": 282,
+          "time": "2026-02-24T15:27:15+00:00",
+          "direction": "SELL",
+          "sl_price": 5169.965,
+          "entry_low": 5160.955,
+          "entry_high": 5165.255,
+          "sl": 5169.105,
+          "tp1": 5161.605,
+          "tp2": 5160.105,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep high 5161.10 buffer 1.60 point lalu reclaim/reversal | Memory: 107W/23L, score 1280."
         }
       ],
-      "updated_at": "2026-06-11T23:33:34.812331"
+      "updated_at": "2026-02-24T15:27:00+00:00"
     },
     "METHOD_CRT_D1_SWEEP_SELL": {
       "total_sl": 1,
@@ -1594,8 +1629,8 @@
       "updated_at": "2026-06-12T08:52:28.846806"
     },
     "RR2_GROUP_SELL": {
-      "total_sl": 8,
-      "last_report_level": 0,
+      "total_sl": 24,
+      "last_report_level": 20,
       "losses": [
         {
           "signal_id": 124,
@@ -1727,9 +1762,281 @@
             "SL lebar tapi tetap ditembus"
           ],
           "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 12W/7L, score 136."
+        },
+        {
+          "signal_id": 155,
+          "time": "2026-02-18T22:31:30+00:00",
+          "direction": "SELL",
+          "sl_price": 4976.325,
+          "entry_low": 4967.575,
+          "entry_high": 4968.575,
+          "sl": 4976.075,
+          "tp1": 4963.075,
+          "tp2": 4958.075,
+          "tags": [
+            "setup gagal follow-through",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 10W/5L, score 120."
+        },
+        {
+          "signal_id": 194,
+          "time": "2026-02-25T23:07:30+00:00",
+          "direction": "SELL",
+          "sl_price": 5196.425,
+          "entry_low": 5187.475,
+          "entry_high": 5188.475,
+          "sl": 5195.975,
+          "tp1": 5182.975,
+          "tp2": 5177.975,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 10W/6L, score 120."
+        },
+        {
+          "signal_id": 131,
+          "time": "2026-01-21T23:06:30+00:00",
+          "direction": "SELL",
+          "sl_price": 4799.845,
+          "entry_low": 4789.545,
+          "entry_high": 4790.545,
+          "sl": 4798.045,
+          "tp1": 4785.045,
+          "tp2": 4780.045,
+          "tags": [
+            "setup gagal follow-through",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 11W/5L, score 132."
+        },
+        {
+          "signal_id": 254,
+          "time": "2026-02-18T22:31:30+00:00",
+          "direction": "SELL",
+          "sl_price": 4976.325,
+          "entry_low": 4967.575,
+          "entry_high": 4968.575,
+          "sl": 4976.075,
+          "tp1": 4963.075,
+          "tp2": 4958.075,
+          "tags": [
+            "setup gagal follow-through",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 11W/6L, score 132."
+        },
+        {
+          "signal_id": 293,
+          "time": "2026-02-25T23:07:30+00:00",
+          "direction": "SELL",
+          "sl_price": 5196.425,
+          "entry_low": 5187.475,
+          "entry_high": 5188.475,
+          "sl": 5195.975,
+          "tp1": 5182.975,
+          "tp2": 5177.975,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 11W/7L, score 132."
+        },
+        {
+          "signal_id": 530,
+          "time": "2026-04-15T23:01:30+00:00",
+          "direction": "SELL",
+          "sl_price": 4823.135,
+          "entry_low": 4813.535,
+          "entry_high": 4814.535,
+          "sl": 4822.035,
+          "tp1": 4809.035,
+          "tp2": 4804.035,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 18W/8L, score 204."
+        },
+        {
+          "signal_id": 657,
+          "time": "2026-05-06T22:57:30+00:00",
+          "direction": "SELL",
+          "sl_price": 4709.605,
+          "entry_low": 4700.415,
+          "entry_high": 4701.415,
+          "sl": 4708.915,
+          "tp1": 4695.915,
+          "tp2": 4690.915,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 22W/9L, score 248."
+        },
+        {
+          "signal_id": 551,
+          "time": "2022-02-23T23:08:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1932.718,
+          "entry_low": 1923.398,
+          "entry_high": 1924.398,
+          "sl": 1931.898,
+          "tp1": 1918.898,
+          "tp2": 1913.898,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 13W/5L, score 152."
+        },
+        {
+          "signal_id": 604,
+          "time": "2022-03-10T00:33:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1981.352,
+          "entry_low": 1972.682,
+          "entry_high": 1973.682,
+          "sl": 1981.182,
+          "tp1": 1968.182,
+          "tp2": 1963.182,
+          "tags": [
+            "setup gagal follow-through",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 13W/6L, score 152."
+        },
+        {
+          "signal_id": 627,
+          "time": "2022-03-17T03:43:15+00:00",
+          "direction": "SELL",
+          "sl_price": 1942.553,
+          "entry_low": 1934.018,
+          "entry_high": 1935.018,
+          "sl": 1942.518,
+          "tp1": 1929.518,
+          "tp2": 1924.518,
+          "tags": [
+            "setup gagal follow-through",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 13W/7L, score 152."
+        },
+        {
+          "signal_id": 642,
+          "time": "2022-03-24T06:40:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1953.568,
+          "entry_low": 1939.593,
+          "entry_high": 1940.593,
+          "sl": 1948.093,
+          "tp1": 1935.093,
+          "tp2": 1930.093,
+          "tags": [
+            "setup gagal follow-through",
+            "market choppy",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 13W/8L, score 152."
+        },
+        {
+          "signal_id": 677,
+          "time": "2022-04-07T07:34:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1930.487,
+          "entry_low": 1921.808,
+          "entry_high": 1922.808,
+          "sl": 1930.308,
+          "tp1": 1917.308,
+          "tp2": 1912.308,
+          "tags": [
+            "setup gagal follow-through",
+            "market choppy",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 14W/9L, score 160."
+        },
+        {
+          "signal_id": 765,
+          "time": "2022-05-19T04:52:15+00:00",
+          "direction": "SELL",
+          "sl_price": 1823.088,
+          "entry_low": 1814.528,
+          "entry_high": 1815.528,
+          "sl": 1823.028,
+          "tp1": 1810.028,
+          "tp2": 1805.028,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 17W/10L, score 196."
+        },
+        {
+          "signal_id": 846,
+          "time": "2022-07-07T01:37:15+00:00",
+          "direction": "SELL",
+          "sl_price": 1747.558,
+          "entry_low": 1738.868,
+          "entry_high": 1739.868,
+          "sl": 1747.368,
+          "tp1": 1734.368,
+          "tp2": 1729.368,
+          "tags": [
+            "setup gagal follow-through",
+            "market choppy",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 20W/11L, score 224."
+        },
+        {
+          "signal_id": 898,
+          "time": "2022-08-04T04:18:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1775.052,
+          "entry_low": 1766.488,
+          "entry_high": 1767.488,
+          "sl": 1774.988,
+          "tp1": 1761.988,
+          "tp2": 1756.988,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan SELL",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 22W/12L, score 244."
+        },
+        {
+          "signal_id": 911,
+          "time": "2022-08-11T07:36:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1794.014,
+          "entry_low": 1785.194,
+          "entry_high": 1786.194,
+          "sl": 1793.694,
+          "tp1": 1780.694,
+          "tp2": 1775.694,
+          "tags": [
+            "setup gagal follow-through",
+            "SL lebar tapi tetap ditembus"
+          ],
+          "reason": "RR2 GROUP SELL: locked Wednesday 22 UTC bearish continuation/rejection | Memory: 22W/13L, score 244."
         }
       ],
-      "updated_at": "2025-01-02T05:19:00+00:00"
+      "updated_at": "2022-08-11T07:36:00+00:00"
     }
   }
 }

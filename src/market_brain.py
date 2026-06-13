@@ -1281,11 +1281,11 @@ class BrainEngine:
         # CHOPPY MARKET SCALP (Auto-Injected)
         # Sangat rileks, hanya mengandalkan ekor panjang di market ranging/biasa
         atr = ctx.get('atr', 2.0)
-        if m15_bias == 'ranging' or h1_bias == 'ranging' or (m15_bias != h1_bias):
+        if (m15_bias == 'ranging' or h1_bias == 'ranging' or (m15_bias != h1_bias)) and (1.0 < atr < 3.0):
             if lower_wick > body_size * 2.5 and lower_wick > atr * 0.4 and close > open_:
-                return ('BUY', 'CHOPPY_SCALP: Market Ranging + Rejection Ekor Bawah Panjang', 'METHOD_CHOPPY_SCALP_BUY', 85.0)
+                return ('BUY', 'CHOPPY_SCALP: Market Ranging + Rejection Ekor Bawah Panjang (ATR 1-3)', 'METHOD_CHOPPY_SCALP_BUY', 85.0)
             if upper_wick > body_size * 2.5 and upper_wick > atr * 0.4 and close < open_:
-                return ('SELL', 'CHOPPY_SCALP: Market Ranging + Rejection Ekor Atas Panjang', 'METHOD_CHOPPY_SCALP_SELL', 85.0)
+                return ('SELL', 'CHOPPY_SCALP: Market Ranging + Rejection Ekor Atas Panjang (ATR 1-3)', 'METHOD_CHOPPY_SCALP_SELL', 85.0)
 
         struct = ctx.get('structure', {})
         support = struct.get('nearest_support')
@@ -1298,37 +1298,44 @@ class BrainEngine:
         c3 = candles[-3] if len(candles) >= 3 else None
 
         # 1. METHOD_POI_REBOUND (Mantul Keras)
-        # Harga turun ke Support/FVG lalu ditolak keras (Pinbar besar)
+        # Harga turun ke Support/FVG lalu ditolak keras (Pinbar besar) + Sweep + Retest
+        sweep_type = struct.get('sweep_type')
         if support and abs(low - support) < (atr * 1.0):
-            if lower_wick > body_size * 1.8 and close > open_:
-                if h1_bias != 'bearish' and m15_bias != 'bearish':
-                    return ('BUY', 'POI_REBOUND: Mantul keras dari Support (Pinbar Rejection)', 'METHOD_POI_REBOUND_BUY', 88.0)
+            # Batalkan setup jika close kuat menembus support
+            if close > support and lower_wick > body_size * 1.8 and close > open_:
+                if sweep_type == 'bullish' and h1_bias != 'bearish' and m15_bias != 'bearish' and atr > 1.2:
+                    return ('BUY', 'POI_REBOUND: Rejection + Sweep dari Support (ATR>1.2)', 'METHOD_POI_REBOUND_BUY', 88.0)
         if resistance and abs(high - resistance) < (atr * 1.0):
-            if upper_wick > body_size * 1.8 and close < open_:
-                if h1_bias != 'bullish' and m15_bias != 'bullish':
-                    return ('SELL', 'POI_REBOUND: Mantul keras dari Resistance (Pinbar Rejection)', 'METHOD_POI_REBOUND_SELL', 88.0)
+            if close < resistance and upper_wick > body_size * 1.8 and close < open_:
+                if sweep_type == 'bearish' and h1_bias != 'bullish' and m15_bias != 'bullish' and atr > 1.2:
+                    return ('SELL', 'POI_REBOUND: Rejection + Sweep dari Resistance (ATR>1.2)', 'METHOD_POI_REBOUND_SELL', 88.0)
 
         # Cek FVG & OB Rebound
         for fvg in fvgs:
             if fvg['direction'] == 'Bullish' and low <= fvg['high'] and close > fvg['low']:
-                if lower_wick > body_size * 2.0 and close > open_:
-                    if h1_bias != 'bearish' and m15_bias != 'bearish':
-                        return ('BUY', 'POI_REBOUND: Rejection keras di Bullish FVG', 'METHOD_POI_REBOUND_FVG_BUY', 87.0)
+                if close > open_ and lower_wick > body_size * 2.0:
+                    if sweep_type == 'bullish' and h1_bias != 'bearish' and m15_bias != 'bearish':
+                        return ('BUY', 'POI_REBOUND: Rejection keras + Sweep di Bullish FVG', 'METHOD_POI_REBOUND_FVG_BUY', 87.0)
             if fvg['direction'] == 'Bearish' and high >= fvg['low'] and close < fvg['high']:
-                if upper_wick > body_size * 2.0 and close < open_:
-                    if h1_bias != 'bullish' and m15_bias != 'bullish':
-                        return ('SELL', 'POI_REBOUND: Rejection keras di Bearish FVG', 'METHOD_POI_REBOUND_FVG_SELL', 87.0)
+                if close < open_ and upper_wick > body_size * 2.0:
+                    if sweep_type == 'bearish' and h1_bias != 'bullish' and m15_bias != 'bullish':
+                        return ('SELL', 'POI_REBOUND: Rejection keras + Sweep di Bearish FVG', 'METHOD_POI_REBOUND_FVG_SELL', 87.0)
                     
         obs = ctx.get('obs', [])
         for ob in obs:
             ob_dir = str(ob.get('type') or ob.get('direction') or '').lower()
             ob_low, ob_high = float(ob.get('low', 0)), float(ob.get('high', 0))
-            if 'bull' in ob_dir and low <= ob_high and close > ob_low:
-                if lower_wick > body_size * 2.0 and close > open_:
-                    return ('BUY', 'POI_REBOUND: Rejection keras di Bullish Order Block', 'METHOD_POI_REBOUND_OB_BUY', 87.5)
-            if 'bear' in ob_dir and high >= ob_low and close < ob_high:
-                if upper_wick > body_size * 2.0 and close < open_:
-                    return ('SELL', 'POI_REBOUND: Rejection keras di Bearish Order Block', 'METHOD_POI_REBOUND_OB_SELL', 87.5)
+            is_fresh = ob.get('touches', 0) == 0 or ob.get('fresh', True)
+            if is_fresh and 'bull' in ob_dir and low <= ob_high and close > ob_low:
+                # Cancel if close is below OB (jebol OB)
+                if close > ob_low and lower_wick > body_size * 2.0 and close > open_:
+                    if sweep_type == 'bullish':
+                        return ('BUY', 'POI_REBOUND: Rejection keras + Sweep di Fresh Bullish Order Block', 'METHOD_POI_REBOUND_OB_BUY', 87.5)
+            if is_fresh and 'bear' in ob_dir and high >= ob_low and close < ob_high:
+                # Cancel if close is above OB
+                if close < ob_high and upper_wick > body_size * 2.0 and close < open_:
+                    if sweep_type == 'bearish':
+                        return ('SELL', 'POI_REBOUND: Rejection keras + Sweep di Fresh Bearish Order Block', 'METHOD_POI_REBOUND_OB_SELL', 87.5)
 
         # 2. METHOD_POI_ACCUMULATION (Sideways di POI lalu Break)
         if c1 and c2 and c3:
@@ -1361,19 +1368,55 @@ class BrainEngine:
                 if c1['close'] > resistance and c1['close'] > c1['open'] and c1_body > atr * 0.8:
                     return ('BUY', 'POI_FLIP_BREAK: Resistance dijebol keras setelah ngerem (Resistance turns Support)', 'METHOD_POI_FLIP_BREAK_BUY', 89.0)
 
-        # 4. METHOD_BOS_BREAKOUT (Mengejar Momentum Break of Structure)
-        # Jika market sebelumnya choppy/ranging, lalu tiba-tiba terjadi BOS dengan body besar
+        # 4. METHOD_BOS_BREAKOUT (Mengejar Momentum Break of Structure dengan Retest)
+        # Jangan entry langsung saat BOS. Tunggu retest ke OB/FVG.
         h1_bias = ctx.get('h1_bias')
         h4_bias = ctx.get('h4_bias')
-        if ctx.get('break_bull') and close > open_ and body_size > atr * 0.85:
-            # Pastikan bukan false breakout (ekor atas tidak boleh terlalu panjang)
-            if upper_wick < body_size * 0.6 and (h1_bias == 'bullish' or h4_bias == 'bullish'):
-                return ('BUY', 'BOS_BREAKOUT: Bullish Break of Structure (Momentum Kuat)', 'METHOD_BOS_BREAKOUT_BUY', 88.5)
+        
+        # Cek FVG/OB untuk retest
+        retest_fvg_bull = False
+        retest_fvg_bear = False
+        for fvg in fvgs:
+            if fvg['direction'] == 'Bullish' and low <= fvg['high'] and close > fvg['low']:
+                retest_fvg_bull = True
+            if fvg['direction'] == 'Bearish' and high >= fvg['low'] and close < fvg['high']:
+                retest_fvg_bear = True
                 
-        if ctx.get('break_bear') and close < open_ and body_size > atr * 0.85:
-            # Pastikan bukan false breakout (ekor bawah tidak boleh terlalu panjang)
-            if lower_wick < body_size * 0.6 and (h1_bias == 'bearish' or h4_bias == 'bearish'):
-                return ('SELL', 'BOS_BREAKOUT: Bearish Break of Structure (Momentum Kuat)', 'METHOD_BOS_BREAKOUT_SELL', 88.5)
+        retest_ob_bull = False
+        retest_ob_bear = False
+        obs = ctx.get('obs', [])
+        for ob in obs:
+            ob_dir = str(ob.get('type') or ob.get('direction') or '').lower()
+            if 'bull' in ob_dir and low <= float(ob.get('high', 0)) and close > float(ob.get('low', 0)):
+                retest_ob_bull = True
+            if 'bear' in ob_dir and high >= float(ob.get('low', 0)) and close < float(ob.get('high', 0)):
+                retest_ob_bear = True
+        
+        has_retest_bull = retest_fvg_bull or retest_ob_bull
+        has_retest_bear = retest_fvg_bear or retest_ob_bear
+        
+        demand_zone = struct.get('nearest_support')
+        supply_zone = struct.get('nearest_resistance')
+        
+        # Bullish BOS Retest
+        if ctx.get('break_bull') and has_retest_bull:
+            # Entry hanya jika candle retest close bullish dan menolak dari OB/FVG
+            if close > open_ and lower_wick > body_size * 1.0:
+                # Filter: supply zone lawan jangan terlalu dekat (misal jarak minimal 1.5 ATR)
+                if not supply_zone or abs(supply_zone - close) > atr * 1.5:
+                    # Filter: harus ada sweep low sebelumnya
+                    if struct.get('sweep_type') == 'bullish' or ctx.get('sentuh_low'):
+                        return ('BUY', 'BOS_BREAKOUT: Bullish BOS Retest FVG/OB (Terkonfirmasi)', 'METHOD_BOS_BREAKOUT_BUY', 88.5)
+                
+        # Bearish BOS Retest
+        if ctx.get('break_bear') and has_retest_bear:
+            # Entry hanya jika candle retest close bearish dan menolak dari OB/FVG
+            if close < open_ and upper_wick > body_size * 1.0:
+                # Filter: demand zone lawan jangan terlalu dekat
+                if not demand_zone or abs(close - demand_zone) > atr * 1.5:
+                    # Filter: harus ada sweep high sebelumnya
+                    if struct.get('sweep_type') == 'bearish' or ctx.get('sentuh_high'):
+                        return ('SELL', 'BOS_BREAKOUT: Bearish BOS Retest FVG/OB (Terkonfirmasi)', 'METHOD_BOS_BREAKOUT_SELL', 88.5)
 
         # 5. METHOD_IFVG_BREAKOUT (Inversion FVG Momentum)
         # Jika Bearish FVG dijebol keras ke atas, langsung BUY (karena menjadi Support baru)
@@ -1388,6 +1431,147 @@ class BrainEngine:
                 if close < open_ and body_size > atr * 0.5:
                     if lower_wick < body_size * 0.8: # Pastikan bukan ekor/fakeout
                         return ('SELL', 'IFVG_BREAKOUT: Bullish FVG dijebol ke bawah (Inversion FVG Momentum)', 'METHOD_IFVG_BREAK_SELL', 88.2)
+
+        return None
+
+    def _new_user_methods(self, ctx: Dict[str, Any]) -> Optional[Tuple[str, str, str, float]]:
+        price = ctx.get('price', 0)
+        close = ctx.get('last_close', 0)
+        open_ = ctx.get('last_open', 0)
+        high = ctx.get('last_high', 0)
+        low = ctx.get('last_low', 0)
+        momentum = ctx.get('momentum')
+        atr = ctx.get('atr', 2.0)
+        m15_bias = ctx.get('m15_bias')
+        h1_bias = ctx.get('h1_bias')
+        fvgs = ctx.get('fvgs', [])
+        obs = ctx.get('obs', [])
+        struct = ctx.get('structure', {})
+        sweep_type = struct.get('sweep_type')
+        candles = ctx.get('candles', [])
+        
+        if len(candles) < 3: return None
+        
+        body_top = max(open_, close)
+        body_bottom = min(open_, close)
+        body_size = max(body_top - body_bottom, 0.01)
+        upper_wick = high - body_top
+        lower_wick = body_bottom - low
+        
+        is_bullish_close = close > open_
+        is_bearish_close = close < open_
+        is_strong_bullish = is_bullish_close and body_size > atr * 0.8
+        is_strong_bearish = is_bearish_close and body_size > atr * 0.8
+        
+        demand_zone = struct.get('nearest_support')
+        supply_zone = struct.get('nearest_resistance')
+        
+        # 1. METHOD_LIQUIDITY_SWEEP_FVG_BUY & 2. METHOD_LIQUIDITY_SWEEP_FVG_SELL
+        for fvg in fvgs:
+            fvg_size = fvg['high'] - fvg['low']
+            if fvg_size < atr * 0.2: continue
+            
+            if fvg['direction'] == 'Bullish':
+                if low <= fvg['high'] and close > fvg['low'] and is_bullish_close:
+                    if sweep_type == 'bullish' or ctx.get('sentuh_low'):
+                        if not supply_zone or abs(supply_zone - close) > atr * 1.5:
+                            return ('BUY', 'LIQUIDITY_SWEEP_FVG: Sweep Low + Strong Bullish + FVG Retest', 'METHOD_LIQUIDITY_SWEEP_FVG_BUY', 90.0)
+            
+            if fvg['direction'] == 'Bearish':
+                if high >= fvg['low'] and close < fvg['high'] and is_bearish_close:
+                    if sweep_type == 'bearish' or ctx.get('sentuh_high'):
+                        if not demand_zone or abs(close - demand_zone) > atr * 1.5:
+                            return ('SELL', 'LIQUIDITY_SWEEP_FVG: Sweep High + Strong Bearish + FVG Retest', 'METHOD_LIQUIDITY_SWEEP_FVG_SELL', 90.0)
+
+        # 3. METHOD_BOS_RETEST_OB_BUY & 4. METHOD_BOS_RETEST_OB_SELL
+        for ob in obs:
+            ob_dir = str(ob.get('type') or ob.get('direction') or '').lower()
+            ob_low, ob_high = float(ob.get('low', 0)), float(ob.get('high', 0))
+            is_fresh = ob.get('touches', 0) == 0 or ob.get('fresh', True)
+            if is_fresh and atr > 1.0:
+                if 'bull' in ob_dir and low <= ob_high and close > ob_low:
+                    if ctx.get('break_bull') and is_bullish_close and lower_wick > body_size * 1.5:
+                        if not supply_zone or abs(supply_zone - close) > atr * 1.5:
+                            return ('BUY', 'BOS_RETEST_OB: Bullish BOS + Retest Fresh OB + Strong Pinbar', 'METHOD_BOS_RETEST_OB_BUY', 89.0)
+                if 'bear' in ob_dir and high >= ob_low and close < ob_high:
+                    if ctx.get('break_bear') and is_bearish_close and upper_wick > body_size * 1.5:
+                        if not demand_zone or abs(close - demand_zone) > atr * 1.5:
+                            return ('SELL', 'BOS_RETEST_OB: Bearish BOS + Retest Fresh OB + Strong Pinbar', 'METHOD_BOS_RETEST_OB_SELL', 89.0)
+
+        # 5. METHOD_CHOCH_SWEEP_REVERSAL_BUY & 6. METHOD_CHOCH_SWEEP_REVERSAL_SELL
+        if sweep_type == 'bullish' and struct.get('break_type') == 'MSS_BULLISH':
+            if is_bullish_close and lower_wick > body_size * 0.8:
+                return ('BUY', 'CHOCH_SWEEP_REVERSAL: Sweep Low + CHOCH Bullish + Rejection', 'METHOD_CHOCH_SWEEP_REVERSAL_BUY', 91.0)
+        if sweep_type == 'bearish' and struct.get('break_type') == 'MSS_BEARISH':
+            if is_bearish_close and upper_wick > body_size * 0.8:
+                return ('SELL', 'CHOCH_SWEEP_REVERSAL: Sweep High + CHOCH Bearish + Rejection', 'METHOD_CHOCH_SWEEP_REVERSAL_SELL', 91.0)
+
+        # 7. METHOD_ASIA_RANGE_SWEEP_BUY & 8. METHOD_ASIA_RANGE_SWEEP_SELL
+        try:
+            hour = datetime.now(timezone.utc).hour
+        except:
+            hour = 14
+        if 8 <= hour <= 21:
+            if sweep_type == 'bullish' and is_strong_bullish and lower_wick > body_size * 0.8:
+                return ('BUY', 'ASIA_RANGE_SWEEP: London/NY Sweep Low + Reversal Bullish', 'METHOD_ASIA_RANGE_SWEEP_BUY', 89.5)
+            if sweep_type == 'bearish' and is_strong_bearish and upper_wick > body_size * 0.8:
+                return ('SELL', 'ASIA_RANGE_SWEEP: London/NY Sweep High + Reversal Bearish', 'METHOD_ASIA_RANGE_SWEEP_SELL', 89.5)
+
+        # 9. METHOD_INDUCEMENT_TRAP_BUY & 10. METHOD_INDUCEMENT_TRAP_SELL
+        if not ctx.get('choppy') and atr > 1.2:
+            if sweep_type == 'bullish':
+                is_huge_engulfing = is_strong_bullish and body_size > (atr * 1.5)
+                reclaim_fvg = False
+                for fvg in fvgs:
+                    if fvg['direction'] == 'Bullish' and low < fvg['low'] and close > fvg['low']:
+                        reclaim_fvg = True
+                        break
+                if is_huge_engulfing or reclaim_fvg:
+                    return ('BUY', 'INDUCEMENT_TRAP: Sweep Low + Engulfing/FVG Reclaim', 'METHOD_INDUCEMENT_TRAP_BUY', 92.0)
+            if sweep_type == 'bearish' and is_strong_bearish:
+                return ('SELL', 'INDUCEMENT_TRAP: Sweep Minor High/Equal High + Strong Reversal (ATR>1.2)', 'METHOD_INDUCEMENT_TRAP_SELL', 92.0)
+
+        # 11. METHOD_FVG_CONTINUATION_BUY & 12. METHOD_FVG_CONTINUATION_SELL
+        trend = struct.get('trend', '')
+        if trend == 'TRENDING' or trend == 'EXPANSION':
+            for fvg in fvgs:
+                if fvg['direction'] == 'Bullish' and momentum != 'bearish':
+                    if low <= fvg['high'] and close > fvg['low'] and is_bullish_close:
+                        if not supply_zone or abs(supply_zone - close) > atr * 1.5:
+                            return ('BUY', 'FVG_CONTINUATION: Bullish Trend + Retest FVG', 'METHOD_FVG_CONTINUATION_BUY', 88.0)
+                if fvg['direction'] == 'Bearish' and momentum != 'bullish':
+                    if high >= fvg['low'] and close < fvg['high'] and is_bearish_close:
+                        if not demand_zone or abs(close - demand_zone) > atr * 1.5:
+                            return ('SELL', 'FVG_CONTINUATION: Bearish Trend + Retest FVG', 'METHOD_FVG_CONTINUATION_SELL', 88.0)
+        # 13. METHOD_BREAK_AND_RETEST
+        if trend in ['TRENDING', 'EXPANSION'] and not ctx.get('choppy') and atr > 1.2:
+            if demand_zone and abs(low - demand_zone) < atr * 0.8 and is_bullish_close and lower_wick > body_size * 1.0:
+                return ('BUY', 'BREAK_AND_RETEST: Trend Naik + Retest Support (Eks-Resis) + Rejection', 'METHOD_BREAK_AND_RETEST_BUY', 89.5)
+            if supply_zone and abs(high - supply_zone) < atr * 0.8 and is_bearish_close and upper_wick > body_size * 1.0:
+                return ('SELL', 'BREAK_AND_RETEST: Trend Turun + Retest Resistance (Eks-Supp) + Rejection', 'METHOD_BREAK_AND_RETEST_SELL', 89.5)
+
+        # 14. METHOD_DRAW_ON_LIQUIDITY (Kebalikan Inducement)
+        if trend in ['TRENDING', 'EXPANSION'] and not ctx.get('choppy') and atr > 1.2:
+            if supply_zone and (atr * 1.0) < (supply_zone - close) < (atr * 3.5):
+                if is_bullish_close and body_size > atr * 0.8 and lower_wick < body_size * 0.5:
+                    return ('BUY', 'DRAW_ON_LIQUIDITY: Harga ditarik menuju Unmitigated Supply/Liquidity', 'METHOD_DRAW_ON_LIQUIDITY_BUY', 89.0)
+            if demand_zone and (atr * 1.0) < (close - demand_zone) < (atr * 3.5):
+                if is_bearish_close and body_size > atr * 0.8 and upper_wick < body_size * 0.5:
+                    return ('SELL', 'DRAW_ON_LIQUIDITY: Harga ditarik menuju Unmitigated Demand/Liquidity', 'METHOD_DRAW_ON_LIQUIDITY_SELL', 89.0)
+        # 15. METHOD_FOLLOW_THE_TREND (M5/M15 Breakout Continuation)
+        if trend in ['TRENDING', 'EXPANSION'] and momentum == m15_bias and not ctx.get('choppy'):
+            if m15_bias == 'bullish' and ctx.get('break_bull') and is_strong_bullish and lower_wick < body_size * 0.5:
+                return ('BUY', 'FOLLOW_THE_TREND: M5+M15 Bullish + Strong Breakout High', 'METHOD_FOLLOW_THE_TREND_BUY', 90.0)
+            if m15_bias == 'bearish' and ctx.get('break_bear') and is_strong_bearish and upper_wick < body_size * 0.5:
+                return ('SELL', 'FOLLOW_THE_TREND: M5+M15 Bearish + Strong Breakout Low', 'METHOD_FOLLOW_THE_TREND_SELL', 90.0)
+
+        # 16. METHOD_REVERSAL (M5/M15 Counter-Momentum Sniper)
+        if sweep_type == 'bullish' and momentum == 'bearish':
+            if lower_wick > atr * 1.5 and is_bullish_close:
+                return ('BUY', 'REVERSAL: Counter Momentum + Massive Liquidity Sweep + Rejection', 'METHOD_REVERSAL_BUY', 90.0)
+        if sweep_type == 'bearish' and momentum == 'bullish':
+            if upper_wick > atr * 1.5 and is_bearish_close:
+                return ('SELL', 'REVERSAL: Counter Momentum + Massive Liquidity Sweep + Rejection', 'METHOD_REVERSAL_SELL', 90.0)
 
         return None
 
@@ -1413,19 +1597,24 @@ class BrainEngine:
         struct = ctx.get('structure', {})
         sweep_type = struct.get('sweep_type')
 
-        # V7 user methods are evaluated first and are not limited by M15/H1 bias rules.
+        # 1. Sniper Priority: V7 user methods (CRT D1/H4 Sweep) are highly accurate
         user_method_match = self._user_method_suite(ctx)
         if user_method_match:
             return user_method_match
 
-        # Antigravity Experimental Methods (Injected by Autonomous Analysis)
-        ag_match = self._antigravity_experimental_method(ctx)
-        if ag_match:
-            return ag_match
-
         rr2_sell_match = self._rr2_group_sell(ctx)
         if rr2_sell_match:
             return rr2_sell_match
+
+        # 2. New 10 Methods Execution (contains POI_REBOUND_OB_SELL etc)
+        new_methods_match = self._new_user_methods(ctx)
+        if new_methods_match:
+            return new_methods_match
+
+        # 3. Antigravity Experimental Methods (Injected by Autonomous Analysis)
+        ag_match = self._antigravity_experimental_method(ctx)
+        if ag_match:
+            return ag_match
 
         # 0. High-winrate sweep scalp first. In high_wr_only mode, skip all weaker legacy/sandbox methods.
         high_wr_match = self._high_wr_method_suite(ctx)
@@ -1898,6 +2087,19 @@ class BrainEngine:
             sl = price + sl_dist
             tp1 = price - tp1_dist
             tp2 = price - tp2_dist
+        elif pattern_key.startswith(('METHOD_BREAK_AND_RETEST', 'METHOD_DRAW_ON_LIQUIDITY', 'METHOD_FOLLOW_THE_TREND', 'METHOD_REVERSAL')):
+            # Aggressive scalping methods use elastic ATR-based SL but fast TP (1:1 & 1:1.5 RR)
+            sl_dist = max(atr * 1.5, 6.0)
+            tp1_dist = sl_dist * 1.0
+            tp2_dist = sl_dist * 1.5
+            if direction == 'BUY':
+                sl = price - sl_dist
+                tp1 = price + tp1_dist
+                tp2 = price + tp2_dist
+            else:
+                sl = price + sl_dist
+                tp1 = price - tp1_dist
+                tp2 = price - tp2_dist
         elif direction == 'BUY':
             # SL is nearest support or swing low
             support = struct.get('nearest_support') or ctx.get('prev_low') or (price - 8.0)

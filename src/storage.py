@@ -465,20 +465,8 @@ class Storage:
         conn.commit()
         conn.close()
 
-        # Event-driven: kirim market summary setiap sinyal baru terbit
-        try:
-            import threading
-            def _bg_summary():
-                try:
-                    from scratch_market_summary import main as run_market_summary
-                    run_market_summary()
-                except Exception as e:
-                    import logging
-                    logging.getLogger("Storage").error(f"Market summary error: {e}")
-            t = threading.Thread(target=_bg_summary, daemon=True)
-            t.start()
-        except Exception:
-            pass
+        # Event-driven: market summary dinonaktifkan (terlalu spam)
+        pass
 
     def get_open_signals(self, signal_timeframe=None):
         """Return only blocking signals.
