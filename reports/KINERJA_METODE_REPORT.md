@@ -1,5 +1,5 @@
 # 📊 Laporan Kinerja Metode Bot XAUUSD
-**Waktu Update:** 2022-08-22 02:04:00 UTC
+**Waktu Update:** 2024-07-31 15:34:00 UTC
 
 | Nama Metode | Total Trade | WIN | LOSS | Win Rate |
 |---|---|---|---|---|
@@ -9,6 +9,8 @@
 | ASIAN_SWEEP_SELL | 0 | 0 | 0 | 0.0% |
 | ASIAN_TRAP_BUY | 0 | 0 | 0 | 0.0% |
 | ASIAN_TRAP_SELL | 0 | 0 | 0 | 0.0% |
+| ASIA_LIQUIDITY_RUN_BUY | 0 | 0 | 0 | 0.0% |
+| ASIA_LIQUIDITY_RUN_SELL | 0 | 0 | 0 | 0.0% |
 | ASIA_RANGE_SWEEP_BUY | 0 | 0 | 0 | 0.0% |
 | ASIA_RANGE_SWEEP_SELL | 0 | 0 | 0 | 0.0% |
 | BOS_BREAKOUT_BUY | 0 | 0 | 0 | 0.0% |
@@ -18,6 +20,8 @@
 | BOS_RETEST_OB_BUY | 0 | 0 | 0 | 0.0% |
 | BOS_RETEST_OB_SELL | 0 | 0 | 0 | 0.0% |
 | BREAKER_BLOCK_BUY | 0 | 0 | 0 | 0.0% |
+| BREAKER_BLOCK_SCALP_BUY | 0 | 0 | 0 | 0.0% |
+| BREAKER_BLOCK_SCALP_SELL | 0 | 0 | 0 | 0.0% |
 | BREAKER_BLOCK_SELL | 0 | 0 | 0 | 0.0% |
 | BREAK_AND_RETEST | 0 | 0 | 0 | 0.0% |
 | BREAK_AND_RETEST_BUY | 0 | 0 | 0 | 0.0% |
@@ -28,11 +32,15 @@
 | CHOCH_SWEEP_REVERSAL_SELL | 0 | 0 | 0 | 0.0% |
 | CHOPPY_SCALP_BUY | 0 | 0 | 0 | 0.0% |
 | CHOPPY_SCALP_SELL | 0 | 0 | 0 | 0.0% |
+| CONTINUATION_BOS_BUY | 0 | 0 | 0 | 0.0% |
+| CONTINUATION_BOS_SELL | 0 | 0 | 0 | 0.0% |
 | CRT_D1 | 0 | 0 | 0 | 0.0% |
 | CRT_H4 | 0 | 0 | 0 | 0.0% |
 | DRAW_ON_LIQUIDITY | 0 | 0 | 0 | 0.0% |
 | DRAW_ON_LIQUIDITY_BUY | 0 | 0 | 0 | 0.0% |
 | DRAW_ON_LIQUIDITY_SELL | 0 | 0 | 0 | 0.0% |
+| EQUAL_HIGHS_SWEEP_SELL | 0 | 0 | 0 | 0.0% |
+| EQUAL_LOWS_SWEEP_BUY | 0 | 0 | 0 | 0.0% |
 | FOLLOW_THE_TREND | 0 | 0 | 0 | 0.0% |
 | FOLLOW_THE_TREND_BUY | 0 | 0 | 0 | 0.0% |
 | FOLLOW_THE_TREND_SELL | 0 | 0 | 0 | 0.0% |
@@ -43,6 +51,8 @@
 | H1_BREAK | 0 | 0 | 0 | 0.0% |
 | H1_BREAK_BUY | 0 | 0 | 0 | 0.0% |
 | H1_BREAK_SELL | 0 | 0 | 0 | 0.0% |
+| H1_SWEEP_SCALP_BUY | 0 | 0 | 0 | 0.0% |
+| H1_SWEEP_SCALP_SELL | 0 | 0 | 0 | 0.0% |
 | HIGH_WR_M15_SWEEP_SCALP | 0 | 0 | 0 | 0.0% |
 | HIGH_WR_M15_SWEEP_SCALP_BUY | 0 | 0 | 0 | 0.0% |
 | HIGH_WR_M15_SWEEP_SCALP_SELL | 0 | 0 | 0 | 0.0% |
@@ -65,6 +75,8 @@
 | IFVG_BREAKOUT_SELL | 0 | 0 | 0 | 0.0% |
 | IFVG_BREAK_BUY | 0 | 0 | 0 | 0.0% |
 | IFVG_BREAK_SELL | 0 | 0 | 0 | 0.0% |
+| IFVG_MOMENTUM_BUY | 0 | 0 | 0 | 0.0% |
+| IFVG_MOMENTUM_SELL | 0 | 0 | 0 | 0.0% |
 | IFVG_RETEST_BUY | 0 | 0 | 0 | 0.0% |
 | IFVG_RETEST_SELL | 0 | 0 | 0 | 0.0% |
 | INDUCEMENT_TRAP_BUY | 0 | 0 | 0 | 0.0% |
@@ -73,18 +85,38 @@
 | LIQUIDITY_SWEEP_FVG_SELL | 0 | 0 | 0 | 0.0% |
 | LONDON_KILLZONE_REVERSAL_BUY | 0 | 0 | 0 | 0.0% |
 | LONDON_KILLZONE_REVERSAL_SELL | 0 | 0 | 0 | 0.0% |
+| LONDON_OPEN_BREAKOUT_BUY | 0 | 0 | 0 | 0.0% |
+| LONDON_OPEN_BREAKOUT_SELL | 0 | 0 | 0 | 0.0% |
 | M15_DOUBLE_TOP | 0 | 0 | 0 | 0.0% |
 | M1_ | 0 | 0 | 0 | 0.0% |
 | M5_ | 0 | 0 | 0 | 0.0% |
+| M5_FVG_INSTANT_REBOUND_BUY | 0 | 0 | 0 | 0.0% |
+| M5_FVG_INSTANT_REBOUND_SELL | 0 | 0 | 0 | 0.0% |
+| MICRO_SWEEP_SCALP_BUY | 0 | 0 | 0 | 0.0% |
+| MICRO_SWEEP_SCALP_SELL | 0 | 0 | 0 | 0.0% |
+| MICRO_TURTLE_SOUP_BUY | 0 | 0 | 0 | 0.0% |
+| MICRO_TURTLE_SOUP_SELL | 0 | 0 | 0 | 0.0% |
+| MOMENTUM_IGNITION_BUY | 0 | 0 | 0 | 0.0% |
+| MOMENTUM_IGNITION_SELL | 0 | 0 | 0 | 0.0% |
+| MOMENTUM_MARUBOZU_BUY | 0 | 0 | 0 | 0.0% |
+| MOMENTUM_MARUBOZU_SELL | 0 | 0 | 0 | 0.0% |
 | MOMENTUM_RIDE | 0 | 0 | 0 | 0.0% |
 | MOMENTUM_RIDE_BUY | 0 | 0 | 0 | 0.0% |
 | MOMENTUM_RIDE_SELL | 0 | 0 | 0 | 0.0% |
+| NEWS_SPIKE_FADE_BUY | 0 | 0 | 0 | 0.0% |
+| NEWS_SPIKE_FADE_SELL | 0 | 0 | 0 | 0.0% |
 | NY_KILLZONE_REVERSAL_BUY | 0 | 0 | 0 | 0.0% |
 | NY_KILLZONE_REVERSAL_SELL | 0 | 0 | 0 | 0.0% |
+| NY_OPEN_BREAKOUT_BUY | 0 | 0 | 0 | 0.0% |
+| NY_OPEN_BREAKOUT_SELL | 0 | 0 | 0 | 0.0% |
 | OB_FVG_CONFLUENCE_BUY | 0 | 0 | 0 | 0.0% |
 | OB_FVG_CONFLUENCE_SELL | 0 | 0 | 0 | 0.0% |
+| ORDER_BLOCK_TAP_BUY | 0 | 0 | 0 | 0.0% |
+| ORDER_BLOCK_TAP_SELL | 0 | 0 | 0 | 0.0% |
 | OTE_BEARISH_RETRACE | 0 | 0 | 0 | 0.0% |
 | OTE_BULLISH_RETRACE | 0 | 0 | 0 | 0.0% |
+| PARABOLIC_EXHAUSTION_BUY | 0 | 0 | 0 | 0.0% |
+| PARABOLIC_EXHAUSTION_SELL | 0 | 0 | 0 | 0.0% |
 | PATTERN_ | 0 | 0 | 0 | 0.0% |
 | PATTERN_COMPRESS_BEAR | 0 | 0 | 0 | 0.0% |
 | PATTERN_COMPRESS_BULL | 0 | 0 | 0 | 0.0% |
@@ -105,8 +137,10 @@
 | REJECTION_RESISTANCE | 0 | 0 | 0 | 0.0% |
 | REJECTION_SUPPORT | 0 | 0 | 0 | 0.0% |
 | REVERSAL | 0 | 0 | 0 | 0.0% |
-| REVERSAL_BUY | 0 | 0 | 0 | 0.0% |
-| REVERSAL_SELL | 0 | 0 | 0 | 0.0% |
+| SESSION_OPEN_BREAKOUT_BUY | 0 | 0 | 0 | 0.0% |
+| SESSION_OPEN_BREAKOUT_SELL | 0 | 0 | 0 | 0.0% |
+| SHALLOW_PULLBACK_BUY | 0 | 0 | 0 | 0.0% |
+| SHALLOW_PULLBACK_SELL | 0 | 0 | 0 | 0.0% |
 | STRICT_M15_SWEEP_RECLAIM | 0 | 0 | 0 | 0.0% |
 | STRICT_M15_SWEEP_RECLAIM_BUY | 0 | 0 | 0 | 0.0% |
 | STRICT_M15_SWEEP_RECLAIM_SELL | 0 | 0 | 0 | 0.0% |
