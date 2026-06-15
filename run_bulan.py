@@ -10,6 +10,8 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 target_month = sys.argv[1]  # e.g. 2025-01
+fair_method = (os.environ.get("FAIR_TEST_METHOD") or os.environ.get("METHOD_UNDER_TEST") or "").strip().upper()
+result_key = target_month if not fair_method else f"{target_month}__{fair_method}"
 month_key = target_month.replace('-', '')  # e.g. 202501, supaya run_simulator bisa baca dataset_key
 DB_PATH = "data/xauusd_bot.sqlite"
 GHOST_DB_PATH = "data/xauusd_bot_ghost.sqlite"
@@ -18,12 +20,14 @@ BACKTEST_REPORT_PATH = "reports/BACKTEST_RESULTS_REPORT.md"
 TEMP_CSV = f"data_temp_{month_key}.csv"
 
 print(f"\nMenyiapkan data untuk bulan {target_month}...")
+if fair_method:
+    print(f"FAIR TEST METHOD: {fair_method}")
 
 # 0. Snapshot config sebelum simulasi
 subprocess.run([
     sys.executable, "tools/snapshot_config.py",
-    "--run-month", target_month,
-    "--mode", "backtest_all_methods",
+    "--run-month", result_key,
+    "--mode", "fair_test_method" if fair_method else "backtest_all_methods",
     "--notes", "Snapshot otomatis sebelum run_bulan"
 ])
 
@@ -50,20 +54,25 @@ with open(TEMP_CSV, 'w', newline='') as fout:
     writer = csv.writer(fout)
     for row in rows:
         iso_str = row[0]
-        date_str = iso_str[0:10].replace('-', '.')  # 2022.01.03
-        time_str = iso_str[11:16]                   # 00:00
+        date_str = iso_str[0:10].replace('-', '.')
+        time_str = iso_str[11:16]
         writer.writerow([date_str, time_str, row[1], row[2], row[3], row[4], row[5]])
 
-# 3. Jalankan Simulator dalam mode BACKTEST_ALL_METHODS
-print(f"\n🚀 Memulai Simulasi ALL METHODS untuk {target_month}...")
+# 3. Jalankan Simulator dalam mode BACKTEST_ALL_METHODS netral.
+# --new-test-run penting agar hasil backtest TIDAK merge score/poin ke live DB.
+print(f"\n🚀 Memulai Simulasi {'FAIR TEST' if fair_method else 'ALL METHODS'} untuk {target_month}...")
 env = os.environ.copy()
 env["BACKTEST_ALL_METHODS"] = "true"
 env["DRY_RUN"] = "true"
+if fair_method:
+    env["FAIR_TEST"] = "true"
+    env["FAIR_TEST_METHOD"] = fair_method
 cmd = [
     sys.executable, "-u", "src/run_simulator.py",
     "--file", TEMP_CSV,
     "--keep-ghost",
-    "--append-ghost"
+    "--append-ghost",
+    "--new-test-run"
 ]
 result = subprocess.run(cmd, env=env)
 
@@ -74,9 +83,9 @@ if result.returncode != 0:
     sys.exit(result.returncode)
 
 # 4. Simpan hasil ghost bulan ini ke DB backtest permanen
-print(f"\n💾 Menyimpan hasil {target_month} ke {BACKTEST_DB_PATH}...")
+print(f"\n💾 Menyimpan hasil {result_key} ke {BACKTEST_DB_PATH}...")
 export_cmd = [
-    sys.executable, "tools/save_backtest_results.py", target_month,
+    sys.executable, "tools/save_backtest_results.py", result_key,
     "--source-db", GHOST_DB_PATH,
     "--dest-db", BACKTEST_DB_PATH,
     "--report", BACKTEST_REPORT_PATH,
@@ -84,7 +93,7 @@ export_cmd = [
 export_result = subprocess.run(export_cmd)
 
 if export_result.returncode != 0:
-    print(f"\n❌ Export hasil {target_month} ke DB permanen gagal.")
+    print(f"\n❌ Export hasil {result_key} ke DB permanen gagal.")
     if os.path.exists(TEMP_CSV):
         os.remove(TEMP_CSV)
     sys.exit(export_result.returncode)
@@ -99,11 +108,11 @@ subprocess.run([sys.executable, "manage_methods.py", "sync"])
 if os.path.exists(TEMP_CSV):
     os.remove(TEMP_CSV)
 
-print(f"\n✅ Simulasi ALL METHODS {target_month} SELESAI.")
+print(f"\n✅ Simulasi {'FAIR TEST' if fair_method else 'ALL METHODS'} {result_key} SELESAI.")
 print(f"✅ Detail sementara simulator: {GHOST_DB_PATH}")
 print(f"✅ Hasil permanen backtest: {BACKTEST_DB_PATH}")
 print(f"✅ Report permanen: {BACKTEST_REPORT_PATH}")
 print("\nCek hasil:")
-print(f"  python3 query_backtest_results.py {target_month}")
+print(f"  python3 query_backtest_results.py {result_key}")
 print("  python3 query_backtest_results.py")
 print("  cat reports/BACKTEST_RESULTS_REPORT.md")
