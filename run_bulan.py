@@ -19,6 +19,14 @@ TEMP_CSV = f"data_temp_{month_key}.csv"
 
 print(f"\nMenyiapkan data untuk bulan {target_month}...")
 
+# 0. Snapshot config sebelum simulasi
+subprocess.run([
+    sys.executable, "tools/snapshot_config.py",
+    "--run-month", target_month,
+    "--mode", "backtest_all_methods",
+    "--notes", "Snapshot otomatis sebelum run_bulan"
+])
+
 # 1. Tarik data dari database
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
@@ -46,15 +54,18 @@ with open(TEMP_CSV, 'w', newline='') as fout:
         time_str = iso_str[11:16]                   # 00:00
         writer.writerow([date_str, time_str, row[1], row[2], row[3], row[4], row[5]])
 
-# 3. Jalankan Simulator
-print(f"\n🚀 Memulai Simulasi untuk {target_month}...")
+# 3. Jalankan Simulator dalam mode BACKTEST_ALL_METHODS
+print(f"\n🚀 Memulai Simulasi ALL METHODS untuk {target_month}...")
+env = os.environ.copy()
+env["BACKTEST_ALL_METHODS"] = "true"
+env["DRY_RUN"] = "true"
 cmd = [
     sys.executable, "-u", "src/run_simulator.py",
     "--file", TEMP_CSV,
     "--keep-ghost",
     "--append-ghost"
 ]
-result = subprocess.run(cmd)
+result = subprocess.run(cmd, env=env)
 
 if result.returncode != 0:
     print(f"\n❌ Simulasi {target_month} gagal. Hasil tidak disimpan ke DB backtest permanen.")
@@ -78,14 +89,21 @@ if export_result.returncode != 0:
         os.remove(TEMP_CSV)
     sys.exit(export_result.returncode)
 
-# 5. Bersihkan file CSV sementara
+# 5. Buat report V2 yang lebih mudah dibaca
+subprocess.run([sys.executable, "tools/backtest_report_v2.py"])
+
+# 6. Sinkronkan registry metode
+subprocess.run([sys.executable, "manage_methods.py", "sync"])
+
+# 7. Bersihkan file CSV sementara
 if os.path.exists(TEMP_CSV):
     os.remove(TEMP_CSV)
 
-print(f"\n✅ Simulasi {target_month} SELESAI.")
+print(f"\n✅ Simulasi ALL METHODS {target_month} SELESAI.")
 print(f"✅ Detail sementara simulator: {GHOST_DB_PATH}")
 print(f"✅ Hasil permanen backtest: {BACKTEST_DB_PATH}")
 print(f"✅ Report permanen: {BACKTEST_REPORT_PATH}")
 print("\nCek hasil:")
 print(f"  python3 query_backtest_results.py {target_month}")
 print("  python3 query_backtest_results.py")
+print("  cat reports/BACKTEST_RESULTS_REPORT.md")
