@@ -64,9 +64,11 @@ if fair_method:
     env["FAIR_TEST_METHOD"] = fair_method
 
 runner_code = (
+    "import sys;"
+    "sys.path.insert(0,'src');"
     "from src.backtest_fairness_patch import apply_backtest_fairness_patch;"
     "apply_backtest_fairness_patch();"
-    "import runpy, sys;"
+    "import runpy;"
     "sys.argv=['src/run_simulator.py']+sys.argv[1:];"
     "runpy.run_path('src/run_simulator.py', run_name='__main__')"
 )
