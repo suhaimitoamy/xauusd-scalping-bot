@@ -1,6 +1,7 @@
 """AI Trainer for adaptive brain.
 
-Learns from the first closed trade. LOSS gives penalty, WIN gives reward.
+Learns from closed trades. LOSS gives penalty, TP2 WIN gives reward,
+and TP1/PARTIAL_WIN gets only a small reward because TP2 is the final target.
 AI can create a draft brain upgrade, but active replacement requires YES approval.
 """
 from __future__ import annotations
@@ -37,7 +38,6 @@ class AdaptiveTrainer:
         prev_result = None
         if prev_training:
             prev_result = prev_training.get('result')
-            # Cek apakah ini upgrade
             rank = {'LOSS': 0, 'PARTIAL_WIN': 1, 'WIN': 2, 'FULL_WIN': 3}
             if rank.get(result, -1) <= rank.get(prev_result, -1):
                 return f"Signal #{signal_id} sudah pernah dilatih dengan hasil {prev_result}."
@@ -47,10 +47,8 @@ class AdaptiveTrainer:
         direction = signal.get('direction') or raw.get('direction') or ''
 
         compact = build_compact_ai_context(self.storage, self.symbol, current_price, raw or signal)
-        
         penalty, reward = self._score_result(result)
-        
-        # Jika upgrade, kita hanya tambahkan selisih reward/penalty ke pola
+
         added_penalty = penalty
         added_reward = reward
         if prev_training:
@@ -60,7 +58,6 @@ class AdaptiveTrainer:
         cooldown = self.loss_cooldown_minutes if result == 'LOSS' else 0
         fallback_lesson = self._fallback_lesson(result, signal, pattern_key)
 
-        # Simpan hasil lokal segera
         self.memory.save_training(signal_id, result, pattern_key, fallback_lesson, penalty, reward, False, {'status': 'pending_ai'})
         pattern = self.memory.update_pattern_result(pattern_key, direction, result, fallback_lesson, added_penalty, added_reward, cooldown, prev_result=prev_result)
 
@@ -74,18 +71,14 @@ class AdaptiveTrainer:
             f"Local Lesson: {fallback_lesson}\n"
         )
 
-        # Jalankan AI di background hanya untuk LOSS atau FULL_WIN
         if (self.auto_ai_review or self.auto_brain_draft) and result in ('LOSS', 'FULL_WIN'):
             import threading
             def bg_ai_task():
                 try:
                     lesson, ai_used, ai_json = self._ai_review(signal, raw, compact, result, pattern_key)
                     if ai_used:
-                        # Timpa DB dengan lesson AI
                         self.memory.save_training(signal_id, result, pattern_key, lesson, penalty, reward, ai_used, ai_json)
-                        # Gunakan prev_result=result agar tidak menambah/mengurang hitungan menang/kalah dua kali
                         self.memory.update_pattern_result(pattern_key, direction, result, lesson, 0.0, 0.0, cooldown, prev_result=result)
-                        
                         if self.auto_brain_draft:
                             BrainWriter(self.storage).propose_ai_draft(lesson, compact, pattern_key=pattern_key)
                 except Exception as e:
@@ -147,12 +140,14 @@ class AdaptiveTrainer:
 
     def _score_result(self, result: str) -> tuple[float, float]:
         if result == 'LOSS':
-            return 0.0, 0.0  # ZERO PENALTY
+            return 10.0, 0.0
         if result == 'FULL_WIN':
-            return 0.0, 18.0
+            return 0.0, 15.0
         if result == 'WIN':
-            return 0.0, 12.0
-        return 0.0, 8.0
+            return 0.0, 10.0
+        if result == 'PARTIAL_WIN':
+            return 0.0, 3.0
+        return 0.0, 0.0
 
     def _ai_review(self, signal: Dict[str, Any], raw: Dict[str, Any], compact: str,
                    result: str, pattern_key: str) -> tuple[str, bool, Dict[str, Any]]:
@@ -187,15 +182,14 @@ class AdaptiveTrainer:
     def _fallback_lesson(self, result: str, signal: Dict[str, Any], pattern_key: str) -> str:
         direction = signal.get('direction', 'UNKNOWN')
         if result == 'LOSS':
-            reward = 0.0
-            penalty = 0.0  # ZERO PENALTY
-            return f"{pattern_key} {direction} kena SL; beri penalty dan minta konfirmasi BREAK/close yang lebih kuat pada pola serupa."
+            return f"{pattern_key} {direction} kena SL; beri penalty dan wajib perketat konfirmasi sebelum pola serupa dipakai lagi."
         if result == 'WIN':
-            return f"{pattern_key} {direction} TP; beri reward dan simpan sebagai pola yang boleh diuji lagi."
-        return f"{pattern_key} {direction} TP1/PROTECT; hitung sebagai PARTIAL_WIN dan beri reward kecil karena trade sudah aman."
+            return f"{pattern_key} {direction} TP2; beri reward karena target final tercapai."
+        if result == 'FULL_WIN':
+            return f"{pattern_key} {direction} TP3; beri reward besar karena full target tercapai."
+        return f"{pattern_key} {direction} TP1/PROTECT; reward kecil saja karena TP2 belum final."
 
     def evaluate_no_trade(self, current_price: float = 0) -> str:
-        """Retroactively evaluate recent NO_TRADE decisions."""
         evaluated = 0
         try:
             pending = self.memory.get_unevaluated_no_trades(minutes_ago=30)
@@ -217,15 +211,11 @@ class AdaptiveTrainer:
                 direction = decision.get('direction') or ''
                 pattern_key = decision.get('pattern_key') or 'NO_TRADE_GENERIC'
                 reason = decision.get('reason') or ''
-
-                # Determine if movement was in a tradeable direction
                 price_went_up = current_price > decision_price
                 price_went_down = current_price < decision_price
 
                 missed = False
                 if move >= 5.0:
-                    # Large move happened — was there an opportunity?
-                    # Check if reason suggests direction was available
                     reason_upper = reason.upper()
                     if price_went_up and any(k in reason_upper for k in ['BUY', 'BULLISH', 'DEMAND', 'LOW']):
                         missed = True
@@ -233,32 +223,24 @@ class AdaptiveTrainer:
                         missed = True
 
                 if missed:
-                    # Missed opportunity — small penalty
                     penalty, reward = 3.0, 0.0
                     result_tag = 'MISSED_OPPORTUNITY'
                     lesson = f"NO_TRADE saat harga bergerak ${move:.1f}. Peluang terlewat."
                 elif move < 3.0:
-                    # Price stayed flat / choppy — good skip
                     penalty, reward = 0.0, 2.0
                     result_tag = 'GOOD_SKIP'
                     lesson = f"NO_TRADE benar, harga hanya bergerak ${move:.1f}. Skip tepat."
                 else:
-                    # Moderate move, neutral
                     penalty, reward = 0.0, 0.0
                     result_tag = 'NEUTRAL_SKIP'
                     lesson = f"NO_TRADE netral, harga bergerak ${move:.1f}."
 
                 if penalty > 0 or reward > 0:
-                    self.memory.update_pattern_result(
-                        pattern_key, direction, result_tag, lesson, penalty, reward, 0
-                    )
+                    self.memory.update_pattern_result(pattern_key, direction, result_tag, lesson, penalty, reward, 0)
 
                 self.memory.mark_no_trade_evaluated(decision['id'])
                 evaluated += 1
             except Exception as e:
                 import logging
                 logging.getLogger("AITrainer").error(f"Error evaluating NO_TRADE decision {decision.get('id', 'unknown')}: {e}")
-                self.memory.mark_no_trade_evaluated(decision['id'])
-                continue
-
         return f"NO_TRADE eval selesai: {evaluated} keputusan dievaluasi."
