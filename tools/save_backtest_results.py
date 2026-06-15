@@ -260,7 +260,7 @@ def write_report(conn, report_path):
                SUM(losses) AS losses
         FROM backtest_method_summary
         GROUP BY pattern_key
-        ORDER BY total_trades DESC, win_rate DESC
+        ORDER BY total_trades DESC
     """)
     for pattern_key, total, wins, losses in cur.fetchall():
         wr = (wins / total * 100) if total else 0.0
