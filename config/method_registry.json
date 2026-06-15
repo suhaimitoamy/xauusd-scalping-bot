@@ -298,32 +298,12 @@
       "notes": ""
     },
     "METHOD_HW_BREAK_12": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_HW_BREAK_12",
-      "notes": ""
-    },
-    "METHOD_HW_BREAK_12_BUY": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_HW_BREAK_12",
-      "notes": ""
-    },
-    "METHOD_HW_BREAK_12_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_HW_BREAK_12",
       "notes": ""
     },
     "METHOD_HW_BREAK_20": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_HW_BREAK_20",
-      "notes": ""
-    },
-    "METHOD_HW_BREAK_20_BUY": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_HW_BREAK_20",
-      "notes": ""
-    },
-    "METHOD_HW_BREAK_20_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_HW_BREAK_20",
       "notes": ""
     },
@@ -333,22 +313,12 @@
       "notes": ""
     },
     "METHOD_HW_SWEEP_12": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_HW_SWEEP_12",
-      "notes": ""
-    },
-    "METHOD_HW_SWEEP_12_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_HW_SWEEP_12",
       "notes": ""
     },
     "METHOD_HW_SWEEP_32": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_HW_SWEEP_32",
-      "notes": ""
-    },
-    "METHOD_HW_SWEEP_32_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_HW_SWEEP_32",
       "notes": ""
     },
@@ -373,12 +343,12 @@
       "notes": ""
     },
     "METHOD_ICT_TURTLE_SOUP_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_ICT_TURTLE_SOUP",
       "notes": ""
     },
     "METHOD_ICT_TURTLE_SOUP_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_ICT_TURTLE_SOUP",
       "notes": ""
     },
@@ -487,44 +457,9 @@
       "base": "METHOD_M1_",
       "notes": ""
     },
-    "METHOD_M1_BREAK_6": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M1_BREAK_6",
-      "notes": ""
-    },
-    "METHOD_M1_BREAK_8": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M1_BREAK_8",
-      "notes": ""
-    },
-    "METHOD_M1_SWEEP_12": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M1_SWEEP_12",
-      "notes": ""
-    },
-    "METHOD_M1_SWEEP_6": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M1_SWEEP_6",
-      "notes": ""
-    },
     "METHOD_M5_": {
       "status": "WATCHLIST",
       "base": "METHOD_M5_",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_12": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_12",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_6": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_6",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_8": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_8",
       "notes": ""
     },
     "METHOD_M5_FVG_INSTANT_REBOUND_BUY": {
@@ -535,16 +470,6 @@
     "METHOD_M5_FVG_INSTANT_REBOUND_SELL": {
       "status": "WATCHLIST",
       "base": "METHOD_M5_FVG_INSTANT_REBOUND",
-      "notes": ""
-    },
-    "METHOD_M5_SWEEP_12": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_SWEEP_12",
-      "notes": ""
-    },
-    "METHOD_M5_SWEEP_8": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_SWEEP_8",
       "notes": ""
     },
     "METHOD_MICRO_SWEEP_SCALP_BUY": {
@@ -703,7 +628,7 @@
       "notes": ""
     },
     "METHOD_PATTERN_SHOOTING_STAR": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_PATTERN_SHOOTING_STAR",
       "notes": ""
     },
@@ -773,12 +698,12 @@
       "notes": ""
     },
     "METHOD_SESSION_OPEN_BREAKOUT_BUY": {
-      "status": "EXPERIMENTAL",
+      "status": "LIVE_MAIN",
       "base": "METHOD_SESSION_OPEN_BREAKOUT",
       "notes": ""
     },
     "METHOD_SESSION_OPEN_BREAKOUT_SELL": {
-      "status": "EXPERIMENTAL",
+      "status": "LIVE_MAIN",
       "base": "METHOD_SESSION_OPEN_BREAKOUT",
       "notes": ""
     },
@@ -808,7 +733,7 @@
       "notes": ""
     },
     "RR2_GROUP_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "RR2_GROUP",
       "notes": ""
     }

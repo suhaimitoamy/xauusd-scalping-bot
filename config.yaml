@@ -115,28 +115,10 @@ adaptive_brain:
   enabled: true
   high_wr_only: false
   main_methods:
-  - METHOD_M5_BREAK_6
-  - METHOD_M5_BREAK_12
-  - METHOD_HW_BREAK_12_SELL
-  - METHOD_M1_SWEEP_12
-  - METHOD_M1_BREAK_6
-  - METHOD_M1_BREAK_8
-  - METHOD_M5_BREAK_8
-  - METHOD_PATTERN_SHOOTING_STAR
-  - RR2_GROUP_SELL
-  - METHOD_ICT_TURTLE_SOUP_SELL
-  - METHOD_HW_BREAK_12_BUY
-  - METHOD_ICT_TURTLE_SOUP_BUY
   - METHOD_CRT_H4_SWEEP_BUY
   - METHOD_CRT_H4_SWEEP_SELL
-  - METHOD_HW_BREAK_20_BUY
-  - METHOD_HW_BREAK_20_SELL
-  - METHOD_M1_SWEEP_6
-  - METHOD_M5_SWEEP_12
-  - METHOD_M5_SWEEP_8
   - METHOD_CRT_D1_SWEEP_SELL
-  - METHOD_HW_SWEEP_12_SELL
-  - METHOD_HW_SWEEP_32_SELL
+  - METHOD_SESSION_OPEN_BREAKOUT_SELL
   method_governance:
     enabled: true
     mode: report_only
@@ -167,7 +149,8 @@ adaptive_brain:
     - METHOD_HW_SWEEP_12_SELL
     - METHOD_HW_SWEEP_32_SELL
     watch_methods: []
-    notes: Metode utama dikunci. AI/Antigravity hanya boleh evaluasi, membuat laporan, dan memberi rekomendasi. Tidak boleh auto-edit rule.
+    notes: Metode utama dikunci. AI/Antigravity hanya boleh evaluasi, membuat laporan,
+      dan memberi rekomendasi. Tidak boleh auto-edit rule.
   high_wr_safe_hours_utc: []
   dual_signal_mode: true
   v6_lookbacks:
