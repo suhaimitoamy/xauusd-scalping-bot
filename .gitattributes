@@ -1,2 +1,4 @@
 temp_mega_backtest.csv filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text
+data/backtest_results.sqlite filter=lfs diff=lfs merge=lfs -text
+data/xauusd_bot_ghost.sqlite filter=lfs diff=lfs merge=lfs -text
