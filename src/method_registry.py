@@ -21,6 +21,10 @@ WATCHLIST = "WATCHLIST"
 EXPERIMENTAL = "EXPERIMENTAL"
 DISABLED = "DISABLED"
 
+EXTRA_METHODS = {
+    "METHOD_CRT_H1_SELL",
+}
+
 DIRECTION_SUFFIXES = ("_BUY", "_SELL")
 
 EXPERIMENTAL_HINTS = (
@@ -100,10 +104,11 @@ def set_main_methods(methods: Iterable[str], config: Dict[str, Any] | None = Non
 
 
 def discover_methods_from_code(path: Path = BRAIN_PATH) -> List[str]:
+    found = set(EXTRA_METHODS)
     if not path.exists():
-        return []
+        return sorted(found)
     code = path.read_text(encoding="utf-8", errors="ignore")
-    found = set(re.findall(r"['\"]((?:METHOD|AI_METHOD|ANTIGRAVITY)[A-Z0-9_]+|RR2_GROUP_SELL)['\"]", code))
+    found.update(re.findall(r"['\"]((?:METHOD|AI_METHOD|ANTIGRAVITY)[A-Z0-9_]+|RR2_GROUP_SELL)['\"]", code))
     return sorted(normalize_method_name(x) for x in found if x)
 
 
