@@ -11,7 +11,8 @@ if len(sys.argv) < 2:
 
 target_month = sys.argv[1]
 fair_method = (os.environ.get("FAIR_TEST_METHOD") or os.environ.get("METHOD_UNDER_TEST") or "").strip().upper()
-result_key = target_month if not fair_method else f"{target_month}__{fair_method}"
+research_mode = not fair_method and os.environ.get("BT_RESEARCH", "true").lower() in {"1", "true", "yes", "on"}
+result_key = (f"{target_month}__BT_RESEARCH_NON_MAIN" if research_mode else (target_month if not fair_method else f"{target_month}__{fair_method}"))
 month_key = target_month.replace('-', '')
 DB_PATH = "data/xauusd_bot.sqlite"
 GHOST_DB_PATH = "data/xauusd_bot_ghost.sqlite"
@@ -54,11 +55,18 @@ with open(TEMP_CSV, 'w', newline='') as fout:
         time_str = iso_str[11:16]
         writer.writerow([date_str, time_str, row[1], row[2], row[3], row[4], row[5]])
 
-print(f"\n🚀 Memulai Simulasi {'FAIR TEST' if fair_method else 'ALL METHODS'} untuk {target_month}...")
+mode_label = 'BT RESEARCH NON-MAIN' if research_mode else ('FAIR TEST' if fair_method else 'ALL METHODS')
+print(f"\n🚀 Memulai Simulasi {mode_label} untuk {target_month}...")
 env = os.environ.copy()
 env["BACKTEST_ALL_METHODS"] = "true"
 env["DRY_RUN"] = "true"
 env["BACKTEST_NEUTRAL_CONFIDENCE"] = "true"
+if research_mode:
+    env["BT_RESEARCH"] = "true"
+    env.setdefault("BT_RESEARCH_PER_DAY", "8")
+    env.setdefault("BT_RESEARCH_SL", "2.0")
+    env.setdefault("BT_RESEARCH_TP1", "1.0")
+    env.setdefault("BT_RESEARCH_TP2", "2.0")
 if fair_method:
     env["FAIR_TEST"] = "true"
     env["FAIR_TEST_METHOD"] = fair_method
@@ -68,6 +76,8 @@ runner_code = (
     "sys.path.insert(0,'src');"
     "from src.backtest_fairness_patch import apply_backtest_fairness_patch;"
     "apply_backtest_fairness_patch();"
+    "from src.bt_research_patch import apply_bt_research_patch;"
+    "apply_bt_research_patch();"
     "import runpy;"
     "sys.argv=['src/run_simulator.py']+sys.argv[1:];"
     "runpy.run_path('src/run_simulator.py', run_name='__main__')"
@@ -108,7 +118,7 @@ subprocess.run([sys.executable, "manage_methods.py", "sync"])
 if os.path.exists(TEMP_CSV):
     os.remove(TEMP_CSV)
 
-print(f"\n✅ Simulasi {'FAIR TEST' if fair_method else 'ALL METHODS'} {result_key} SELESAI.")
+print(f"\n✅ Simulasi {mode_label} {result_key} SELESAI.")
 print(f"✅ Detail sementara simulator: {GHOST_DB_PATH}")
 print(f"✅ Hasil permanen backtest: {BACKTEST_DB_PATH}")
 print(f"✅ Report permanen: {BACKTEST_REPORT_PATH}")
