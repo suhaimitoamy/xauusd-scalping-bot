@@ -26,6 +26,10 @@ class SignalGate:
         pattern_key = signal.get('pattern_key') or ''
 
         target_method = os.environ.get('FAIR_TEST_METHOD') or os.environ.get('METHOD_UNDER_TEST')
+        backtest_mode = os.environ.get('BACKTEST_ALL_METHODS', '').lower() in {'1', 'true', 'yes', 'on'}
+        fair_test_mode = os.environ.get('FAIR_TEST', '').lower() in {'1', 'true', 'yes', 'on'} or bool(target_method)
+        live_mode = not backtest_mode and not fair_test_mode
+
         if target_method:
             if not (equivalent_method_names(pattern_key) & equivalent_method_names(target_method)):
                 return False, f"BLOCK: fair-test hanya untuk {target_method}, bukan {pattern_key}"
@@ -40,17 +44,20 @@ class SignalGate:
 
         adaptive = (self.config or {}).get('adaptive_brain', {})
         whitelist = get_main_methods(self.config)
-        backtest_mode = os.environ.get('BACKTEST_ALL_METHODS', '').lower() in {'1', 'true', 'yes', 'on'}
-        fair_test_mode = os.environ.get('FAIR_TEST', '').lower() in {'1', 'true', 'yes', 'on'} or bool(target_method)
-        if whitelist and not backtest_mode and not fair_test_mode and not method_allowed(pattern_key, whitelist, backtest_all=False):
+        if whitelist and live_mode and not method_allowed(pattern_key, whitelist, backtest_all=False):
             return False, f"BLOCK: {pattern_key} tidak ada di LIVE whitelist"
 
         rr_cfg = adaptive.get('rr_guard', {}) if isinstance(adaptive, dict) else {}
         rr_enabled = bool(rr_cfg.get('enabled', True))
         min_rr = float(rr_cfg.get('min_rr', 2.0))
+
         if rr_enabled:
             ok, msg, rr = validate_rr(signal, min_rr=min_rr)
-            if not ok:
+            signal['rr_gate_status'] = 'PASS' if ok else 'FAIL'
+            signal['rr_gate_message'] = msg
+            # Backtest/fair-test tidak boleh diblokir oleh RR Guard.
+            # Tujuannya agar metode tetap muncul di hasil, lalu metode RR jelek bisa diaudit.
+            if live_mode and not ok:
                 return False, msg
 
         confidence = float(signal.get('confidence') or 0)
