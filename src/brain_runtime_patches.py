@@ -12,6 +12,7 @@ def apply_patches() -> None:
     """Apply safe runtime patches without editing the large strategy file directly.
 
     - Backtest mode can test all methods via BACKTEST_ALL_METHODS=true.
+    - FAIR_TEST_METHOD can force a single target method where whitelist checks are used.
     - Live mode keeps whitelist strict, with BUY/SELL suffix compatibility.
     - Context gets h4_bias/d1_bias and time aliases for session methods.
     - Telegram trade events use one consistent template.
@@ -33,12 +34,13 @@ def patch_brain_engine() -> None:
     if getattr(BrainEngine, "_amy_runtime_patched", False):
         return
 
-    original_allowed = BrainEngine._main_method_allowed
-
     def _patched_main_method_allowed(self, pattern_key: str) -> bool:
-        adaptive = (getattr(self, "config", None) or {}).get("adaptive_brain", {})
+        target_method = os.environ.get("FAIR_TEST_METHOD") or os.environ.get("METHOD_UNDER_TEST")
+        if target_method:
+            return bool(equivalent_method_names(pattern_key) & equivalent_method_names(target_method))
         if is_backtest_all_enabled(getattr(self, "config", None) or {}):
             return True
+        adaptive = (getattr(self, "config", None) or {}).get("adaptive_brain", {})
         main_methods = set(adaptive.get("main_methods") or getattr(self, "main_methods", set()) or [])
         if not main_methods:
             return True
