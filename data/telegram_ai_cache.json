@@ -36,5 +36,43 @@
       },
       "signature": "7449e00bbbfe"
     }
+  },
+  "c435bddaca87a35f2e019030b2845eb1d46c0b99": {
+    "question": "Harga saat inj",
+    "answer": "🧠 Dijawab oleh AI berdasarkan data bot\nSource: AI + BOT DATA\n\nBro, harga XAUUSD saat ini ada di **4285.225** (update 22:41 UTC tadi). \n\nKondisinya lagi **bullish semua** dari timeframe M15 sampe intraday, tapi posisi harga udah di zona **premium** alias agak mahal. Range hariannya antara **4213.191 - 4306.491**, dengan equilibrium di **4259.841**.\n\nYang menarik nih, ada **liquidity below di 4283.94** — dan harga sekarang persis di atas level itu. Jadi bisa aja lagi ngetes area liquiditas. Sementara supply zone terdekat ada di **4222-4229** (dari 12 Juni) dan demand zone di **4202-4209** (dari 13 Juni).\n\nKesimpulannya: bullish masih dominan, tapi hati-hati kalau mau entry di harga premium kayak gini. Mending nunggu konfirmasi dulu atau cari pullback ke area demand.",
+    "snapshot_signature": "5784f70868e9",
+    "created_at": "2026-06-14T22:41:43.107520+00:00",
+    "snapshot": {
+      "symbol": "XAU/USD",
+      "price": 4285.225,
+      "updated_utc": "2026-06-14T22:41:38+00:00",
+      "bias": {
+        "m15": "bullish",
+        "h1": "bullish",
+        "h4": "bullish",
+        "intraday": "bullish",
+        "price_position": "premium"
+      },
+      "levels": {
+        "range_high": 4306.491,
+        "range_low": 4213.191,
+        "equilibrium": 4259.841,
+        "liquidity_above": 4306.379,
+        "liquidity_below": 4283.94
+      },
+      "supply_demand": {
+        "supply": {
+          "low": 4222.04787,
+          "high": 4229.55647,
+          "time": "2026-06-12T14:00:05.550522+00:00"
+        },
+        "demand": {
+          "low": 4202.21036,
+          "high": 4209.23951,
+          "time": "2026-06-13T00:00:03.433077+00:00"
+        }
+      },
+      "signature": "5784f70868e9"
+    }
   }
 }

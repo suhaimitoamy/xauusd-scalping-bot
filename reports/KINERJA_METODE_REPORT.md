@@ -1,9 +1,9 @@
 # 📊 Laporan Kinerja Metode Bot XAUUSD
-**Waktu Update:** 2024-07-31 15:34:00 UTC
+**Waktu Update:** 2022-12-30 10:01:00 UTC
 
 | Nama Metode | Total Trade | WIN | LOSS | Win Rate |
 |---|---|---|---|---|
-| M5_RECOMMENDED | 18 | 11 | 7 | 61.1% |
+| M5_RECOMMENDED | 22 | 12 | 10 | 54.5% |
 | CRT_H4_PENDING | 2 | 2 | 0 | 100.0% |
 | ASIAN_SWEEP_BUY | 0 | 0 | 0 | 0.0% |
 | ASIAN_SWEEP_SELL | 0 | 0 | 0 | 0.0% |
