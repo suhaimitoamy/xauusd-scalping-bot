@@ -20,29 +20,29 @@ def print_table(headers, rows):
 
 
 def main():
-    month = sys.argv[1] if len(sys.argv) > 1 else None
+    key = sys.argv[1] if len(sys.argv) > 1 else None
     conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
-    if month:
-        print(f"\n📅 BACKTEST MONTH: {month}\n")
+    if key:
+        print(f"\n📅 BACKTEST KEY: {key}\n")
         cur.execute("""
             SELECT pattern_key, total_trades, wins, losses, printf('%.2f%%', win_rate)
             FROM backtest_method_summary
-            WHERE run_month = ?
+            WHERE run_month = ? OR run_month LIKE ?
             ORDER BY total_trades DESC, win_rate DESC
-        """, (month,))
+        """, (key, f"{key}__%"))
         print_table(["Method", "Total", "WIN", "LOSS", "WR"], cur.fetchall())
     else:
-        print("\n📊 MONTHLY SUMMARY\n")
+        print("\n📊 RUN SUMMARY\n")
         cur.execute("""
             SELECT run_month, total_signals, closed_trades, wins, losses, printf('%.2f%%', win_rate)
             FROM backtest_runs
             ORDER BY run_month ASC
         """)
-        print_table(["Month", "Signal", "Closed", "WIN", "LOSS", "WR"], cur.fetchall())
+        print_table(["Run Key", "Signal", "Closed", "WIN", "LOSS", "WR"], cur.fetchall())
 
-        print("\n🧠 METHOD SUMMARY - ALL MONTHS\n")
+        print("\n🧠 METHOD SUMMARY - ALL RUNS\n")
         cur.execute("""
             SELECT pattern_key,
                    SUM(total_trades),
