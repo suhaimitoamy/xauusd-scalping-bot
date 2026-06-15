@@ -9,10 +9,10 @@ if len(sys.argv) < 2:
     print("Contoh: python3 run_bulan.py 2025-01")
     sys.exit(1)
 
-target_month = sys.argv[1]  # e.g. 2025-01
+target_month = sys.argv[1]
 fair_method = (os.environ.get("FAIR_TEST_METHOD") or os.environ.get("METHOD_UNDER_TEST") or "").strip().upper()
 result_key = target_month if not fair_method else f"{target_month}__{fair_method}"
-month_key = target_month.replace('-', '')  # e.g. 202501, supaya run_simulator bisa baca dataset_key
+month_key = target_month.replace('-', '')
 DB_PATH = "data/xauusd_bot.sqlite"
 GHOST_DB_PATH = "data/xauusd_bot_ghost.sqlite"
 BACKTEST_DB_PATH = "data/backtest_results.sqlite"
@@ -23,7 +23,6 @@ print(f"\nMenyiapkan data untuk bulan {target_month}...")
 if fair_method:
     print(f"FAIR TEST METHOD: {fair_method}")
 
-# 0. Snapshot config sebelum simulasi
 subprocess.run([
     sys.executable, "tools/snapshot_config.py",
     "--run-month", result_key,
@@ -31,16 +30,14 @@ subprocess.run([
     "--notes", "Snapshot otomatis sebelum run_bulan"
 ])
 
-# 1. Tarik data dari database
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
 cur.execute('''
-    SELECT open_time, open, high, low, close, volume_tick 
-    FROM candles 
+    SELECT open_time, open, high, low, close, volume_tick
+    FROM candles
     WHERE timeframe = 'M1' AND open_time LIKE ?
     ORDER BY open_time ASC
 ''', (f"{target_month}%",))
-
 rows = cur.fetchall()
 conn.close()
 
@@ -48,7 +45,6 @@ if not rows:
     print(f"❌ Tidak ada data candle historis untuk bulan {target_month} di database!")
     sys.exit(1)
 
-# 2. Jadikan file CSV kecil
 print(f"Mengekstrak {len(rows)} candle ke dalam {TEMP_CSV}...")
 with open(TEMP_CSV, 'w', newline='') as fout:
     writer = csv.writer(fout)
@@ -58,17 +54,24 @@ with open(TEMP_CSV, 'w', newline='') as fout:
         time_str = iso_str[11:16]
         writer.writerow([date_str, time_str, row[1], row[2], row[3], row[4], row[5]])
 
-# 3. Jalankan Simulator dalam mode BACKTEST_ALL_METHODS netral.
-# --new-test-run penting agar hasil backtest TIDAK merge score/poin ke live DB.
 print(f"\n🚀 Memulai Simulasi {'FAIR TEST' if fair_method else 'ALL METHODS'} untuk {target_month}...")
 env = os.environ.copy()
 env["BACKTEST_ALL_METHODS"] = "true"
 env["DRY_RUN"] = "true"
+env["BACKTEST_NEUTRAL_CONFIDENCE"] = "true"
 if fair_method:
     env["FAIR_TEST"] = "true"
     env["FAIR_TEST_METHOD"] = fair_method
+
+runner_code = (
+    "from src.backtest_fairness_patch import apply_backtest_fairness_patch;"
+    "apply_backtest_fairness_patch();"
+    "import runpy, sys;"
+    "sys.argv=['src/run_simulator.py']+sys.argv[1:];"
+    "runpy.run_path('src/run_simulator.py', run_name='__main__')"
+)
 cmd = [
-    sys.executable, "-u", "src/run_simulator.py",
+    sys.executable, "-u", "-c", runner_code,
     "--file", TEMP_CSV,
     "--keep-ghost",
     "--append-ghost",
@@ -82,7 +85,6 @@ if result.returncode != 0:
         os.remove(TEMP_CSV)
     sys.exit(result.returncode)
 
-# 4. Simpan hasil ghost bulan ini ke DB backtest permanen
 print(f"\n💾 Menyimpan hasil {result_key} ke {BACKTEST_DB_PATH}...")
 export_cmd = [
     sys.executable, "tools/save_backtest_results.py", result_key,
@@ -98,13 +100,9 @@ if export_result.returncode != 0:
         os.remove(TEMP_CSV)
     sys.exit(export_result.returncode)
 
-# 5. Buat report V2 yang lebih mudah dibaca
 subprocess.run([sys.executable, "tools/backtest_report_v2.py"])
-
-# 6. Sinkronkan registry metode
 subprocess.run([sys.executable, "manage_methods.py", "sync"])
 
-# 7. Bersihkan file CSV sementara
 if os.path.exists(TEMP_CSV):
     os.remove(TEMP_CSV)
 
