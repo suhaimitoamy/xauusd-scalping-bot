@@ -32,36 +32,33 @@ class SignalGate:
 
         if target_method:
             if not (equivalent_method_names(pattern_key) & equivalent_method_names(target_method)):
-                return False, f"BLOCK: fair-test hanya untuk {target_method}, bukan {pattern_key}"
+                return False, f"FAIR_TEST_ONLY: {target_method}, bukan {pattern_key}"
 
         signal_tf = signal.get('signal_timeframe') or 'M5'
         active = self.memory.active_signal(signal_tf)
         if active:
-            return False, f"BLOCK: masih ada signal {signal_tf} ACTIVE #{active.get('id')} {active.get('direction')}"
+            return False, f"ACTIVE_SIGNAL_EXISTS: {signal_tf} #{active.get('id')} {active.get('direction')}"
 
         if pattern_key and self.memory.is_pattern_in_cooldown(pattern_key):
-            return False, f"BLOCK: pattern {pattern_key} masih cooldown"
+            return False, f"METHOD_COOLDOWN: {pattern_key}"
 
         adaptive = (self.config or {}).get('adaptive_brain', {})
         whitelist = get_main_methods(self.config)
         if whitelist and live_mode and not method_allowed(pattern_key, whitelist, backtest_all=False):
-            return False, f"BLOCK: {pattern_key} tidak ada di LIVE whitelist"
+            return False, f"NOT_IN_LIVE_WHITELIST: {pattern_key}"
 
-        rr_cfg = adaptive.get('rr_guard', {}) if isinstance(adaptive, dict) else {}
-        rr_enabled = bool(rr_cfg.get('enabled', True))
-        min_rr = float(rr_cfg.get('min_rr', 2.0))
-
-        if rr_enabled:
+        # RR hanya dihitung untuk audit, tidak menahan sinyal.
+        try:
+            rr_cfg = adaptive.get('rr_guard', {}) if isinstance(adaptive, dict) else {}
+            min_rr = float(rr_cfg.get('min_rr', 2.0))
             ok, msg, rr = validate_rr(signal, min_rr=min_rr)
-            signal['rr_gate_status'] = 'PASS' if ok else 'FAIL'
+            signal['rr_gate_status'] = 'PASS' if ok else 'AUDIT_ONLY_FAIL'
             signal['rr_gate_message'] = msg
-            # Backtest/fair-test tidak boleh diblokir oleh RR Guard.
-            # Tujuannya agar metode tetap muncul di hasil, lalu metode RR jelek bisa diaudit.
-            if live_mode and not ok:
-                return False, msg
+        except Exception:
+            signal['rr_gate_status'] = 'AUDIT_ONLY_ERROR'
 
         confidence = float(signal.get('confidence') or 0)
         if confidence <= 0:
-            return False, "BLOCK: confidence invalid"
+            return False, "CONFIDENCE_INVALID"
 
         return True, "ALLOW"
