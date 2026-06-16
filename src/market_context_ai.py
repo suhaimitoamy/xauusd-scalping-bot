@@ -251,7 +251,7 @@ class TelegramMarketAI:
         if not question:
             return None
         snapshot = build_market_snapshot(self.storage, self.symbol, self.bot_state)
-        key = hashlib.sha1(self._norm(question).encode()).hexdigest()
+        key = hashlib.sha1((self._norm(question) + '|' + snapshot.get('signature', '')).encode()).hexdigest()
         cache = self._load_cache()
         if key in cache:
             return cache[key].get('answer')
