@@ -32,7 +32,7 @@ trading:
   preferred_min_confidence: 70
   high_confidence: 80
   max_signals_per_day: 6
-  cooldown_minutes_same_direction: 45
+  cooldown_minutes_same_direction: 15
   cooldown_minutes_any_signal: 20
 risk:
   min_sl_points: 4.0
