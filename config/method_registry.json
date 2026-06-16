@@ -1,61 +1,32 @@
 {
   "version": 1,
-  "description": "Method status registry. Only whitelist/LIVE_MAIN methods are kept.",
+  "description": "Method status registry. LIVE_MAIN methods are whitelist; WATCHLIST methods are for new research backtest.",
   "methods": {
-    "METHOD_M5_BREAK_6_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_6",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_8_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_8",
-      "notes": ""
-    },
-    "METHOD_CRT_H4_SWEEP_BUY": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_CRT_H4_SWEEP",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_12_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_12",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_12_BUY": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_12",
-      "notes": ""
-    },
-    "METHOD_CRT_H4_SWEEP_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_CRT_H4_SWEEP",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_8_BUY": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_8",
-      "notes": ""
-    },
-    "METHOD_CRT_D1_SWEEP_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_CRT_D1_SWEEP",
-      "notes": ""
-    },
-    "METHOD_M5_BREAK_6_BUY": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_M5_BREAK_6",
-      "notes": ""
-    },
-    "METHOD_SESSION_OPEN_BREAKOUT_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_SESSION_OPEN_BREAKOUT",
-      "notes": ""
-    },
-    "METHOD_HIGH_WR_M15_SWEEP_SCALP_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_HIGH_WR_M15_SWEEP_SCALP",
-      "notes": ""
-    }
+    "METHOD_M5_BREAK_6_SELL": {"status": "LIVE_MAIN", "base": "METHOD_M5_BREAK_6", "notes": ""},
+    "METHOD_M5_BREAK_8_SELL": {"status": "LIVE_MAIN", "base": "METHOD_M5_BREAK_8", "notes": ""},
+    "METHOD_CRT_H4_SWEEP_BUY": {"status": "LIVE_MAIN", "base": "METHOD_CRT_H4_SWEEP", "notes": ""},
+    "METHOD_M5_BREAK_12_SELL": {"status": "LIVE_MAIN", "base": "METHOD_M5_BREAK_12", "notes": ""},
+    "METHOD_M5_BREAK_12_BUY": {"status": "LIVE_MAIN", "base": "METHOD_M5_BREAK_12", "notes": ""},
+    "METHOD_CRT_H4_SWEEP_SELL": {"status": "LIVE_MAIN", "base": "METHOD_CRT_H4_SWEEP", "notes": ""},
+    "METHOD_M5_BREAK_8_BUY": {"status": "LIVE_MAIN", "base": "METHOD_M5_BREAK_8", "notes": ""},
+    "METHOD_CRT_D1_SWEEP_SELL": {"status": "LIVE_MAIN", "base": "METHOD_CRT_D1_SWEEP", "notes": ""},
+    "METHOD_M5_BREAK_6_BUY": {"status": "LIVE_MAIN", "base": "METHOD_M5_BREAK_6", "notes": ""},
+    "METHOD_SESSION_OPEN_BREAKOUT_SELL": {"status": "LIVE_MAIN", "base": "METHOD_SESSION_OPEN_BREAKOUT", "notes": ""},
+    "METHOD_HIGH_WR_M15_SWEEP_SCALP_SELL": {"status": "LIVE_MAIN", "base": "METHOD_HIGH_WR_M15_SWEEP_SCALP", "notes": ""},
+    "METHOD_CRT_H1": {"status": "WATCHLIST", "base": "METHOD_CRT_H1", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_FVG_RETEST_M5_M15": {"status": "WATCHLIST", "base": "METHOD_FVG_RETEST_M5_M15", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_IFVG_RETEST": {"status": "WATCHLIST", "base": "METHOD_IFVG_RETEST", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_BOS_BREAK_RETEST": {"status": "WATCHLIST", "base": "METHOD_BOS_BREAK_RETEST", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_ASIA_SWEEP_REVERSAL": {"status": "WATCHLIST", "base": "METHOD_ASIA_SWEEP_REVERSAL", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_M5_TREND_PULLBACK": {"status": "WATCHLIST", "base": "METHOD_M5_TREND_PULLBACK", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_M15_TREND_PULLBACK": {"status": "WATCHLIST", "base": "METHOD_M15_TREND_PULLBACK", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_M5_BREAKOUT_CONTINUATION": {"status": "WATCHLIST", "base": "METHOD_M5_BREAKOUT_CONTINUATION", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_M15_RANGE_REVERSION": {"status": "WATCHLIST", "base": "METHOD_M15_RANGE_REVERSION", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_SESSION_SWEEP_RECLAIM": {"status": "WATCHLIST", "base": "METHOD_SESSION_SWEEP_RECLAIM", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_LONDON_FAKE_BREAKOUT_REVERSAL": {"status": "WATCHLIST", "base": "METHOD_LONDON_FAKE_BREAKOUT_REVERSAL", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_NY_CONTINUATION_AFTER_SWEEP": {"status": "WATCHLIST", "base": "METHOD_NY_CONTINUATION_AFTER_SWEEP", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_M5_MOMENTUM_DISPLACEMENT": {"status": "WATCHLIST", "base": "METHOD_M5_MOMENTUM_DISPLACEMENT", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_OB_RETEST_CONTINUATION": {"status": "WATCHLIST", "base": "METHOD_OB_RETEST_CONTINUATION", "notes": "NEW_RESEARCH_METHOD"},
+    "METHOD_EQUAL_HIGH_LOW_SWEEP": {"status": "WATCHLIST", "base": "METHOD_EQUAL_HIGH_LOW_SWEEP", "notes": "NEW_RESEARCH_METHOD"}
   }
 }

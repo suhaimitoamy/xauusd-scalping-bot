@@ -22,7 +22,21 @@ EXPERIMENTAL = "EXPERIMENTAL"
 DISABLED = "DISABLED"
 
 EXTRA_METHODS = {
-    "METHOD_CRT_H1_SELL",
+    "METHOD_CRT_H1",
+    "METHOD_FVG_RETEST_M5_M15",
+    "METHOD_IFVG_RETEST",
+    "METHOD_BOS_BREAK_RETEST",
+    "METHOD_ASIA_SWEEP_REVERSAL",
+    "METHOD_M5_TREND_PULLBACK",
+    "METHOD_M15_TREND_PULLBACK",
+    "METHOD_M5_BREAKOUT_CONTINUATION",
+    "METHOD_M15_RANGE_REVERSION",
+    "METHOD_SESSION_SWEEP_RECLAIM",
+    "METHOD_LONDON_FAKE_BREAKOUT_REVERSAL",
+    "METHOD_NY_CONTINUATION_AFTER_SWEEP",
+    "METHOD_M5_MOMENTUM_DISPLACEMENT",
+    "METHOD_OB_RETEST_CONTINUATION",
+    "METHOD_EQUAL_HIGH_LOW_SWEEP",
 }
 
 DIRECTION_SUFFIXES = ("_BUY", "_SELL")
@@ -138,6 +152,8 @@ def default_status(method: str, live_whitelist: Iterable[str]) -> str:
     name = normalize_method_name(method)
     if method_allowed(name, live_whitelist):
         return LIVE_MAIN
+    if name in EXTRA_METHODS:
+        return WATCHLIST
     if any(hint in name for hint in EXPERIMENTAL_HINTS):
         return EXPERIMENTAL
     return WATCHLIST
@@ -149,6 +165,7 @@ def build_registry(config: Dict[str, Any] | None = None) -> Dict[str, Dict[str, 
     existing = load_registry()
     discovered = set(discover_methods_from_code())
     discovered.update(live)
+    discovered.update(EXTRA_METHODS)
 
     registry: Dict[str, Dict[str, Any]] = {}
     for method in sorted(discovered):
@@ -159,7 +176,7 @@ def build_registry(config: Dict[str, Any] | None = None) -> Dict[str, Dict[str, 
         registry[method] = {
             "status": status,
             "base": base_method_name(method),
-            "notes": prev.get("notes", ""),
+            "notes": prev.get("notes", "NEW_RESEARCH_METHOD" if method in EXTRA_METHODS else ""),
         }
     return registry
 
