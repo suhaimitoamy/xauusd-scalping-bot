@@ -3,13 +3,13 @@
 Aktif hanya saat BT_RESEARCH=true.
 Live trading tidak berubah.
 
-Mode ini sengaja agresif untuk mencari kandidat baru:
-- LIVE_MAIN dilewati.
-- Cooldown dimatikan.
-- Active-signal lock dimatikan.
-- Metode non-main diberi logic riset berdasarkan keluarga namanya.
-- Jika tidak ada setup alami, engine membuat trigger eksplorasi terjadwal
-  agar metode yang jarang trigger tetap punya data untuk disaring manual.
+V3: cover-all candidate lab.
+- LIVE_MAIN dilewati otomatis dari config.yaml.
+- Cooldown dimatikan hanya saat BT_RESEARCH.
+- Active signal lock dimatikan hanya saat BT_RESEARCH.
+- Setiap slot research memilih satu metode non-main secara rotasi.
+- Kalau logic natural keluarga metode cocok, signal diberi alasan natural.
+- Kalau tidak cocok, tetap dibuat forced-sample agar semua metode punya data.
 """
 from __future__ import annotations
 
@@ -83,7 +83,7 @@ def _research_slot(ctx: Dict[str, Any]) -> Tuple[int, bool]:
     dt = _ctx_datetime(ctx)
     if dt is None:
         return 0, True
-    per_day = max(1, int(os.environ.get("BT_RESEARCH_PER_DAY", "8") or 8))
+    per_day = max(1, int(os.environ.get("BT_RESEARCH_PER_DAY", "24") or 24))
     spacing_minutes = max(5, int(1440 / per_day))
     minute_of_day = dt.hour * 60 + dt.minute
     slot = (dt.timetuple().tm_yday * per_day) + int(minute_of_day / spacing_minutes)
@@ -106,13 +106,14 @@ def _side_from_context(ctx: Dict[str, Any]) -> str:
     prev_low = _num(ctx, "prev_low")
     momentum = str(ctx.get("momentum") or "").lower()
     m15 = str(ctx.get("m15_bias") or "").lower()
+    h1 = str(ctx.get("h1_bias") or "").lower()
     if prev_high and close > prev_high:
         return "BUY"
     if prev_low and close < prev_low:
         return "SELL"
-    if momentum == "bullish" or m15 == "bullish":
+    if momentum == "bullish" or (m15 == "bullish" and h1 != "bearish"):
         return "BUY"
-    if momentum == "bearish" or m15 == "bearish":
+    if momentum == "bearish" or (m15 == "bearish" and h1 != "bullish"):
         return "SELL"
     return "BUY" if close >= open_ else "SELL"
 
@@ -164,22 +165,7 @@ def _all_non_main_methods() -> List[str]:
     except Exception:
         pass
 
-    fallback = [
-        "METHOD_BREAK_AND_RETEST_BUY", "METHOD_BREAK_AND_RETEST_SELL",
-        "METHOD_BOS_RETEST_OB_BUY", "METHOD_BOS_RETEST_OB_SELL",
-        "METHOD_ORDER_BLOCK_TAP_BUY", "METHOD_ORDER_BLOCK_TAP_SELL",
-        "METHOD_NY_OPEN_BREAKOUT_BUY", "METHOD_NY_OPEN_BREAKOUT_SELL",
-        "METHOD_LONDON_OPEN_BREAKOUT_BUY", "METHOD_LONDON_OPEN_BREAKOUT_SELL",
-        "METHOD_DRAW_ON_LIQUIDITY_BUY", "METHOD_DRAW_ON_LIQUIDITY_SELL",
-        "METHOD_INDUCEMENT_TRAP_BUY", "METHOD_INDUCEMENT_TRAP_SELL",
-        "METHOD_ASIA_RANGE_SWEEP_BUY", "METHOD_ASIA_RANGE_SWEEP_SELL",
-        "METHOD_MOMENTUM_IGNITION_BUY", "METHOD_MOMENTUM_IGNITION_SELL",
-        "METHOD_POI_ACCUMULATION_BUY", "METHOD_POI_ACCUMULATION_SELL",
-        "METHOD_POI_REBOUND_OB_BUY", "METHOD_POI_REBOUND_OB_SELL",
-        "METHOD_CHOPPY_SCALP_BUY", "METHOD_CHOPPY_SCALP_SELL",
-        "METHOD_MICRO_SWEEP_SCALP_BUY", "METHOD_MICRO_SWEEP_SCALP_SELL",
-        "METHOD_NEWS_SPIKE_FADE_BUY", "METHOD_NEWS_SPIKE_FADE_SELL",
-    ]
+    fallback = []
     for method in fallback:
         if not _is_main(method) and method not in methods:
             methods.append(method)
@@ -207,153 +193,116 @@ def _method_rule(method: str, ctx: Dict[str, Any]) -> Optional[Decision]:
     break_bear = bool(ctx.get("break_bear")) or (prev_low and close < prev_low)
     sentuh_low = bool(ctx.get("sentuh_low")) or (prev_low and st["low"] <= prev_low)
     sentuh_high = bool(ctx.get("sentuh_high")) or (prev_high and st["high"] >= prev_high)
-    bullish_candle = close > open_
-    bearish_candle = close < open_
-    strong_body = st["ratio"] >= 0.35
-    small_body = st["ratio"] <= 0.32
+    bullish = close > open_
+    bearish = close < open_
+    strong = st["ratio"] >= 0.35
+    very_strong = st["ratio"] >= 0.55
+    small = st["ratio"] <= 0.32
     near_high = close >= st["high"] - st["range"] * 0.35
     near_low = close <= st["low"] + st["range"] * 0.35
+    lower_reject = st["lower_wick"] >= max(st["body"] * 0.35, atr * 0.08)
+    upper_reject = st["upper_wick"] >= max(st["body"] * 0.35, atr * 0.08)
+    buy = direction == "BUY"
+    sell = direction == "SELL"
 
-    def ok_buy() -> bool:
-        return direction == "BUY"
-
-    def ok_sell() -> bool:
-        return direction == "SELL"
-
-    # Session methods: sengaja lebih aktif, tapi tetap berbasis jam London/NY/Asia.
     if "SESSION_OPEN_BREAKOUT" in method:
-        if ok_buy() and hour in {7, 8, 9, 13, 14} and bullish_candle and (break_bull or momentum != "bearish"):
-            return direction, "SESSION OPEN BUY: open-session push + bullish close", method, 72.0
-        if ok_sell() and hour in {7, 8, 9, 13, 14} and bearish_candle and (break_bear or momentum != "bullish"):
-            return direction, "SESSION OPEN SELL: open-session push + bearish close", method, 72.0
+        if buy and hour in {7, 8, 9, 13, 14, 15} and bullish and (break_bull or near_high):
+            return direction, "SESSION OPEN BUY v3: session push + close near high", method, 73.0
+        if sell and hour in {7, 8, 9, 13, 14, 15} and bearish and (break_bear or near_low):
+            return direction, "SESSION OPEN SELL v3: session push + close near low", method, 73.0
 
-    if "LONDON_OPEN_BREAKOUT" in method:
-        if hour in {7, 8, 9} and ((ok_buy() and bullish_candle) or (ok_sell() and bearish_candle)):
-            return direction, "LONDON OPEN: candle searah di jam London", method, 69.0
+    if "LONDON_OPEN" in method or "LONDON_KILLZONE" in method:
+        if hour in {7, 8, 9, 10} and ((buy and bullish) or (sell and bearish)):
+            return direction, "LONDON v3: london directional candle", method, 69.0
 
-    if "NY_OPEN_BREAKOUT" in method:
-        if hour in {13, 14, 15} and ((ok_buy() and bullish_candle) or (ok_sell() and bearish_candle)):
-            return direction, "NY OPEN: candle searah di jam NY", method, 69.0
+    if "NY_OPEN" in method or "NY_KILLZONE" in method:
+        if hour in {13, 14, 15, 16} and ((buy and bullish) or (sell and bearish)):
+            return direction, "NY v3: new york directional candle", method, 69.0
 
-    # Asia methods.
     if "ASIA" in method or "ASIAN" in method:
-        if ok_buy() and hour in {0, 1, 2, 3, 4, 5} and sentuh_low and bullish_candle:
-            return direction, "ASIA BUY: low sweep/reclaim during Asia", method, 66.0
-        if ok_sell() and hour in {0, 1, 2, 3, 4, 5} and sentuh_high and bearish_candle:
-            return direction, "ASIA SELL: high sweep/reclaim during Asia", method, 66.0
+        if buy and hour in {0, 1, 2, 3, 4, 5, 6} and (sentuh_low or lower_reject) and bullish:
+            return direction, "ASIA BUY v3: low reaction + bullish close", method, 66.0
+        if sell and hour in {0, 1, 2, 3, 4, 5, 6} and (sentuh_high or upper_reject) and bearish:
+            return direction, "ASIA SELL v3: high reaction + bearish close", method, 66.0
 
-    # BOS / continuation / breakout families.
+    if "IFVG" in method or "FVG" in method:
+        if buy and bullish and (break_bull or lower_reject or m15 == "bullish") and momentum != "bearish":
+            return direction, "FVG/IFVG BUY v3: imbalance continuation/retest proxy", method, 71.0
+        if sell and bearish and (break_bear or upper_reject or m15 == "bearish") and momentum != "bullish":
+            return direction, "FVG/IFVG SELL v3: imbalance continuation/retest proxy", method, 71.0
+
     if "BOS" in method or "BREAKOUT" in method or "CONTINUATION" in method:
-        if ok_buy() and break_bull and bullish_candle and strong_body:
-            return direction, "BOS/BREAKOUT BUY: break high + strong close", method, 70.0
-        if ok_sell() and break_bear and bearish_candle and strong_body:
-            return direction, "BOS/BREAKOUT SELL: break low + strong close", method, 70.0
+        if buy and (break_bull or (bullish and near_high and very_strong)):
+            return direction, "BOS/BREAKOUT BUY v3: break/strong expansion", method, 70.0
+        if sell and (break_bear or (bearish and near_low and very_strong)):
+            return direction, "BOS/BREAKOUT SELL v3: break/strong expansion", method, 70.0
 
-    # Break and retest / OB / breaker.
-    if "BREAK_AND_RETEST" in method or "RETEST" in method or "ORDER_BLOCK" in method or "BREAKER" in method:
-        if ok_buy() and (break_bull or m15 == "bullish") and bullish_candle and close >= (prev_high - atr * 0.60 if prev_high else close):
-            return direction, "RETEST/OB BUY: bullish reclaim near broken level", method, 68.0
-        if ok_sell() and (break_bear or m15 == "bearish") and bearish_candle and close <= (prev_low + atr * 0.60 if prev_low else close):
-            return direction, "RETEST/OB SELL: bearish reclaim near broken level", method, 68.0
+    if "BREAK_AND_RETEST" in method or "RETEST" in method or "ORDER_BLOCK" in method or "BREAKER" in method or "OB_" in method:
+        if buy and (m15 == "bullish" or break_bull) and (bullish or lower_reject):
+            return direction, "RETEST/OB BUY v3: reclaim/reaction after displacement", method, 68.0
+        if sell and (m15 == "bearish" or break_bear) and (bearish or upper_reject):
+            return direction, "RETEST/OB SELL v3: rejection/reaction after displacement", method, 68.0
 
-    # POI / accumulation / rebound.
-    if "POI" in method or "ACCUMULATION" in method or "REBOUND" in method:
-        if ok_buy() and pos in {"discount", "equilibrium", "unknown", ""} and (sentuh_low or bullish_candle) and momentum != "bearish":
-            return direction, "POI BUY: discount/equilibrium reaction + bullish reclaim", method, 67.0
-        if ok_sell() and pos in {"premium", "equilibrium", "unknown", ""} and (sentuh_high or bearish_candle) and momentum != "bullish":
-            return direction, "POI SELL: premium/equilibrium reaction + bearish reject", method, 67.0
+    if "POI" in method or "ACCUMULATION" in method or "REBOUND" in method or "OTE" in method:
+        if buy and pos in {"discount", "equilibrium", "unknown", ""} and (lower_reject or bullish or sentuh_low):
+            return direction, "POI BUY v3: discount/equilibrium reaction", method, 67.0
+        if sell and pos in {"premium", "equilibrium", "unknown", ""} and (upper_reject or bearish or sentuh_high):
+            return direction, "POI SELL v3: premium/equilibrium reaction", method, 67.0
 
-    # Sweep / turtle / liquidity.
     if "SWEEP" in method or "TURTLE" in method or "LIQUIDITY" in method or "DRAW_ON_LIQUIDITY" in method:
-        if ok_buy() and sentuh_low and bullish_candle and st["lower_wick"] >= st["body"] * 0.35:
-            return direction, "LIQUIDITY BUY: low sweep + close back up", method, 69.0
-        if ok_sell() and sentuh_high and bearish_candle and st["upper_wick"] >= st["body"] * 0.35:
-            return direction, "LIQUIDITY SELL: high sweep + close back down", method, 69.0
+        if buy and (sentuh_low or lower_reject) and bullish:
+            return direction, "LIQUIDITY BUY v3: sell-side sweep/reclaim", method, 69.0
+        if sell and (sentuh_high or upper_reject) and bearish:
+            return direction, "LIQUIDITY SELL v3: buy-side sweep/reclaim", method, 69.0
 
-    # Inducement trap / CHoCH reversal.
-    if "INDUCEMENT" in method or "TRAP" in method or "CHOCH" in method or "REVERSAL" in method:
-        if ok_buy() and sentuh_low and bullish_candle and near_high:
-            return direction, "TRAP BUY: sell-side sweep then strong bullish close", method, 66.0
-        if ok_sell() and sentuh_high and bearish_candle and near_low:
-            return direction, "TRAP SELL: buy-side sweep then strong bearish close", method, 66.0
+    if "INDUCEMENT" in method or "TRAP" in method or "CHOCH" in method or "REVERSAL" in method or "EXHAUSTION" in method:
+        if buy and (sentuh_low or lower_reject) and bullish and momentum != "bearish":
+            return direction, "REVERSAL BUY v3: trap/rejection + bullish reclaim", method, 66.0
+        if sell and (sentuh_high or upper_reject) and bearish and momentum != "bullish":
+            return direction, "REVERSAL SELL v3: trap/rejection + bearish reclaim", method, 66.0
 
-    # Pullback / trend continuation.
-    if "PULLBACK" in method or "FOLLOW_THE_TREND" in method:
-        if ok_buy() and m15 == "bullish" and h1 != "bearish" and bullish_candle and not break_bear:
-            return direction, "PULLBACK BUY: M15 bullish + candle reclaim", method, 65.0
-        if ok_sell() and m15 == "bearish" and h1 != "bullish" and bearish_candle and not break_bull:
-            return direction, "PULLBACK SELL: M15 bearish + candle reject", method, 65.0
+    if "PULLBACK" in method or "FOLLOW_THE_TREND" in method or "STRICT_M15" in method:
+        if buy and m15 == "bullish" and h1 != "bearish" and (bullish or lower_reject):
+            return direction, "PULLBACK BUY v3: M15 trend + reclaim", method, 65.0
+        if sell and m15 == "bearish" and h1 != "bullish" and (bearish or upper_reject):
+            return direction, "PULLBACK SELL v3: M15 trend + rejection", method, 65.0
 
-    # Momentum / marubozu / ignition.
     if "MOMENTUM" in method or "MARUBOZU" in method:
-        if ok_buy() and bullish_candle and strong_body and near_high and momentum != "bearish":
-            return direction, "MOMENTUM BUY: strong body close near high", method, 66.0
-        if ok_sell() and bearish_candle and strong_body and near_low and momentum != "bullish":
-            return direction, "MOMENTUM SELL: strong body close near low", method, 66.0
+        if buy and bullish and strong and near_high and momentum != "bearish":
+            return direction, "MOMENTUM BUY v3: strong body continuation", method, 66.0
+        if sell and bearish and strong and near_low and momentum != "bullish":
+            return direction, "MOMENTUM SELL v3: strong body continuation", method, 66.0
 
-    # Choppy scalp deliberately trades ranges, not trend.
     if "CHOPPY" in method:
-        if choppy or bias == "sideways" or small_body:
-            if ok_buy() and (sentuh_low or close <= open_ + atr * 0.2):
-                return direction, "CHOPPY BUY: range scalp from lower side", method, 60.0
-            if ok_sell() and (sentuh_high or close >= open_ - atr * 0.2):
-                return direction, "CHOPPY SELL: range scalp from upper side", method, 60.0
+        if choppy or bias == "sideways" or small:
+            if buy and (lower_reject or close <= open_ + atr * 0.20 or sentuh_low):
+                return direction, "CHOPPY BUY v3: lower range reaction", method, 60.0
+            if sell and (upper_reject or close >= open_ - atr * 0.20 or sentuh_high):
+                return direction, "CHOPPY SELL v3: upper range reaction", method, 60.0
 
-    # News spike fade: treat abnormally large candle as fade candidate.
     if "NEWS_SPIKE" in method or "SPIKE_FADE" in method:
-        big = st["range"] >= max(atr * 1.6, 2.0)
-        if big and ok_buy() and bearish_candle and st["lower_wick"] > st["body"] * 0.25:
-            return direction, "NEWS FADE BUY: large bearish spike with lower rejection", method, 58.0
-        if big and ok_sell() and bullish_candle and st["upper_wick"] > st["body"] * 0.25:
-            return direction, "NEWS FADE SELL: large bullish spike with upper rejection", method, 58.0
+        big = st["range"] >= max(atr * 1.35, 1.8)
+        if big and buy and (lower_reject or bearish):
+            return direction, "NEWS FADE BUY v3: spike down fade proxy", method, 58.0
+        if big and sell and (upper_reject or bullish):
+            return direction, "NEWS FADE SELL v3: spike up fade proxy", method, 58.0
 
-    # AI/Antigravity candidates: generic exploration but still use candle side.
-    if method.startswith(("AI_METHOD_", "ANTIGRAVITY_")):
-        if ok_buy() and bullish_candle and momentum != "bearish":
-            return direction, "AI/ANTIGRAVITY BUY: generic bullish candidate", method, 55.0
-        if ok_sell() and bearish_candle and momentum != "bullish":
-            return direction, "AI/ANTIGRAVITY SELL: generic bearish candidate", method, 55.0
+    if method.startswith(("AI_METHOD_", "ANTIGRAVITY_", "RR2_")):
+        if buy and (bullish or momentum == "bullish"):
+            return direction, "AI/ANTIGRAVITY BUY v3: generic bullish candidate", method, 55.0
+        if sell and (bearish or momentum == "bearish"):
+            return direction, "AI/ANTIGRAVITY SELL v3: generic bearish candidate", method, 55.0
 
     return None
 
 
-def _rule_candidates(ctx: Dict[str, Any]) -> List[Decision]:
-    slot, should_fire = _research_slot(ctx)
-    if not should_fire:
-        return []
-    side = _side_from_context(ctx)
-    methods = _all_non_main_methods()
-    preferred = [m for m in methods if (_direction_from_method(m) or side) == side]
-    others = [m for m in methods if m not in preferred]
-    ordered = preferred + others
-    candidates: List[Decision] = []
-    for method in ordered:
-        hit = _method_rule(method, ctx)
-        if hit:
-            candidates.append(hit)
-    if candidates:
-        candidates.sort(key=lambda x: (x[0] != side, -x[3], x[2]))
-        return candidates
-    return []
-
-
-def _fallback_decision(ctx: Dict[str, Any]) -> Optional[Decision]:
-    slot, should_fire = _research_slot(ctx)
-    if not should_fire:
-        return None
-    side = _side_from_context(ctx)
-    methods = [m for m in _all_non_main_methods() if (_direction_from_method(m) or side) == side]
-    if not methods:
-        methods = _all_non_main_methods()
-    if not methods:
-        return None
-    method = methods[slot % len(methods)]
-    direction = _direction_from_method(method) or side
+def _forced_decision(method: str, ctx: Dict[str, Any]) -> Optional[Decision]:
+    direction = _direction_from_method(method) or _side_from_context(ctx)
     return (
         direction,
-        "BT_RESEARCH fallback: forced non-main sample; WR ignored; use only for candidate discovery",
+        "BT_RESEARCH_COVER_ALL v3: forced sample for non-main method; WR ignored for discovery",
         method,
-        52.0,
+        50.0,
     )
 
 
@@ -363,10 +312,29 @@ def _research_decision(ctx: Dict[str, Any]) -> Optional[Decision]:
     slot, should_fire = _research_slot(ctx)
     if not should_fire:
         return None
-    candidates = _rule_candidates(ctx)
-    if candidates:
-        return candidates[slot % len(candidates)]
-    return _fallback_decision(ctx)
+    methods = _all_non_main_methods()
+    if not methods:
+        return None
+
+    # Cover-all mode: setiap slot memilih satu metode non-main agar semua metode dapat data.
+    method = methods[slot % len(methods)]
+    hit = _method_rule(method, ctx)
+    if hit:
+        return hit
+
+    # Jika metode pilihan tidak cocok dengan market, tetap sample agar metode tidak 0 trade.
+    if _on(os.environ.get("BT_RESEARCH_FORCE_ALL", "true")):
+        return _forced_decision(method, ctx)
+
+    # Optional: kalau force dimatikan, cari metode lain yang natural cocok.
+    side = _side_from_context(ctx)
+    for m in methods:
+        if (_direction_from_method(m) or side) != side:
+            continue
+        hit = _method_rule(m, ctx)
+        if hit:
+            return hit
+    return None
 
 
 def _research_signal(symbol: str, direction: str, price: float, ctx: Dict[str, Any], pattern_key: str, reason: str, confidence: float) -> Dict[str, Any]:
@@ -392,7 +360,7 @@ def _research_signal(symbol: str, direction: str, price: float, ctx: Dict[str, A
         "tp2": round(tp2, 3),
         "tp3": None,
         "invalid_level": round(sl, 3),
-        "confidence": round(float(confidence or 52.0), 1),
+        "confidence": round(float(confidence or 50.0), 1),
         "reason": reason,
         "status": "ACTIVE",
         "entry_type": "MARKET",
@@ -413,6 +381,7 @@ def _research_signal(symbol: str, direction: str, price: float, ctx: Dict[str, A
             "h1_bias": ctx.get("h1_bias"),
             "intraday_context": ctx.get("intraday_context"),
             "bt_research": True,
+            "cover_all_v3": True,
         },
     }
 
@@ -423,31 +392,33 @@ def apply_bt_research_patch() -> None:
 
     try:
         from src.market_memory import MarketMemory
-        if not getattr(MarketMemory, "_bt_research_patched", False):
+        if not getattr(MarketMemory, "_bt_research_patched_v3", False):
             MarketMemory.active_signal = lambda self, signal_timeframe=None: None
             MarketMemory.is_pattern_in_cooldown = lambda self, pattern_key: False
-            MarketMemory._bt_research_patched = True
+            MarketMemory._bt_research_patched_v3 = True
     except Exception:
         pass
 
     try:
         from src.ai_trainer import AdaptiveTrainer
-        if not getattr(AdaptiveTrainer, "_bt_research_patched", False):
+        if not getattr(AdaptiveTrainer, "_bt_research_patched_v3", False):
             old_init = AdaptiveTrainer.__init__
 
             @wraps(old_init)
             def init_no_cd(self, *args, **kwargs):
                 old_init(self, *args, **kwargs)
                 self.loss_cooldown_minutes = 0
+                self.auto_ai_review = False
+                self.auto_brain_draft = False
 
             AdaptiveTrainer.__init__ = init_no_cd
-            AdaptiveTrainer._bt_research_patched = True
+            AdaptiveTrainer._bt_research_patched_v3 = True
     except Exception:
         pass
 
     try:
         from src.signal_gate import SignalGate
-        if not getattr(SignalGate, "_bt_research_patched", False):
+        if not getattr(SignalGate, "_bt_research_patched_v3", False):
             old_check = SignalGate.check
 
             @wraps(old_check)
@@ -472,13 +443,13 @@ def apply_bt_research_patch() -> None:
                 return True, "BT_RESEARCH_ALLOW"
 
             SignalGate.check = check_research
-            SignalGate._bt_research_patched = True
+            SignalGate._bt_research_patched_v3 = True
     except Exception:
         pass
 
     try:
         from src.market_brain import BrainEngine
-        if getattr(BrainEngine, "_bt_research_patched_v2", False):
+        if getattr(BrainEngine, "_bt_research_patched_v3", False):
             return
 
         old_decide = BrainEngine._decide
@@ -494,8 +465,8 @@ def apply_bt_research_patch() -> None:
                 if direction == "NO_TRADE" or str(pattern_key or "").upper() in {"WAITING", "NO_TRADE"}:
                     return _research_decision(ctx) or original
                 if pattern_key and not _is_main(pattern_key):
-                    # Non-main natural trigger boleh lewat, tapi memory score tetap dinetralkan di build.
-                    return original
+                    natural = _research_decision(ctx)
+                    return natural or original
             except Exception:
                 pass
             return _research_decision(ctx) or original
@@ -510,6 +481,6 @@ def apply_bt_research_patch() -> None:
 
         BrainEngine._decide = decide_research
         BrainEngine._build_signal = build_research
-        BrainEngine._bt_research_patched_v2 = True
+        BrainEngine._bt_research_patched_v3 = True
     except Exception:
         pass
