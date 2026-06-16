@@ -93,12 +93,12 @@
       "notes": ""
     },
     "METHOD_BREAKER_BLOCK_SCALP_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_BREAKER_BLOCK_SCALP",
       "notes": ""
     },
     "METHOD_BREAKER_BLOCK_SCALP_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_BREAKER_BLOCK_SCALP",
       "notes": ""
     },
@@ -167,11 +167,6 @@
       "base": "METHOD_CRT_D1",
       "notes": ""
     },
-    "METHOD_CRT_D1_SWEEP_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_CRT_D1_SWEEP",
-      "notes": ""
-    },
     "METHOD_CRT_H1_SELL": {
       "status": "WATCHLIST",
       "base": "METHOD_CRT_H1",
@@ -180,16 +175,6 @@
     "METHOD_CRT_H4": {
       "status": "WATCHLIST",
       "base": "METHOD_CRT_H4",
-      "notes": ""
-    },
-    "METHOD_CRT_H4_SWEEP_BUY": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_CRT_H4_SWEEP",
-      "notes": ""
-    },
-    "METHOD_CRT_H4_SWEEP_SELL": {
-      "status": "LIVE_MAIN",
-      "base": "METHOD_CRT_H4_SWEEP",
       "notes": ""
     },
     "METHOD_DRAW_ON_LIQUIDITY": {
@@ -398,12 +383,12 @@
       "notes": ""
     },
     "METHOD_IFVG_RETEST_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_IFVG_RETEST",
       "notes": ""
     },
     "METHOD_IFVG_RETEST_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_IFVG_RETEST",
       "notes": ""
     },
@@ -463,12 +448,12 @@
       "notes": ""
     },
     "METHOD_M5_FVG_INSTANT_REBOUND_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_M5_FVG_INSTANT_REBOUND",
       "notes": ""
     },
     "METHOD_M5_FVG_INSTANT_REBOUND_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_M5_FVG_INSTANT_REBOUND",
       "notes": ""
     },
@@ -633,22 +618,22 @@
       "notes": ""
     },
     "METHOD_POI_ACCUMULATION_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_POI_ACCUMULATION",
       "notes": ""
     },
     "METHOD_POI_ACCUMULATION_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_POI_ACCUMULATION",
       "notes": ""
     },
     "METHOD_POI_FLIP_BREAK_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_POI_FLIP_BREAK",
       "notes": ""
     },
     "METHOD_POI_FLIP_BREAK_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_POI_FLIP_BREAK",
       "notes": ""
     },
@@ -658,12 +643,12 @@
       "notes": ""
     },
     "METHOD_POI_REBOUND_FVG_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_POI_REBOUND_FVG",
       "notes": ""
     },
     "METHOD_POI_REBOUND_FVG_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_POI_REBOUND_FVG",
       "notes": ""
     },
@@ -698,22 +683,22 @@
       "notes": ""
     },
     "METHOD_SESSION_OPEN_BREAKOUT_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_SESSION_OPEN_BREAKOUT",
       "notes": ""
     },
     "METHOD_SESSION_OPEN_BREAKOUT_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_SESSION_OPEN_BREAKOUT",
       "notes": ""
     },
     "METHOD_SHALLOW_PULLBACK_BUY": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_SHALLOW_PULLBACK",
       "notes": ""
     },
     "METHOD_SHALLOW_PULLBACK_SELL": {
-      "status": "LIVE_MAIN",
+      "status": "WATCHLIST",
       "base": "METHOD_SHALLOW_PULLBACK",
       "notes": ""
     },
