@@ -63,7 +63,7 @@ env["DRY_RUN"] = "true"
 env["BACKTEST_NEUTRAL_CONFIDENCE"] = "true"
 if research_mode:
     env["BT_RESEARCH"] = "true"
-    env.setdefault("BT_RESEARCH_PER_DAY", "8")
+    env.setdefault("BT_RESEARCH_PER_DAY", "24")
     env.setdefault("BT_RESEARCH_SL", "2.0")
     env.setdefault("BT_RESEARCH_TP1", "1.0")
     env.setdefault("BT_RESEARCH_TP2", "2.0")

@@ -1,112 +1,9 @@
 {
   "methods": {
     "METHOD_ICT_TURTLE_SOUP_BUY": {
-      "total_sl": 158,
-      "last_report_level": 150,
+      "total_sl": 164,
+      "last_report_level": 160,
       "losses": [
-        {
-          "signal_id": 73,
-          "time": "2026-05-08T16:11:30+00:00",
-          "direction": "BUY",
-          "sl_price": 4718.315,
-          "entry_low": 4723.995,
-          "entry_high": 4724.995,
-          "sl": 4718.495,
-          "tp1": 4730.495,
-          "tp2": 4736.495,
-          "tags": [
-            "liquidity sweep/turtle soup gagal reversal",
-            "market choppy",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim | Memory: 67W/133L, score 790."
-        },
-        {
-          "signal_id": 75,
-          "time": "2026-05-10T23:49:30+00:00",
-          "direction": "BUY",
-          "sl_price": 4681.115,
-          "entry_low": 4687.135,
-          "entry_high": 4688.135,
-          "sl": 4681.635,
-          "tp1": 4693.635,
-          "tp2": 4699.635,
-          "tags": [
-            "liquidity sweep/turtle soup gagal reversal",
-            "market choppy",
-            "bias M15/H1 melawan BUY",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim | Memory: 67W/134L, score 790."
-        },
-        {
-          "signal_id": 77,
-          "time": "2026-05-11T20:54:30+00:00",
-          "direction": "BUY",
-          "sl_price": 4752.015,
-          "entry_low": 4758.865,
-          "entry_high": 4759.865,
-          "sl": 4753.365,
-          "tp1": 4765.365,
-          "tp2": 4771.365,
-          "tags": [
-            "liquidity sweep/turtle soup gagal reversal",
-            "market choppy",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim | Memory: 67W/135L, score 790."
-        },
-        {
-          "signal_id": 82,
-          "time": "2026-05-12T18:20:15+00:00",
-          "direction": "BUY",
-          "sl_price": 4707.04,
-          "entry_low": 4716.198,
-          "entry_high": 4717.198,
-          "sl": 4710.698,
-          "tp1": 4722.698,
-          "tp2": 4728.698,
-          "tags": [
-            "liquidity sweep/turtle soup gagal reversal",
-            "market choppy",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim | Memory: 67W/136L, score 790."
-        },
-        {
-          "signal_id": 83,
-          "time": "2026-05-12T21:01:30+00:00",
-          "direction": "BUY",
-          "sl_price": 4709.055,
-          "entry_low": 4715.285,
-          "entry_high": 4716.285,
-          "sl": 4709.785,
-          "tp1": 4721.785,
-          "tp2": 4727.785,
-          "tags": [
-            "liquidity sweep/turtle soup gagal reversal",
-            "market choppy",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim | Memory: 67W/137L, score 790."
-        },
-        {
-          "signal_id": 86,
-          "time": "2026-05-13T09:46:30+00:00",
-          "direction": "BUY",
-          "sl_price": 4672.345,
-          "entry_low": 4678.135,
-          "entry_high": 4679.135,
-          "sl": 4672.635,
-          "tp1": 4684.635,
-          "tp2": 4690.635,
-          "tags": [
-            "liquidity sweep/turtle soup gagal reversal",
-            "bias M15/H1 melawan BUY",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim | Memory: 67W/138L, score 790."
-        },
         {
           "signal_id": 93,
           "time": "2026-05-13T23:38:30+00:00",
@@ -428,13 +325,114 @@
             "reclaim tidak cukup kuat"
           ],
           "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim | Memory: 86W/157L, score 1010."
+        },
+        {
+          "signal_id": 2899,
+          "time": "2022-01-13T03:56:30+00:00",
+          "direction": "BUY",
+          "sl_price": 1820.888,
+          "entry_low": 1826.418,
+          "entry_high": 1827.418,
+          "sl": 1820.918,
+          "tp1": 1832.918,
+          "tp2": 1838.918,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "bias M15/H1 melawan BUY",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3012,
+          "time": "2022-09-21T20:02:30+00:00",
+          "direction": "BUY",
+          "sl_price": 1664.375,
+          "entry_low": 1670.478,
+          "entry_high": 1671.478,
+          "sl": 1664.978,
+          "tp1": 1676.978,
+          "tp2": 1682.978,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "bias M15/H1 melawan BUY",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3131,
+          "time": "2023-09-25T10:20:30+00:00",
+          "direction": "BUY",
+          "sl_price": 1916.665,
+          "entry_low": 1923.165,
+          "entry_high": 1924.165,
+          "sl": 1917.665,
+          "tp1": 1929.665,
+          "tp2": 1935.665,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "bias M15/H1 melawan BUY",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3252,
+          "time": "2024-08-01T10:24:30+00:00",
+          "direction": "BUY",
+          "sl_price": 2443.128,
+          "entry_low": 2449.495,
+          "entry_high": 2450.495,
+          "sl": 2443.995,
+          "tp1": 2455.995,
+          "tp2": 2461.995,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3370,
+          "time": "2025-05-19T08:48:15+00:00",
+          "direction": "BUY",
+          "sl_price": 3236.265,
+          "entry_low": 3242.075,
+          "entry_high": 3243.075,
+          "sl": 3236.575,
+          "tp1": 3248.575,
+          "tp2": 3254.575,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3488,
+          "time": "2026-03-02T03:52:30+00:00",
+          "direction": "BUY",
+          "sl_price": 5401.645,
+          "entry_low": 5408.735,
+          "entry_high": 5409.735,
+          "sl": 5403.235,
+          "tp1": 5415.235,
+          "tp2": 5421.235,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "market choppy",
+            "bias M15/H1 melawan BUY",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bullish Liquidity Sweep & Reclaim"
         }
       ],
-      "updated_at": "2026-06-12T22:03:41.527141"
+      "updated_at": "2026-03-02T03:52:00+00:00"
     },
     "METHOD_PATTERN_SHOOTING_STAR": {
-      "total_sl": 5,
-      "last_report_level": 0,
+      "total_sl": 12,
+      "last_report_level": 10,
       "losses": [
         {
           "signal_id": 5,
@@ -512,13 +510,121 @@
             "pattern candle gagal follow-through"
           ],
           "reason": "PATTERN: Shooting Star / Bearish Pin Bar | Memory: 3W/4L, score 30."
+        },
+        {
+          "signal_id": 2901,
+          "time": "2022-01-13T15:08:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1822.128,
+          "entry_low": 1815.428,
+          "entry_high": 1816.428,
+          "sl": 1821.928,
+          "tp1": 1809.928,
+          "tp2": 1803.928,
+          "tags": [
+            "pattern candle gagal follow-through"
+          ],
+          "reason": "PATTERN: Shooting Star / Bearish Pin Bar"
+        },
+        {
+          "signal_id": 2913,
+          "time": "2022-01-24T16:24:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1843.554,
+          "entry_low": 1836.804,
+          "entry_high": 1837.804,
+          "sl": 1843.304,
+          "tp1": 1831.304,
+          "tp2": 1825.304,
+          "tags": [
+            "pattern candle gagal follow-through",
+            "bias M15/H1 melawan SELL"
+          ],
+          "reason": "PATTERN: Shooting Star / Bearish Pin Bar"
+        },
+        {
+          "signal_id": 3025,
+          "time": "2022-10-03T09:15:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1670.895,
+          "entry_low": 1663.865,
+          "entry_high": 1664.865,
+          "sl": 1670.365,
+          "tp1": 1658.365,
+          "tp2": 1652.365,
+          "tags": [
+            "pattern candle gagal follow-through",
+            "bias M15/H1 melawan SELL"
+          ],
+          "reason": "PATTERN: Shooting Star / Bearish Pin Bar"
+        },
+        {
+          "signal_id": 3145,
+          "time": "2023-10-06T09:31:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1825.935,
+          "entry_low": 1817.998,
+          "entry_high": 1818.998,
+          "sl": 1824.498,
+          "tp1": 1812.498,
+          "tp2": 1806.498,
+          "tags": [
+            "pattern candle gagal follow-through"
+          ],
+          "reason": "PATTERN: Shooting Star / Bearish Pin Bar"
+        },
+        {
+          "signal_id": 3270,
+          "time": "2024-08-20T03:25:30+00:00",
+          "direction": "SELL",
+          "sl_price": 2506.668,
+          "entry_low": 2499.915,
+          "entry_high": 2500.915,
+          "sl": 2506.415,
+          "tp1": 2494.415,
+          "tp2": 2488.415,
+          "tags": [
+            "pattern candle gagal follow-through",
+            "market choppy"
+          ],
+          "reason": "PATTERN: Shooting Star / Bearish Pin Bar"
+        },
+        {
+          "signal_id": 3380,
+          "time": "2025-06-02T00:27:30+00:00",
+          "direction": "SELL",
+          "sl_price": 3313.705,
+          "entry_low": 3307.198,
+          "entry_high": 3308.198,
+          "sl": 3313.698,
+          "tp1": 3301.698,
+          "tp2": 3295.698,
+          "tags": [
+            "pattern candle gagal follow-through"
+          ],
+          "reason": "PATTERN: Shooting Star / Bearish Pin Bar"
+        },
+        {
+          "signal_id": 3505,
+          "time": "2026-04-01T01:12:30+00:00",
+          "direction": "SELL",
+          "sl_price": 4682.705,
+          "entry_low": 4676.118,
+          "entry_high": 4677.118,
+          "sl": 4682.618,
+          "tp1": 4670.618,
+          "tp2": 4664.618,
+          "tags": [
+            "pattern candle gagal follow-through"
+          ],
+          "reason": "PATTERN: Shooting Star / Bearish Pin Bar"
         }
       ],
-      "updated_at": "2026-06-11T14:24:16.620336"
+      "updated_at": "2026-04-01T01:12:00+00:00"
     },
     "METHOD_ICT_TURTLE_SOUP_SELL": {
-      "total_sl": 15,
-      "last_report_level": 10,
+      "total_sl": 21,
+      "last_report_level": 20,
       "losses": [
         {
           "signal_id": 27,
@@ -766,84 +872,117 @@
             "reclaim tidak cukup kuat"
           ],
           "reason": "ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim | Memory: 11W/11L, score 86."
+        },
+        {
+          "signal_id": 2889,
+          "time": "2022-01-07T08:31:15+00:00",
+          "direction": "SELL",
+          "sl_price": 1796.088,
+          "entry_low": 1788.328,
+          "entry_high": 1789.328,
+          "sl": 1794.828,
+          "tp1": 1782.828,
+          "tp2": 1776.828,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3006,
+          "time": "2022-09-19T09:45:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1668.145,
+          "entry_low": 1661.355,
+          "entry_high": 1662.355,
+          "sl": 1667.855,
+          "tp1": 1655.855,
+          "tp2": 1649.855,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "market choppy",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3129,
+          "time": "2023-09-21T10:19:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1921.635,
+          "entry_low": 1915.095,
+          "entry_high": 1916.095,
+          "sl": 1921.595,
+          "tp1": 1909.595,
+          "tp2": 1903.595,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "market choppy",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3250,
+          "time": "2024-08-01T07:50:30+00:00",
+          "direction": "SELL",
+          "sl_price": 2440.995,
+          "entry_low": 2433.728,
+          "entry_high": 2434.728,
+          "sl": 2440.228,
+          "tp1": 2428.228,
+          "tp2": 2422.228,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3367,
+          "time": "2025-05-16T00:54:30+00:00",
+          "direction": "SELL",
+          "sl_price": 3220.755,
+          "entry_low": 3213.835,
+          "entry_high": 3214.835,
+          "sl": 3220.335,
+          "tp1": 3208.335,
+          "tp2": 3202.335,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim"
+        },
+        {
+          "signal_id": 3486,
+          "time": "2026-03-01T23:23:15+00:00",
+          "direction": "SELL",
+          "sl_price": 5365.835,
+          "entry_low": 5359.285,
+          "entry_high": 5360.285,
+          "sl": 5365.785,
+          "tp1": 5353.785,
+          "tp2": 5347.785,
+          "tags": [
+            "liquidity sweep/turtle soup gagal reversal",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "ICT TURTLE SOUP: Bearish Liquidity Sweep & Reclaim"
         }
       ],
-      "updated_at": "2026-06-12T14:01:24.990408"
+      "updated_at": "2026-03-01T23:23:00+00:00"
     },
     "METHOD_CRT_H4_SWEEP_SELL": {
-      "total_sl": 31,
+      "total_sl": 35,
       "last_report_level": 30,
       "losses": [
-        {
-          "signal_id": 79,
-          "time": "2026-02-11T12:43:30+00:00",
-          "direction": "SELL",
-          "sl_price": 5098.765,
-          "entry_low": 5089.595,
-          "entry_high": 5093.895,
-          "sl": 5097.745,
-          "tp1": 5090.245,
-          "tp2": 5088.745,
-          "tags": [
-            "CRT sweep/reclaim gagal bertahan",
-            "bias M15/H1 melawan SELL",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "CRT H4: sweep high 5089.74 buffer 1.22 point lalu reclaim/reversal | Memory: 35W/6L, score 420."
-        },
-        {
-          "signal_id": 119,
-          "time": "2026-02-19T20:01:30+00:00",
-          "direction": "SELL",
-          "sl_price": 5012.445,
-          "entry_low": 5003.025,
-          "entry_high": 5007.325,
-          "sl": 5011.175,
-          "tp1": 5003.675,
-          "tp2": 5002.175,
-          "tags": [
-            "CRT sweep/reclaim gagal bertahan",
-            "market choppy",
-            "bias M15/H1 melawan SELL",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "CRT H4: sweep high 5003.18 buffer 1.82 point lalu reclaim/reversal | Memory: 40W/7L, score 480."
-        },
-        {
-          "signal_id": 124,
-          "time": "2026-02-20T03:35:30+00:00",
-          "direction": "SELL",
-          "sl_price": 5022.835,
-          "entry_low": 5014.365,
-          "entry_high": 5018.665,
-          "sl": 5022.515,
-          "tp1": 5015.015,
-          "tp2": 5013.515,
-          "tags": [
-            "CRT sweep/reclaim gagal bertahan",
-            "bias M15/H1 melawan SELL",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "CRT H4: sweep high 5014.52 buffer 1.71 point lalu reclaim/reversal | Memory: 42W/8L, score 504."
-        },
-        {
-          "signal_id": 129,
-          "time": "2026-02-20T09:32:30+00:00",
-          "direction": "SELL",
-          "sl_price": 5051.255,
-          "entry_low": 5042.175,
-          "entry_high": 5046.475,
-          "sl": 5050.325,
-          "tp1": 5042.825,
-          "tp2": 5041.325,
-          "tags": [
-            "CRT sweep/reclaim gagal bertahan",
-            "market choppy",
-            "bias M15/H1 melawan SELL",
-            "reclaim tidak cukup kuat"
-          ],
-          "reason": "CRT H4: sweep high 5042.32 buffer 1.08 point lalu reclaim/reversal | Memory: 43W/9L, score 516."
-        },
         {
           "signal_id": 139,
           "time": "2026-02-24T15:27:15+00:00",
@@ -1208,12 +1347,81 @@
             "reclaim tidak cukup kuat"
           ],
           "reason": "CRT H4: sweep high 1839.91 buffer 1.38 point lalu reclaim/reversal | Memory: 182W/24L, score 2064."
+        },
+        {
+          "signal_id": 2677,
+          "time": "2026-02-24T15:27:15+00:00",
+          "direction": "SELL",
+          "sl_price": 5169.965,
+          "entry_low": 5160.955,
+          "entry_high": 5165.255,
+          "sl": 5169.105,
+          "tp1": 5161.605,
+          "tp2": 5160.105,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep high 5161.10 buffer 1.60 point lalu reclaim/reversal | Memory: 221W/25L, score 2450."
+        },
+        {
+          "signal_id": 3068,
+          "time": "2023-01-06T08:44:30+00:00",
+          "direction": "SELL",
+          "sl_price": 1849.475,
+          "entry_low": 1839.765,
+          "entry_high": 1844.065,
+          "sl": 1847.915,
+          "tp1": 1840.415,
+          "tp2": 1838.915,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep high 1839.91 buffer 1.38 point lalu reclaim/reversal"
+        },
+        {
+          "signal_id": 3360,
+          "time": "2025-04-10T10:03:30+00:00",
+          "direction": "SELL",
+          "sl_price": 3134.015,
+          "entry_low": 3125.295,
+          "entry_high": 3129.595,
+          "sl": 3133.445,
+          "tp1": 3125.945,
+          "tp2": 3124.445,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep high 3125.45 buffer 2.04 point lalu reclaim/reversal"
+        },
+        {
+          "signal_id": 3485,
+          "time": "2026-02-24T15:27:15+00:00",
+          "direction": "SELL",
+          "sl_price": 5169.965,
+          "entry_low": 5160.955,
+          "entry_high": 5165.255,
+          "sl": 5169.105,
+          "tp1": 5161.605,
+          "tp2": 5160.105,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "market choppy",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep high 5161.10 buffer 1.60 point lalu reclaim/reversal"
         }
       ],
-      "updated_at": "2023-01-06T08:44:00+00:00"
+      "updated_at": "2026-02-24T15:27:00+00:00"
     },
     "METHOD_CRT_D1_SWEEP_SELL": {
-      "total_sl": 3,
+      "total_sl": 4,
       "last_report_level": 0,
       "losses": [
         {
@@ -1266,12 +1474,29 @@
             "reclaim tidak cukup kuat"
           ],
           "reason": "CRT D1: sweep high 3086.72 buffer 1.56 point lalu reclaim/reversal | Memory: 58W/1L, score 680."
+        },
+        {
+          "signal_id": 3356,
+          "time": "2025-03-30T21:34:30+00:00",
+          "direction": "SELL",
+          "sl_price": 3095.098,
+          "entry_low": 3086.575,
+          "entry_high": 3090.875,
+          "sl": 3094.725,
+          "tp1": 3087.225,
+          "tp2": 3085.725,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "bias M15/H1 melawan SELL",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT D1: sweep high 3086.72 buffer 1.56 point lalu reclaim/reversal"
         }
       ],
       "updated_at": "2025-03-30T21:34:00+00:00"
     },
     "METHOD_CRT_H4_SWEEP_BUY": {
-      "total_sl": 22,
+      "total_sl": 24,
       "last_report_level": 20,
       "losses": [
         {
@@ -1655,9 +1880,42 @@
             "reclaim tidak cukup kuat"
           ],
           "reason": "CRT H4: sweep low 4542.27 buffer 1.36 point lalu reclaim/reversal | Memory: 88W/21L, score 1056."
+        },
+        {
+          "signal_id": 3255,
+          "time": "2024-08-02T10:34:30+00:00",
+          "direction": "BUY",
+          "sl_price": 2447.528,
+          "entry_low": 2453.335,
+          "entry_high": 2457.635,
+          "sl": 2449.485,
+          "tp1": 2456.985,
+          "tp2": 2458.485,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep low 2457.49 buffer 1.85 point lalu reclaim/reversal"
+        },
+        {
+          "signal_id": 3463,
+          "time": "2025-12-15T21:55:15+00:00",
+          "direction": "BUY",
+          "sl_price": 4292.205,
+          "entry_low": 4296.405,
+          "entry_high": 4300.705,
+          "sl": 4292.555,
+          "tp1": 4300.055,
+          "tp2": 4301.555,
+          "tags": [
+            "CRT sweep/reclaim gagal bertahan",
+            "bias M15/H1 melawan BUY",
+            "reclaim tidak cukup kuat"
+          ],
+          "reason": "CRT H4: sweep low 4300.56 buffer 1.66 point lalu reclaim/reversal"
         }
       ],
-      "updated_at": "2026-06-12T08:52:28.846806"
+      "updated_at": "2025-12-15T21:55:00+00:00"
     },
     "RR2_GROUP_SELL": {
       "total_sl": 94,
