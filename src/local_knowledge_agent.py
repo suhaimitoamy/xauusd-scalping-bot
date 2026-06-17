@@ -406,6 +406,11 @@ class LocalKnowledgeAgent:
         if not raw or raw.startswith('/'):
             return None
 
+        signal_edu = self._handle_signal_education_question(raw)
+        if signal_edu:
+            self._log(chat_id, user_id, username, raw, 'SIGNAL_EDUCATION', signal_edu)
+            return signal_edu
+
         # Utility questions (time, etc.) — always check first
         utility = self._handle_utility_question(raw)
         if utility:
@@ -1047,7 +1052,7 @@ class LocalKnowledgeAgent:
         if any(k in norm for k in ['buy atau sell', 'sell atau buy', 'rekomendasi buy', 'rekomendasi sell', 'mending buy', 'mending sell', 'buy apa sell']):
             active = memory.active_signal()
             if active:
-                return f"Saat ini bot sedang merekomendasikan setup {active.get('direction')} di area {active.get('entry_low')} - {active.get('entry_high')} dengan SL di {active.get('sl')}."
+                return self._format_signal_education(active, source="BOT DATA ONLY")
             
             # Build both scenarios
             events = memory.recent_events('XAU/USD', limit=100)

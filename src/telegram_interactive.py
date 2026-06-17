@@ -33,7 +33,8 @@ class TelegramBotPolling:
         self.bot_state = bot_state or {}
         self.storage = storage
         self.ai_fallback = None
-        if storage is not None:
+        ai_fallback_enabled = os.getenv("TELEGRAM_AI_FALLBACK_ENABLED", "false").lower() in ("true", "1", "yes", "on")
+        if storage is not None and ai_fallback_enabled:
             try:
                 from src.market_context_ai import TelegramMarketAI
                 self.ai_fallback = TelegramMarketAI(storage, bot_state=self.bot_state)
