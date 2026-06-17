@@ -13,6 +13,12 @@ except ImportError:
     send_telegram_message = None
     def telegram_is_configured(): return False
 
+try:
+    from src.candle_sync import sync_closed_higher_timeframes_from_m5, canonical_time
+except ImportError:
+    sync_closed_higher_timeframes_from_m5 = None
+    canonical_time = None
+
 logger = logging.getLogger("CandleBuilder")
 
 
@@ -69,14 +75,67 @@ class CandleBuilder:
     def _get_candle_open_time(self, timestamp, tf_seconds):
         return (timestamp // tf_seconds) * tf_seconds
 
-    def process_tick(self, symbol, price, timestamp, raw_data):
+    def _normalize_timestamp(self, timestamp):
         try:
-            ts = int(timestamp)
+            ts = float(timestamp)
         except (ValueError, TypeError):
-            ts = int(time.time())
+            ts = time.time()
 
-        dt_utc = datetime.fromtimestamp(ts, timezone.utc).isoformat()
-        dt_local = datetime.fromtimestamp(ts).isoformat()
+        # Some feeds return milliseconds; internal candle buckets must use seconds.
+        if ts > 10_000_000_000:
+            ts = ts / 1000.0
+        return int(ts)
+
+    def _hydrate_or_create_candle(self, symbol, tf, candle_open_ts):
+        candle = Candle(symbol, tf, candle_open_ts)
+        open_dt = datetime.fromtimestamp(candle_open_ts, timezone.utc).isoformat(timespec='seconds')
+        legacy_open_dt = open_dt.replace('T', ' ').replace('+00:00', '')
+
+        try:
+            rows = self.storage.fetchall(
+                """
+                SELECT * FROM candles
+                WHERE symbol=? AND timeframe=? AND open_time IN (?, ?)
+                ORDER BY id DESC LIMIT 1
+                """,
+                (symbol, tf, open_dt, legacy_open_dt)
+            )
+        except Exception:
+            rows = []
+
+        if rows and int(rows[0].get('is_closed') or 0) == 0:
+            row = rows[0]
+            try:
+                candle.open = float(row.get('open'))
+                candle.high = float(row.get('high'))
+                candle.low = float(row.get('low'))
+                candle.close = float(row.get('close'))
+                candle.volume_tick = int(row.get('volume_tick') or 0)
+                candle.close_time = None
+                candle.is_closed = False
+            except Exception:
+                pass
+
+        return candle
+
+    def _sync_htf_from_m5(self, symbol):
+        if not sync_closed_higher_timeframes_from_m5:
+            return
+        result = sync_closed_higher_timeframes_from_m5(self.storage, symbol)
+        if result.get('ok'):
+            saved = result.get('saved') or {}
+            logger.info(
+                "HTF resync from M5 closed candles: "
+                f"M15={saved.get('M15', 0)} H1={saved.get('H1', 0)} H4={saved.get('H4', 0)}"
+            )
+        else:
+            logger.warning(f"HTF resync skipped: {result.get('error')}")
+
+    def process_tick(self, symbol, price, timestamp, raw_data):
+        ts = self._normalize_timestamp(timestamp)
+
+        dt_utc = datetime.fromtimestamp(ts, timezone.utc).isoformat(timespec='seconds')
+        dt_local = datetime.fromtimestamp(ts).isoformat(timespec='seconds')
 
         import os
         if os.environ.get('DRY_RUN') != 'true':
@@ -92,6 +151,12 @@ class CandleBuilder:
                 candle.is_closed = True
                 candle.close_time = candle.open_time + seconds - 1
                 self._save_candle(candle)
+
+                if tf == 'M5':
+                    try:
+                        self._sync_htf_from_m5(symbol)
+                    except Exception as e:
+                        logger.error(f"Error syncing HTF candles from closed M5: {e}")
 
                 if tf in ['M5', 'M15', 'H1']:
                     try:
@@ -185,11 +250,11 @@ class CandleBuilder:
                         logger.error(f"Error in on_m5_closed callback: {e}")
 
                 # Create new candle
-                self.current_candles[tf] = Candle(symbol, tf, candle_open_ts)
+                self.current_candles[tf] = self._hydrate_or_create_candle(symbol, tf, candle_open_ts)
                 self.current_candles[tf].update(price)
             elif not candle:
                 # Initialize new candle
-                self.current_candles[tf] = Candle(symbol, tf, candle_open_ts)
+                self.current_candles[tf] = self._hydrate_or_create_candle(symbol, tf, candle_open_ts)
                 self.current_candles[tf].update(price)
             else:
                 # Update existing candle
@@ -201,11 +266,11 @@ class CandleBuilder:
 
     def _save_candle(self, candle):
         open_dt = datetime.fromtimestamp(
-            candle.open_time, timezone.utc).isoformat()
+            candle.open_time, timezone.utc).isoformat(timespec='seconds')
         close_dt = None
         if candle.close_time:
             close_dt = datetime.fromtimestamp(
-                candle.close_time, timezone.utc).isoformat()
+                candle.close_time, timezone.utc).isoformat(timespec='seconds')
 
         self.storage.save_candle(
             symbol=candle.symbol,
