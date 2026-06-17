@@ -28,6 +28,8 @@ M5_PER_TIMEFRAME = {
     'H4': 48,
 }
 
+FUTURE_GRACE_SECONDS = 120
+
 
 def parse_utc(value: Any) -> Optional[datetime]:
     if value is None:
@@ -111,20 +113,56 @@ def _dedupe_by_open_time(candles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return [dedup[ts] for ts in sorted(dedup)]
 
 
-def sync_closed_higher_timeframes_from_m5(storage, symbol: str, limit: int = 650) -> Dict[str, Any]:
-    """Rebuild closed M15/H1/H4 candles from closed M5 candles.
+def _candle_close_ts(candle: Dict[str, Any], timeframe: str) -> Optional[int]:
+    tf = str(timeframe or '').upper()
+    open_ts = open_ts_from_candle(candle)
+    if open_ts is None:
+        close_dt = parse_utc(candle.get('close_time'))
+        return int(close_dt.timestamp()) if close_dt else None
+    return open_ts + TF_SECONDS.get(tf, 0) - 1
 
-    This keeps higher-timeframe OHLC aligned to the same base data as the M5 chart
-    and avoids stale/fallback HTF rows being trusted by /market_context.
-    """
+
+def is_future_closed_candle(candle: Dict[str, Any], timeframe: str, now_ts: Optional[int] = None) -> bool:
+    now_ts = int(time.time()) if now_ts is None else int(now_ts)
+    close_ts = _candle_close_ts(candle, timeframe)
+    if close_ts is None:
+        return False
+    return close_ts > now_ts + FUTURE_GRACE_SECONDS
+
+
+def get_recent_valid_candles(storage, symbol: str, timeframe: str, limit: int = 100) -> List[Dict[str, Any]]:
+    tf = str(timeframe or '').upper()
+    now_ts = int(time.time())
+    fetch_limit = max(int(limit) * 10, int(limit) + 50, 200)
     try:
-        m5_rows = storage.get_recent_candles(symbol, 'M5', limit)
-    except Exception as exc:
-        return {'ok': False, 'error': str(exc), 'saved': {}}
+        rows = storage.fetchall(
+            """
+            SELECT * FROM candles
+            WHERE symbol = ? AND timeframe = ? AND is_closed = 1
+            ORDER BY open_time DESC LIMIT ?
+            """,
+            (symbol, tf, fetch_limit)
+        )
+    except Exception:
+        return []
 
+    valid = []
+    for row in rows:
+        if is_future_closed_candle(row, tf, now_ts):
+            continue
+        valid.append(row)
+        if len(valid) >= int(limit):
+            break
+
+    return [dict(r) for r in reversed(valid)]
+
+
+def sync_closed_higher_timeframes_from_m5(storage, symbol: str, limit: int = 650) -> Dict[str, Any]:
+    """Rebuild closed M15/H1/H4 candles from closed M5 candles."""
+    m5_rows = get_recent_valid_candles(storage, symbol, 'M5', limit)
     m5_rows = _dedupe_by_open_time(m5_rows)
     if len(m5_rows) < 3:
-        return {'ok': False, 'error': 'not enough closed M5 candles', 'saved': {}}
+        return {'ok': False, 'error': 'not enough valid closed M5 candles', 'saved': {}}
 
     now_ts = int(time.time())
     saved: Dict[str, int] = {}
@@ -182,17 +220,7 @@ def sync_closed_higher_timeframes_from_m5(storage, symbol: str, limit: int = 650
 def last_closed_candle_summary(storage, symbol: str, timeframe: str, now: Optional[datetime] = None) -> Dict[str, Any]:
     tf = str(timeframe or '').upper()
     now = now or datetime.now(timezone.utc)
-    try:
-        rows = storage.get_recent_candles(symbol, tf, 1)
-    except Exception as exc:
-        return {
-            'timeframe': tf,
-            'available': False,
-            'fresh': False,
-            'status': 'STALE',
-            'age_minutes': None,
-            'reason': f'db_error: {exc}',
-        }
+    rows = get_recent_valid_candles(storage, symbol, tf, 1)
 
     if not rows:
         return {
@@ -201,23 +229,33 @@ def last_closed_candle_summary(storage, symbol: str, timeframe: str, now: Option
             'fresh': False,
             'status': 'STALE',
             'age_minutes': None,
-            'reason': 'no closed candle',
+            'reason': 'no valid closed candle',
         }
 
     candle = rows[-1]
     open_dt = parse_utc(candle.get('open_time'))
     seconds = TF_SECONDS.get(tf, 0)
     if open_dt and seconds:
-        close_dt = open_dt.timestamp() + seconds - 1
-        age_minutes = max(0.0, (now.timestamp() - close_dt) / 60.0)
-        close_time_utc = utc_iso_from_ts(int(close_dt))
+        close_ts = int(open_dt.timestamp()) + seconds - 1
+        age_raw = (now.timestamp() - close_ts) / 60.0
+        close_time_utc = utc_iso_from_ts(close_ts)
     else:
-        age_minutes = None
+        age_raw = None
         close_time_utc = canonical_time(candle.get('close_time'))
 
     limit = FRESH_LIMIT_MINUTES.get(tf, 999999)
-    fresh = age_minutes is not None and age_minutes <= limit
-    reason = 'ok' if fresh else f'age>{limit}m'
+    if age_raw is None:
+        fresh = False
+        age_minutes = None
+        reason = 'invalid candle time'
+    elif age_raw < -2:
+        fresh = False
+        age_minutes = round(age_raw, 1)
+        reason = 'future candle timestamp'
+    else:
+        age_minutes = round(max(0.0, age_raw), 1)
+        fresh = age_minutes <= limit
+        reason = 'ok' if fresh else f'age>{limit}m'
 
     return {
         'timeframe': tf,
@@ -228,7 +266,7 @@ def last_closed_candle_summary(storage, symbol: str, timeframe: str, now: Option
         'time': canonical_time(candle.get('open_time')) or str(candle.get('open_time') or '-'),
         'time_utc': canonical_time(candle.get('open_time')) or str(candle.get('open_time') or '-'),
         'close_time_utc': close_time_utc,
-        'age_minutes': round(age_minutes, 1) if age_minutes is not None else None,
+        'age_minutes': age_minutes,
         'open': _to_float(candle.get('open')),
         'high': _to_float(candle.get('high')),
         'low': _to_float(candle.get('low')),
