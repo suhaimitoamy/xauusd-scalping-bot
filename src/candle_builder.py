@@ -14,10 +14,11 @@ except ImportError:
     def telegram_is_configured(): return False
 
 try:
-    from src.candle_sync import sync_closed_higher_timeframes_from_m5, canonical_time
+    from src.candle_sync import sync_closed_higher_timeframes_from_m5, canonical_time, parse_utc
 except ImportError:
     sync_closed_higher_timeframes_from_m5 = None
     canonical_time = None
+    parse_utc = None
 
 logger = logging.getLogger("CandleBuilder")
 
@@ -76,15 +77,29 @@ class CandleBuilder:
         return (timestamp // tf_seconds) * tf_seconds
 
     def _normalize_timestamp(self, timestamp):
+        now_ts = int(time.time())
+        ts = None
         try:
             ts = float(timestamp)
         except (ValueError, TypeError):
-            ts = time.time()
+            if parse_utc:
+                dt = parse_utc(timestamp)
+                if dt:
+                    ts = dt.timestamp()
 
-        # Some feeds return milliseconds; internal candle buckets must use seconds.
+        if ts is None:
+            return now_ts
+
         if ts > 10_000_000_000:
             ts = ts / 1000.0
-        return int(ts)
+
+        ts = int(ts)
+        if abs(ts - now_ts) > 300:
+            logger.warning(
+                f"Provider timestamp rejected for candle calibration: provider={timestamp} parsed={ts} now={now_ts}"
+            )
+            return now_ts
+        return ts
 
     def _hydrate_or_create_candle(self, symbol, tf, candle_open_ts):
         candle = Candle(symbol, tf, candle_open_ts)
