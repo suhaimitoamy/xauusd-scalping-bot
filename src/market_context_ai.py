@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from src.ai_advisor import get_ai_response
+from src.candle_sync import build_freshness_bundle
 
 
 def _fmt(v, digits: int = 2):
@@ -128,30 +129,26 @@ def _db_supply_demand(storage, symbol: str, price: float) -> Dict[str, Any]:
     return out
 
 
-def _last_candle_summary(tf: str, candles: List[Dict[str, Any]]) -> Dict[str, Any]:
-    if not candles:
-        return {'timeframe': tf, 'available': False}
-    c = candles[-1]
-    return {
-        'timeframe': tf,
-        'available': True,
-        'time': _ctime(c),
-        'open': _c(c, 'open'),
-        'high': _c(c, 'high'),
-        'low': _c(c, 'low'),
-        'close': _c(c, 'close'),
-        'closed': c.get('is_closed', 1),
-    }
-
-
 def _candle_line(c: Dict[str, Any]) -> str:
+    tf = c.get('timeframe') or '-'
     if not c.get('available'):
-        return f"{c.get('timeframe')}: data belum ada"
+        return f"{tf}: data belum ada | status STALE"
+    age = c.get('age_minutes')
+    age_text = f"{age}m" if age is not None else "N/A"
     return (
-        f"{c.get('timeframe')}: {c.get('time')} | "
+        f"{tf}: last UTC {c.get('time_utc')} | close {c.get('close_time_utc')} | "
+        f"age {age_text} | {c.get('status')} | "
         f"O {_fmt(c.get('open'))} H {_fmt(c.get('high'))} "
         f"L {_fmt(c.get('low'))} C {_fmt(c.get('close'))}"
     )
+
+
+def _fresh_line(tf: str, c: Dict[str, Any]) -> str:
+    if not c.get('available'):
+        return f"{tf}: STALE | no closed candle"
+    age = c.get('age_minutes')
+    age_text = f"{age}m" if age is not None else "N/A"
+    return f"{tf}: {c.get('status')} | last {c.get('time_utc')} | age {age_text} | {c.get('reason')}"
 
 
 def _structure_snapshot(m5, m15, h1) -> Dict[str, Any]:
@@ -165,6 +162,16 @@ def _structure_snapshot(m5, m15, h1) -> Dict[str, Any]:
 
 
 def _decision_from_snapshot(snapshot: Dict[str, Any]) -> Dict[str, str]:
+    freshness = snapshot.get('freshness') or {}
+    data_status = str(freshness.get('data_status') or 'DATA STALE')
+    if data_status != 'FRESH':
+        return {
+            'status': 'DATA STALE',
+            'bias': 'WAIT',
+            'reason': 'M5/M15/H1/H4 belum fresh atau HTF terdeteksi tidak sinkron.',
+            'action': 'DATA STALE / WAIT'
+        }
+
     b = snapshot.get('bias', {})
     struct = snapshot.get('structure', {}) or {}
     m15 = str(b.get('m15') or 'unknown')
@@ -219,7 +226,10 @@ def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, An
     h1 = storage.get_recent_candles(symbol, 'H1', 72)
     h4 = storage.get_recent_candles(symbol, 'H4', 48)
     d1 = storage.get_recent_candles(symbol, 'D1', 30)
-    price = float(bot_state.get('last_price') or (m5[-1]['close'] if m5 else 0) or 0)
+
+    freshness = build_freshness_bundle(storage, symbol, bot_state)
+    live_price = freshness.get('live_price')
+    price = float(live_price or (m5[-1]['close'] if m5 else 0) or 0)
 
     base = m15 if len(m15) >= 20 else m5
     sd = _supply_demand_from_candles(base)
@@ -251,7 +261,10 @@ def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, An
     snapshot = {
         'symbol': symbol,
         'price': round(price, 3) if price else None,
+        'live_price': round(float(live_price), 3) if live_price else None,
         'updated_utc': datetime.now(timezone.utc).isoformat(timespec='seconds'),
+        'freshness': freshness,
+        'data_status': freshness.get('data_status'),
         'bias': {
             'm15': m15_bias,
             'h1': h1_bias,
@@ -269,15 +282,10 @@ def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, An
         },
         'supply_demand': sd,
         'structure': structure,
-        'last_candles': {
-            'M5': _last_candle_summary('M5', m5),
-            'M15': _last_candle_summary('M15', m15),
-            'H1': _last_candle_summary('H1', h1),
-            'H4': _last_candle_summary('H4', h4),
-        },
+        'last_candles': freshness.get('candles') or {},
     }
     snapshot['decision'] = _decision_from_snapshot(snapshot)
-    payload = json.dumps({k: snapshot[k] for k in ('price', 'bias', 'levels', 'supply_demand', 'structure')}, sort_keys=True, default=str)
+    payload = json.dumps({k: snapshot[k] for k in ('price', 'bias', 'levels', 'supply_demand', 'structure', 'freshness')}, sort_keys=True, default=str)
     snapshot['signature'] = hashlib.sha1(payload.encode()).hexdigest()[:12]
     return snapshot
 
@@ -292,31 +300,40 @@ def format_market_context(storage, symbol: str, bot_state: Optional[Dict[str, An
     struct = s.get('structure', {}) or {}
     dec = s.get('decision', {})
     candles = s.get('last_candles', {})
+    freshness = s.get('freshness', {})
 
     return (
-        "🧭 XAUUSD MARKET DECISION\n"
+        "🧭 XAUUSD MARKET CONTEXT\n"
         "Source: BOT DATA / SQLite Candle\n\n"
-        f"Harga: {_fmt(s.get('price'))}\n"
-        f"Status: {dec.get('status')}\n"
+        f"Live price: {_fmt(s.get('live_price') or s.get('price'))}\n"
+        f"Live source: {freshness.get('price_source', 'Twelve Data WebSocket')}\n"
+        f"Status data: {s.get('data_status')}\n"
+        f"Market decision: {dec.get('action')}\n"
         f"Bias final: {dec.get('bias')}\n"
-        f"Alasan: {dec.get('reason')}\n"
-        f"Action: {dec.get('action')}\n\n"
+        f"Alasan: {dec.get('reason')}\n\n"
         "📊 BIAS DETAIL\n"
         f"M15: {bias.get('m15')} | H1: {bias.get('h1')} | H4: {bias.get('h4')} | D1: {bias.get('d1')}\n"
-        f"Intraday: {bias.get('intraday')} | Posisi harga: {bias.get('price_position')}\n"
+        f"Intraday: {bias.get('intraday')} | Posisi harga: {bias.get('price_position')}\n\n"
+        "🏗 PHASE STRUCTURE\n"
         f"Phase: {struct.get('trend', 'N/A')} | Break: {struct.get('break_type', 'N/A')} | Sweep: {struct.get('sweep_type', 'N/A')}\n\n"
-        "📍 LEVEL BOT\n"
+        "📍 SUPPLY / DEMAND\n"
         f"Supply: {_fmt(supply.get('low'))} - {_fmt(supply.get('high'))}\n"
         f"Demand: {_fmt(demand.get('low'))} - {_fmt(demand.get('high'))}\n"
-        f"EQ: {_fmt(levels.get('equilibrium'))}\n"
+        f"EQ: {_fmt(levels.get('equilibrium'))}\n\n"
+        "💧 LIQUIDITY\n"
         f"Liquidity atas: {_fmt(levels.get('liquidity_above'))}\n"
         f"Liquidity bawah: {_fmt(levels.get('liquidity_below'))}\n\n"
-        "🕯 TV CALIBRATION CANDLE\n"
-        f"{_candle_line(candles.get('M5', {}))}\n"
-        f"{_candle_line(candles.get('M15', {}))}\n"
-        f"{_candle_line(candles.get('H1', {}))}\n"
-        f"{_candle_line(candles.get('H4', {}))}\n\n"
-        "Catatan: cocokkan OHLC dan time candle ini dengan TradingView. Kalau OHLC beda, bias/CHOCH/BOS bisa ikut beda."
+        "🕯 LAST CLOSED CANDLE OHLC\n"
+        f"{_candle_line(candles.get('M5', {'timeframe': 'M5'}))}\n"
+        f"{_candle_line(candles.get('M15', {'timeframe': 'M15'}))}\n"
+        f"{_candle_line(candles.get('H1', {'timeframe': 'H1'}))}\n"
+        f"{_candle_line(candles.get('H4', {'timeframe': 'H4'}))}\n\n"
+        "🧪 FRESHNESS STATUS\n"
+        f"{_fresh_line('M5', candles.get('M5', {}))}\n"
+        f"{_fresh_line('M15', candles.get('M15', {}))}\n"
+        f"{_fresh_line('H1', candles.get('H1', {}))}\n"
+        f"{_fresh_line('H4', candles.get('H4', {}))}\n\n"
+        "Catatan: bandingkan OHLC last closed candle di atas dengan TradingView pada waktu UTC yang sama."
     )
 
 
