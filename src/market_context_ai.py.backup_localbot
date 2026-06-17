@@ -270,8 +270,8 @@ class TelegramMarketAI:
             {"role": "user", "content": prompt},
         ]
         ai_text, used_ai = get_ai_response(messages, fallback, max_tokens=800, timeout=20)
-        source = "BOT DATA ONLY" if used_ai else "BOT DATA"
-        answer = f"🤖 Dijawab oleh Bot Lokal\nSource: {source}\n\n{ai_text.strip()}"
+        source = "AI + BOT DATA" if used_ai else "BOT DATA"
+        answer = f"🧠 Dijawab oleh AI berdasarkan data bot\nSource: {source}\n\n{ai_text.strip()}"
         cache[key] = {
             'question': question,
             'answer': answer,

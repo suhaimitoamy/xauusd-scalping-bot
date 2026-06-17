@@ -74,5 +74,195 @@
       },
       "signature": "5784f70868e9"
     }
+  },
+  "53ac031042fd80479a395493394f1de8cea70c69": {
+    "question": "Bias nya apa",
+    "answer": "🧠 Dijawab oleh AI berdasarkan data bot\nSource: AI + BOT DATA\n\nBro, bias XAUUSD saat ini lagi **bearish** buat intraday, TF m15 sama H1 juga bearish semua. Tapi H4 masih **sideways** alias galau. Harganya sekarang di 4338.96, dan posisinya lagi di **premium** (di atas equilibrium 4328.36), jadi secara teknikal lebih condong ke tekanan jual.\n\nIntinya: dominasi bearish buat jangka pendek, tapi H4 masih bingung arah. Jadi kalo mau entry, mending cari konfirmasi dulu jangan asal jual.",
+    "snapshot_signature": "a50b8132e75d",
+    "created_at": "2026-06-16T11:42:09.458880+00:00",
+    "snapshot": {
+      "symbol": "XAU/USD",
+      "price": 4338.96,
+      "updated_utc": "2026-06-16T11:42:06+00:00",
+      "bias": {
+        "m15": "bearish",
+        "h1": "bearish",
+        "h4": "sideways",
+        "intraday": "bearish",
+        "price_position": "premium"
+      },
+      "levels": {
+        "range_high": 4349.339,
+        "range_low": 4307.374,
+        "equilibrium": 4328.357,
+        "liquidity_above": 4340.089,
+        "liquidity_below": 4337.716
+      },
+      "supply_demand": {
+        "supply": {
+          "low": 4341.59684,
+          "high": 4347.25905,
+          "time": "2026-06-15T15:45:04.972718+00:00"
+        },
+        "demand": {
+          "low": 4325.82082,
+          "high": 4348.39327,
+          "time": "2026-06-16T01:00:04.781369+00:00"
+        }
+      },
+      "signature": "a50b8132e75d"
+    }
+  },
+  "0c18e91c72b16686eb64193137d3b1fdb2f93ae9": {
+    "question": "Bias nya apa",
+    "answer": "🧠 Dijawab oleh AI berdasarkan data bot\nSource: AI + BOT DATA\n\nBro, bias saat ini lagi **bearish** buat intraday, TF m15 sama H1 juga sama-sama bearish. Tapi H4 masih **sideways** alias galau. Harga sekarang di **premium** (di atas equilibrium 4328.36), jadi secara struktur agak rawan buat koreksi ke bawah.\n\nIntinya: dominasi jualan masih kuat buat jangka pendek, tapi jangan kaget kalau ada gerak bolak-balik dulu di range. Santai aja, pantau aja dulu pergerakannya.",
+    "snapshot_signature": "57bda05322fc",
+    "created_at": "2026-06-16T11:42:31.889492+00:00",
+    "snapshot": {
+      "symbol": "XAU/USD",
+      "price": 4338.583,
+      "updated_utc": "2026-06-16T11:42:28+00:00",
+      "bias": {
+        "m15": "bearish",
+        "h1": "bearish",
+        "h4": "sideways",
+        "intraday": "bearish",
+        "price_position": "premium"
+      },
+      "levels": {
+        "range_high": 4349.339,
+        "range_low": 4307.374,
+        "equilibrium": 4328.357,
+        "liquidity_above": 4340.089,
+        "liquidity_below": 4337.716
+      },
+      "supply_demand": {
+        "supply": {
+          "low": 4341.59684,
+          "high": 4347.25905,
+          "time": "2026-06-15T15:45:04.972718+00:00"
+        },
+        "demand": {
+          "low": 4325.82082,
+          "high": 4348.39327,
+          "time": "2026-06-16T01:00:04.781369+00:00"
+        }
+      },
+      "signature": "57bda05322fc"
+    }
+  },
+  "48dbf79fdca4caac045224282b6602ccae00b841": {
+    "question": "Bias hari ini",
+    "answer": "🧠 Dijawab oleh AI berdasarkan data bot\nSource: AI + BOT DATA\n\nBro, bias hari ini buat XAUUSD tuh **bullish semua** dari timeframe m15, H1, H4, sampe intraday. Jadi secara arah dominan lagi naik bro.\n\nHarga sekarang di **4342.917**, posisinya lagi di **premium** alias di atas equilibrium (4328.357). Ada liquidity di atas di 4343.105 sama di bawah 4342.728 — tipis banget selisihnya, jadi kayak lagi tarik-ulur tipis di situ.\n\nRange hariannya di **4307.374 - 4349.339**, jadi masih ada ruang ke atas sekitar 6 poin ke range high. Tapi hati-hati juga soalnya ada supply zone di 4341.59 - 4347.25 (dari kemarin) yang bisa jadi resistance.\n\nIntinya: bias bullish, tapi harga udah di premium dan deket supply, jadi kalo mau entry mending cari pullback dulu atau konfirmasi tembus level liquidity. Jangan asal ngejar ya bro 😄",
+    "snapshot_signature": "75aa967ef1ac",
+    "created_at": "2026-06-16T12:18:25.512953+00:00",
+    "snapshot": {
+      "symbol": "XAU/USD",
+      "price": 4342.917,
+      "updated_utc": "2026-06-16T12:18:19+00:00",
+      "bias": {
+        "m15": "bullish",
+        "h1": "bullish",
+        "h4": "bullish",
+        "intraday": "bullish",
+        "price_position": "premium"
+      },
+      "levels": {
+        "range_high": 4349.339,
+        "range_low": 4307.374,
+        "equilibrium": 4328.357,
+        "liquidity_above": 4343.105,
+        "liquidity_below": 4342.728
+      },
+      "supply_demand": {
+        "supply": {
+          "low": 4341.59684,
+          "high": 4347.25905,
+          "time": "2026-06-15T15:45:04.972718+00:00"
+        },
+        "demand": {
+          "low": 4325.82082,
+          "high": 4348.39327,
+          "time": "2026-06-16T01:00:04.781369+00:00"
+        }
+      },
+      "signature": "75aa967ef1ac"
+    }
+  },
+  "3bf4b6c8f0936f6f172164c7e65e00cfbf6535cd": {
+    "question": "Harga saat ini",
+    "answer": "🧠 Dijawab oleh AI berdasarkan data bot\nSource: AI + BOT DATA\n\nBro, harga XAUUSD saat ini ada di **4336.137** (update terakhir tadi malam jam 23:25 UTC).\n\nKalau liat dari data bot, posisi harga sekarang lagi di area **premium** — artinya agak mahal dari nilai equilibrium di 4331.077. Range hariannya antara 4314.995 sampai 4347.16, jadi masih di dalam range.\n\nYang menarik, ada liquidity di atas 4336.702 dan di bawah 4335.998 — artinya harga lagi ngepit di antara dua level likuiditas itu. Biasanya kalau udah gini, siap-siap aja breakout ke salah satu sisi.\n\nBiasnya sendiri: M15 bullish, tapi H1 dan H4 sideways. Jadi masih bingung arah, bro. Santai dulu aja sambil liat konfirmasi.",
+    "snapshot_signature": "1b4775ebdf2a",
+    "created_at": "2026-06-16T23:25:19.339049+00:00",
+    "snapshot": {
+      "symbol": "XAU/USD",
+      "price": 4336.137,
+      "updated_utc": "2026-06-16T23:25:14+00:00",
+      "bias": {
+        "m15": "bullish",
+        "h1": "sideways",
+        "h4": "sideways",
+        "intraday": "sideways",
+        "price_position": "premium"
+      },
+      "levels": {
+        "range_high": 4347.16,
+        "range_low": 4314.995,
+        "equilibrium": 4331.077,
+        "liquidity_above": 4336.702,
+        "liquidity_below": 4335.998
+      },
+      "supply_demand": {
+        "supply": {
+          "low": 4339.30284,
+          "high": 4345.95764,
+          "time": "2026-06-16T14:00:05.394993+00:00"
+        },
+        "demand": {
+          "low": 4325.82082,
+          "high": 4348.39327,
+          "time": "2026-06-16T01:00:04.781369+00:00"
+        }
+      },
+      "signature": "1b4775ebdf2a"
+    }
+  },
+  "d2b669a2d5f42db8854cd0d8c39b66c309cb73fc": {
+    "question": "Kenapa",
+    "answer": "🧠 Dijawab oleh AI berdasarkan data bot\nSource: AI + BOT DATA\n\nWah bro, pertanyaan lo cuma \"Kenapa\" doang nih? 😅 Kurang jelas nih maksudnya. Lo nanya kenapa harga turun, kenapa bullish, atau kenapa ada level tertentu?\n\nCoba deh spill pertanyaan lengkapnya biar gue bisa jawab pake data real dari bot. Soalnya data XAU/USD sekarang udah lengkap:\n\n- Harga saat ini: **$4,325.26**\n- Bias m15 bullish, tapi H4 masih bearish\n- Ada supply zone di **$4,325.45 - $4,327.69** (baru terbentuk 10 menit lalu)\n- Liquidity di atas **$4,325.63** dan bawah **$4,325.18**\n\nPokoknya tanya lagi aja yang lebih jelas, gue siap bantu analisa pake data ini! 🔥",
+    "snapshot_signature": "353b755755e8",
+    "created_at": "2026-06-17T06:35:36.430334+00:00",
+    "snapshot": {
+      "symbol": "XAU/USD",
+      "price": 4325.26,
+      "updated_utc": "2026-06-17T06:35:27+00:00",
+      "bias": {
+        "m15": "bullish",
+        "h1": "sideways",
+        "h4": "bearish",
+        "intraday": "sideways",
+        "price_position": "discount"
+      },
+      "levels": {
+        "range_high": 4349.528,
+        "range_low": 4319.654,
+        "equilibrium": 4334.591,
+        "liquidity_above": 4325.634,
+        "liquidity_below": 4325.183
+      },
+      "supply_demand": {
+        "supply": {
+          "low": 4325.4466,
+          "high": 4327.69291,
+          "time": "2026-06-17T06:25:01.939738+00:00"
+        },
+        "demand": {
+          "low": 4314.99461,
+          "high": 4332.83017,
+          "time": "2026-06-17T06:00:04.030528+00:00"
+        }
+      },
+      "signature": "353b755755e8"
+    }
   }
 }

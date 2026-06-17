@@ -58,8 +58,8 @@ session:
       start: 04:45
       end: 06:15
 ai:
-  enabled: false
-  provider: local_bot
+  enabled: true
+  provider: deepseek
   max_tokens: 500
   temperature: 0.2
 rest_bootstrap:
@@ -86,9 +86,9 @@ alerts:
   telegram_tp_sl: true
 ai_smart_token:
   enabled: true
-  allow_ai_for_sweep_break_important: false
-  allow_ai_for_poi_report: false
-  allow_ai_for_premium_signal: false
+  allow_ai_for_sweep_break_important: true
+  allow_ai_for_poi_report: true
+  allow_ai_for_premium_signal: true
   block_ai_for_no_trade_auto: true
   block_ai_for_duplicate_event: true
 adaptive_rules:

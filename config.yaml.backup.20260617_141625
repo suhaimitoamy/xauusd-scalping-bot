@@ -31,7 +31,7 @@ trading:
   min_confidence: 65
   preferred_min_confidence: 70
   high_confidence: 80
-  max_signals_per_day: 999
+  max_signals_per_day: 6
   cooldown_minutes_same_direction: 15
   cooldown_minutes_any_signal: 20
 risk:
@@ -58,8 +58,8 @@ session:
       start: 04:45
       end: 06:15
 ai:
-  enabled: false
-  provider: local_bot
+  enabled: true
+  provider: deepseek
   max_tokens: 500
   temperature: 0.2
 rest_bootstrap:
@@ -86,9 +86,9 @@ alerts:
   telegram_tp_sl: true
 ai_smart_token:
   enabled: true
-  allow_ai_for_sweep_break_important: false
-  allow_ai_for_poi_report: false
-  allow_ai_for_premium_signal: false
+  allow_ai_for_sweep_break_important: true
+  allow_ai_for_poi_report: true
+  allow_ai_for_premium_signal: true
   block_ai_for_no_trade_auto: true
   block_ai_for_duplicate_event: true
 adaptive_rules:

@@ -2346,6 +2346,51 @@
         }
       ],
       "updated_at": "2023-04-20T06:29:00+00:00"
+    },
+    "METHOD_CHOCH_REVERSAL_BUY": {
+      "total_sl": 1,
+      "last_report_level": 0,
+      "losses": [
+        {
+          "signal_id": 68,
+          "time": "2026-06-17T04:30:00+00:00",
+          "direction": "BUY",
+          "sl_price": 4325.072,
+          "entry_low": 4332.256,
+          "entry_high": 4333.256,
+          "sl": 4326.756,
+          "tp1": 4337.756,
+          "tp2": 4340.756,
+          "tags": [
+            "setup gagal follow-through",
+            "bias M15/H1 melawan BUY"
+          ],
+          "reason": "CHoCH Bullish: Struktur berbalik dari Bearish ke Bullish (Reversal Kuat)"
+        }
+      ],
+      "updated_at": "2026-06-17T04:30:07.987065+00:00"
+    },
+    "METHOD_CHOCH_REVERSAL_SELL": {
+      "total_sl": 1,
+      "last_report_level": 0,
+      "losses": [
+        {
+          "signal_id": 69,
+          "time": "2026-06-17T05:50:00+00:00",
+          "direction": "SELL",
+          "sl_price": 4332.943,
+          "entry_low": 4324.947,
+          "entry_high": 4325.947,
+          "sl": 4332.943,
+          "tp1": 4320.447,
+          "tp2": 4317.447,
+          "tags": [
+            "setup gagal follow-through"
+          ],
+          "reason": "CHoCH Bearish: Struktur berbalik dari Bullish ke Bearish (Reversal Kuat)"
+        }
+      ],
+      "updated_at": "2026-06-17T05:50:04.653388+00:00"
     }
   }
 }

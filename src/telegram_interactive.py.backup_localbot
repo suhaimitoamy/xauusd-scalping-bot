@@ -270,7 +270,7 @@ class TelegramBotPolling:
                     logger.exception(f"Telegram AI fallback error: {e}")
             if ans:
                 # Ensure no AI label leaks through for local knowledge only
-                ans = ans.replace('🧠 Dijawab oleh Bot Lokal', '🤖 Dijawab oleh Bot Lokal')
+                ans = ans.replace('🧠 Dijawab oleh AI', '🤖 Dijawab oleh Bot Lokal')
                 answers.append(ans)
         if not answers:
             return None
