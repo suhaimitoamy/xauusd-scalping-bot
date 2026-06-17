@@ -2,7 +2,7 @@ import os
 import requests
 import json
 from src.formatter import setup_logger
-from datetime import datetime, timezone
+from src.candle_sync import canonical_time, expected_close_time
 import time
 
 logger = setup_logger("DataBootstrapAgent")
@@ -49,32 +49,39 @@ def bootstrap_history(storage, config):
             data = response.json()
 
             if data.get("status") != "ok":
-                logger.error(
-                    f"Failed to fetch {internal_tf}: {
-                        data.get('message')}")
+                logger.error(f"Failed to fetch {internal_tf}: {data.get('message')}")
                 success = False
                 continue
 
             values = data.get("values", [])
-            # Twelve data returns newest first. We reverse it to oldest first for logical processing,
-            # though storage uses UPSERT anyway.
+            # Twelve Data returns newest first. We reverse it to oldest first.
             values.reverse()
 
             saved_count = 0
             for i, row in enumerate(values):
-                open_time = row['datetime'] + \
-                    ":00" if len(row['datetime']) == 16 else row['datetime']
+                raw_open_time = row.get('datetime')
+                if not raw_open_time:
+                    continue
+                if len(raw_open_time) == 16:
+                    raw_open_time = f"{raw_open_time}:00"
 
-                # Assume closed if not the very last candle (most recent)
+                open_time = canonical_time(raw_open_time)
+                if not open_time:
+                    logger.warning(f"Skipping {internal_tf} candle with invalid datetime: {raw_open_time}")
+                    continue
+
+                close_time = expected_close_time(open_time, internal_tf)
+
+                # Assume closed if not the very last candle (most recent).
                 is_closed = True
                 if use_closed_only and i == len(values) - 1:
-                    is_closed = False  # The last one might still be forming
+                    is_closed = False
 
                 storage.save_candle(
                     symbol=symbol,
                     timeframe=internal_tf,
                     open_time=open_time,
-                    close_time=open_time,  # approximate for now
+                    close_time=close_time,
                     open_p=float(row['open']),
                     high_p=float(row['high']),
                     low_p=float(row['low']),
@@ -84,8 +91,7 @@ def bootstrap_history(storage, config):
                 )
                 saved_count += 1
 
-            logger.info(
-                f"Bootstrap {internal_tf}: saved {saved_count} candles.")
+            logger.info(f"Bootstrap {internal_tf}: saved {saved_count} candles.")
             time.sleep(0.5)  # Prevent rate limiting
 
         except Exception as e:
