@@ -29,7 +29,10 @@ def main():
 
     config = load_config()
     symbol = args.symbol or config.get("symbol", "XAU/USD")
-    db_path = config.get("db_path", "data/xauusd_bot.sqlite")
+    db_path = config.get("storage", {}).get(
+        "sqlite_path",
+        config.get("db_path", "data/xauusd_bot.sqlite")
+    )
 
     storage = Storage(db_path)
     assistant = MappingAssistant(storage, symbol)
