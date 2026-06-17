@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from src.ai_advisor import get_ai_response
-from src.candle_sync import build_freshness_bundle
+from src.candle_sync import build_freshness_bundle, get_recent_valid_candles
 
 
 def _fmt(v, digits: int = 2):
@@ -145,7 +145,7 @@ def _candle_line(c: Dict[str, Any]) -> str:
 
 def _fresh_line(tf: str, c: Dict[str, Any]) -> str:
     if not c.get('available'):
-        return f"{tf}: STALE | no closed candle"
+        return f"{tf}: STALE | no valid closed candle"
     age = c.get('age_minutes')
     age_text = f"{age}m" if age is not None else "N/A"
     return f"{tf}: {c.get('status')} | last {c.get('time_utc')} | age {age_text} | {c.get('reason')}"
@@ -221,11 +221,11 @@ def _decision_from_snapshot(snapshot: Dict[str, Any]) -> Dict[str, str]:
 
 def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     bot_state = bot_state or {}
-    m5 = storage.get_recent_candles(symbol, 'M5', 80)
-    m15 = storage.get_recent_candles(symbol, 'M15', 96)
-    h1 = storage.get_recent_candles(symbol, 'H1', 72)
-    h4 = storage.get_recent_candles(symbol, 'H4', 48)
-    d1 = storage.get_recent_candles(symbol, 'D1', 30)
+    m5 = get_recent_valid_candles(storage, symbol, 'M5', 80)
+    m15 = get_recent_valid_candles(storage, symbol, 'M15', 96)
+    h1 = get_recent_valid_candles(storage, symbol, 'H1', 72)
+    h4 = get_recent_valid_candles(storage, symbol, 'H4', 48)
+    d1 = get_recent_valid_candles(storage, symbol, 'D1', 30)
 
     freshness = build_freshness_bundle(storage, symbol, bot_state)
     live_price = freshness.get('live_price')
