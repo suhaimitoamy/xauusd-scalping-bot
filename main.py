@@ -116,7 +116,7 @@ def command_response(storage, bot_state, symbol, config, command, args_text="", 
         return approve_or_reject(storage, 'no')
 
     if command in ('/help', '/start'):
-        return """🧠 XAUUSD Adaptive Brain Bot V7
+        return """🧠 BOT AKTIF
 
 Commands:
 /signal - cek signal adaptive M5
@@ -380,7 +380,7 @@ Total fitur utama: 26. Methods: 15. News filter: OFF."""
 
 def run_cli(storage, bot_state, symbol, config, tg_polling=None):
     print("==================================================")
-    print("XAUUSD Adaptive Brain Bot V7")
+    print("BOT AKTIF")
     print("Commands: /signal, /m1_signal, /m5_signal, /alerts, /brain")
     print("          /pending, YES, NO, /price, /stats, /exit")
     print("==================================================\n")
@@ -430,7 +430,10 @@ def main():
     alert_engine = MarketAlertEngine(storage, symbol=symbol, config=config)
 
     if telegram_is_configured():
-        send_telegram_message("🧠 XAUUSD Adaptive Brain Bot V7 ONLINE\nM1 + M5 signals independent\nMarket alerts: 21 | Total fitur: 26 | Methods: 15\nNews filter: OFF\nSource: LOCAL BRAIN + AI TRAINER")
+        send_telegram_message("🤖 BOT AKTIF
+
+Sistem sudah online.
+Silakan kirim pertanyaan di kolom komentar.")
 
     def _send_signal_if_allowed(sig):
         if sig and sig.get('direction') != 'NO_TRADE':
