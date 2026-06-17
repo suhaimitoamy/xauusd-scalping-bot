@@ -1,87 +1,384 @@
-# 🚀 XAUUSD Hyper-Evolution Scalping Bot (V8 - Operasi Mata Dewa)
+# 🤖 XAUUSD Adaptive Brain Bot V7
 
-Sistem Bot XAUUSD (Gold) yang didesain secara khusus untuk ekosistem Termux Android. Bot ini telah berevolusi menjadi agen **Hyper-Evolution**, sebuah *signal provider* yang sangat agresif, brutal, dan mampu **Bermutasi Otomatis (Self-Evolving)** secara *real-time* setiap kali mengalami kerugian (*Stop Loss*). 
-Di Versi 8 ini, penglihatan bot (Vision) dirombak total menyamai akurasi *script Pine indikator SMC* terbaik.
+Bot lokal untuk membantu membaca, memetakan, dan memberi sinyal XAUUSD berdasarkan data candle, market structure, Smart Money Concepts, dan memori performa metode.
 
----
-
-## 🧠 Filosofi & Mesin Utama
-
-Bot ini mengesampingkan indikator tradisional yang lambat (seperti MA/Trend Filters) dan mengandalkan **Price Action murni** serta **Smart Money Concepts (SMC)** di sekitar area likuiditas (*Point of Interest*). 
-
-### 1. Quantitative Data Engine (Mega Backtest 5 Tahun)
-Meniru pendekatan *Jim Simons (Renaissance Technologies)*, bot ini diperkuat dengan skrip `scratch_mega_backtest.py` yang mampu menyedot data **1,9 Juta Candle M1 (2022-2026)** dalam hitungan detik. Menggunakan struktur memori *In-Memory SQLite*, bot ini beroperasi pada skala **ratusan ribu candle per menit**, menguji metode-metodenya secara matematis murni tanpa bias emosional manusia.
-
-### 2. The Watchdog (`run_live_auto_reload.py`)
-Bot tidak perlu lagi di-*restart* manual. Daemon *Watchdog* akan memantau seluruh file `.py` dan `config.yaml` setiap 1 detik. Jika *source code* berubah (misal Antigravity AI menyuntikkan strategi baru), bot akan otomatis merestart dirinya sendiri dalam 0.5 detik tanpa interupsi *trading* (*Hot-Reload*).
-
-### 2. Market Brain (`market_brain.py`) & 8 Pilar SMC (Mata Dewa)
-Pusat eksekusi sinyal bot telah ditingkatkan dengan **8 Pilar SMC PineScript Asli**:
-1. **FVG Berfilter Wick**: Mendeteksi FVG hanya dengan validasi *wick* ketat (< 36% dari bodi).
-2. **Liquidity Swings (3,1)**: Memetakan likuiditas menggunakan formasi pivot (Kiri 3, Kanan 1).
-3. **Akurasi Order Block**: OB ditarik spesifik dari *Open* ke *Low* (Bull) atau *Open* ke *High* (Bear) dengan validasi breakout menembus 2 candle ke belakang.
-4. **Displacement Dinamis**: Momentum breakout tidak lagi kaku, melainkan menggunakan rata-rata bodi 5 candle (`sma(body, 5)`).
-5. **Tokyo Killzone**: Mengunci area sapuan sesi Asia pada pukul 10:00 - 14:00 (JST/Tokyo).
-6. **BPR & IFVG**: Mendeteksi tumpukan FVG (Balanced Price Range) dan perubahan fungsi FVG jebol (Inversion FVG).
-7. **HTF Bias (EMA 20 & 50)**: Eksekusi metode SMC selalu difilter mengikuti tren Timeframe Besar (H1).
-8. **S&R Price Action**: Bot wajib memvalidasi bentuk lilin *Pinbar* ekstrem (jarum > 1.5x lipat bodi) saat harga menolak/mantul dari *Support* atau *Resistance*.
-
-**13 Pasukan Metode (User Suite) Aktif:**
-1. **CRT Sweep** (Sapuan likuiditas H4 & D1)
-2. **H1 Breakout**
-3. **M15 Double Top**
-4. **FVG Rejection** (Pinbar Retest)
-5. **IFVG Breakout & Retest** (Momentum Jebol / Pantul Inversion FVG)
-6. **Support/Resistance Rejection** (Pinbar Retest)
-7. **CHoCH Reversal** (Reversal Kuat M5/M15)
-8. **BOS Momentum** (Continuation)
-9. **OTE Retrace** (Pinbar Fib 0.618-0.786)
-10. **Breaker Block Retest** (Pinbar di OB Jebol)
-11. **Asian Session Sweep** (Reversal di Tokyo Killzone)
-12. **OB + FVG Confluence** (Power of 3 Sniper Entry)
-13. **POI Accumulation** (Breakout Ketat Konsolidasi)
-
-### 3. Market Alert Engine (`market_alert_engine.py`)
-Mata-mata *market structure* yang akan memberikan notifikasi ke Telegram Anda.
-- **Bebas Noise**: Alert dari Timeframe M1 **telah dimatikan secara permanen**. Anda hanya akan menerima struktur valid dari M5 ke atas.
-
-### 4. Performance Reporter (Event-Driven)
-Tidak perlu menunggu *cron* per 30 menit! Modul ini **langsung memicu (trigger)** laporan otomatis ke Telegram seketika (*real-time*) setiap kali sebuah posisi ditutup, menampilkan semua status (🟢, 🟠, 🔴, ⚪) dari seluruh arsenal metode yang ada.
+Project ini berjalan di **Termux Android** dan terhubung ke **Telegram** untuk mengirim notifikasi, edukasi signal, market alert, dan ringkasan mapping.
 
 ---
 
-## 🧬 Antigravity Auto-Mutator (Pengganti DeepSeek)
-Sistem mutasi internal bot (DeepSeek API) telah **DIBEKUKAN**. Sekarang, proses evaluasi 100% diambil alih oleh **Antigravity (Google Gemini Agent)** dari luar bot.
+## Status Project Saat Ini
 
-1. **Antigravity Monitor**: *Script* `scratch_antigravity_monitor.py` terus berputar di *background* setiap 5 detik untuk memindai Database SQLite.
-2. **Reaktif Waking**: Jika *Stop Loss* terjadi, script ini akan menemukan SL yang belum dievaluasi dan langsung "membangunkan" agen Antigravity.
-3. **Pembedahan Kode (Mutasi)**: Antigravity akan merombak kode Python di `market_brain.py` secara presisi untuk menutupi kelemahan metode tersebut.
-4. **Reinkarnasi (Memory Reset)**: Metode yang sudah dimutasi akan dihapus "dosa masa lalunya" (Win Rate dikembalikan ke 0/0) agar memiliki kesempatan membuktikan diri lagi sebagai entitas baru, menghindari pemblokiran (*Auto-Block*) prematur dari bot.
-5. Telegram menerima notifikasi: `🧬 HOT-RELOAD: Otak bot berhasil dimutasi (Hyper-Evolution) secara otomatis!`
+```text
+🤖 BOT AKTIF
 
-Semua ini terjadi secara otonom tanpa memerlukan persetujuan (`YES/NO`) dari Anda!
+Sistem sudah online.
+Silakan kirim pertanyaan di kolom komentar.
+```
+
+Mode utama project saat ini:
+
+```text
+Source utama       : Local Brain + AI Trainer
+AI Telegram        : OFF
+AI fallback        : OFF secara default
+Edukasi Telegram   : Bot lokal
+Signal             : M1 dan M5 berjalan terpisah
+Market alert       : Aktif
+Knowledge          : Local Knowledge Agent + knowledge_seed.json
+Database           : SQLite lokal
+```
+
+---
+
+## Fungsi Utama
+
+### 1. Signal Bot
+
+Bot membaca setup BUY/SELL dari metode yang aktif di `market_brain.py` dan menyimpan hasilnya ke database SQLite.
+
+Signal utama mencakup:
+
+- Arah signal: BUY / SELL / NO TRADE
+- Entry area
+- Stop Loss
+- TP1
+- TP2
+- Invalidasi
+- Pattern / metode
+- Confidence
+- Reason signal
+- Status signal
+- Result signal
+
+M1 dan M5 berjalan sebagai stream signal yang terpisah.
 
 ---
 
-## 🕹️ Komando Telegram Dasar (CLI)
-Saat berjalan, Anda punya arsenal komando berikut melalui Terminal/Telegram:
-- `/status` / `/price` / `/signal` : Komando sinyal standar.
-- `/poi` : Mencetak Peta *Point of Interest* Multi-Timeframe.
-- `/stats` : Rangkuman memori kemenangan/kekalahan hari ini.
-- `/kb_stats` : Statistik *Knowledge Base*.
-- `/exit` : Mematikan bot dengan aman.
+### 2. Market Structure Alert
+
+Bot membaca struktur market dan mengirim alert Telegram untuk kondisi seperti:
+
+- BOS valid / invalid
+- CHOCH valid / invalid
+- MSS valid / invalid
+- Support break valid / invalid
+- Resistance break valid / invalid
+- Sweep reclaim valid / invalid
+- Fake break
+- Trend invalidation
+- Retest mode
+
+Invalidasi trend:
+
+```text
+Bullish invalid jika Higher Low jebol
+Bearish invalid jika Lower High jebol
+```
 
 ---
 
-## ⏳ Background Tasks (Cron Jobs & Monitors)
+### 3. Early Warning Alert
 
-1. **Autonomous Auditor (Jam 5 Pagi WIB / 22:00 UTC)**
-   - Cron: `0 22 * * *` (Via Antigravity AI `/schedule`)
-   - Tugas: Bertindak sebagai "Kepala Peneliti Quant". AI akan membaca `data/sl_method_audit.json` untuk menganalisis penyebab kerugian bot selama 5 tahun terakhir, menambal *bug* kode secara mandiri tanpa izin user, menambah metode/fitur baru secara otonom, dan mengirimkan laporan penemuan paginya ke Telegram.
-   
-2. **Antigravity SL Monitor**
-   - Perintah: `python3 scratch_cron_manager.py` (Menjaga Daemon tetap hidup 24/7)
-   - Tugas: Menjadi radar pendeteksi kerugian beruntun. Jika kondisi memburuk, akan langsung membangkitkan agen AI untuk melakukan reinkarnasi kode saat itu juga.
+Bot juga punya mode early warning sebelum candle benar-benar confirm.
+
+Early warning yang tersedia:
+
+- Support sedang disweep
+- Resistance sedang disweep
+- Support break bearish sedang terbentuk
+- Resistance break bullish sedang terbentuk
+- CHOCH/MSS bullish sedang terbentuk
+- CHOCH/MSS bearish sedang terbentuk
+- Trend bullish hampir invalid
+- Trend bearish hampir invalid
+
+Confirmed `VALID / INVALID` tetap dikirim setelah validasi close candle.
 
 ---
-*Dokumen ini merupakan "Living Document". Setiap mutasi atau perubahan struktural pada logika AI wajib di-update langsung ke dokumen ini agar tersinkronisasi sempurna dengan otak bot.*
+
+### 4. Mapping Assistant
+
+Mapping assistant membantu membaca kondisi market sebelum mengambil keputusan.
+
+Komponen mapping:
+
+- Session context WIB / New York
+- EST / EDT otomatis
+- London Killzone
+- New York Killzone
+- D1 / H4 / H1 bias
+- Range high / range low / equilibrium
+- Premium / discount
+- BSL / SSL
+- Equal high / equal low
+- PDH / PDL
+- FVG aktif
+- Order Block aktif
+- Liquidity map
+- Market narrative
+
+Script utama:
+
+```bash
+python scripts/send_mapping_summary.py
+python scripts/send_mapping_summary.py --send
+```
+
+---
+
+### 5. Order Block dan FVG Mapping
+
+Bot memetakan area penting seperti:
+
+- Bullish OB
+- Bearish OB
+- OB fresh
+- OB touched
+- OB invalid
+- Bullish FVG
+- Bearish FVG
+- FVG fresh
+- FVG partial
+- FVG invalid / IFVG
+
+Area ini digunakan sebagai area pantau, bukan tombol entry otomatis.
+
+---
+
+### 6. Telegram Edukasi Lokal
+
+Telegram sekarang memakai **bot lokal**, bukan AI bebas.
+
+Sumber edukasi Telegram:
+
+```text
+src/local_knowledge_agent.py
+/data/knowledge_seed.json
+```
+
+Pertanyaan seperti ini dijawab dari signal aktif / signal terakhir:
+
+```text
+Enaknya sell atau buy?
+Buy atau sell?
+Kenapa?
+Alasannya?
+Detail signal?
+Kenapa sell?
+Kenapa buy?
+```
+
+Jawaban edukasi signal berisi:
+
+- Rekomendasi BUY/SELL
+- Current price
+- Entry
+- SL
+- TP1
+- TP2
+- Invalidasi
+- Pattern
+- Timeframe
+- Class
+- Reason signal
+- Bias M15
+- Bias H1
+- Momentum M5
+- ATR
+- Choppy
+- Zone terakhir
+- OB terakhir
+- FVG terakhir
+- Status valid / invalidasi
+
+Pertanyaan konsep market juga dijawab lokal, misalnya:
+
+```text
+Apa itu FVG?
+Apa itu OB?
+Apa itu CHOCH?
+Apa itu BOS?
+Apa itu MSS?
+Apa itu liquidity?
+Apa itu inducement?
+Apa itu premium discount?
+Apa itu OTE?
+```
+
+---
+
+### 7. AI Trainer Lokal
+
+AI Trainer lokal menyimpan hasil evaluasi metode berdasarkan hasil signal.
+
+Contoh output:
+
+```text
+🧠 AI TRAINER RESULT
+Signal: #70 SELL
+Result: LOSS / WIN
+Pattern: METHOD_CHOCH_REVERSAL_SELL
+Reward: +0.0
+Penalty: -10.0
+Pattern score: -10.0
+```
+
+AI Trainer digunakan untuk membaca performa metode, bukan untuk menjawab bebas seperti chatbot.
+
+---
+
+## File Penting
+
+```text
+main.py                              # Entry point bot
+config.yaml                          # Konfigurasi utama
+src/market_brain.py                  # Otak signal dan metode
+src/market_structure.py              # BOS/CHOCH/MSS/break/sweep/invalidasi
+src/local_knowledge_agent.py         # Jawaban Telegram lokal
+src/telegram_interactive.py          # Polling dan routing Telegram
+src/telegram_notifier.py             # Kirim pesan Telegram
+src/storage.py                       # SQLite storage
+src/session_context.py               # WIB, NY, EST/EDT, killzone
+src/mapping_assistant.py             # Ringkasan mapping market
+src/htf_bias_engine.py               # Bias D1/H4/H1
+src/range_map.py                     # Range, premium, discount, EQ
+src/liquidity_map.py                 # BSL, SSL, EQH, EQL, PDH, PDL
+src/order_block_engine.py            # OB mapping
+src/fvg_mapping.py                   # FVG mapping
+src/market_narrative.py              # Kesimpulan mapping
+scripts/send_mapping_summary.py      # Print/kirim mapping ke Telegram
+data/knowledge_seed.json             # Knowledge edukasi lokal
+data/xauusd_bot.sqlite               # Database utama
+```
+
+---
+
+## Cara Menjalankan di Termux
+
+Masuk ke folder project:
+
+```bash
+cd /storage/emulated/0/Download/aplikasi/xauusd-scalping-bot
+```
+
+Jalankan bot:
+
+```bash
+python main.py
+```
+
+Jalankan mapping summary:
+
+```bash
+python scripts/send_mapping_summary.py
+```
+
+Kirim mapping summary ke Telegram:
+
+```bash
+python scripts/send_mapping_summary.py --send
+```
+
+Push perubahan ke GitHub:
+
+```bash
+git add .
+git commit -m "update project"
+git push origin main
+```
+
+---
+
+## Environment Telegram
+
+Minimal environment yang dibutuhkan:
+
+```bash
+export TELEGRAM_BOT_TOKEN="ISI_TOKEN_BOT"
+export TELEGRAM_CHAT_ID="ISI_CHAT_ID"
+```
+
+Opsional:
+
+```bash
+export TELEGRAM_DISCUSSION_CHAT_ID="ISI_CHAT_ID_GROUP_DISKUSI"
+export TELEGRAM_PARSE_MODE=""
+export TELEGRAM_AI_FALLBACK_ENABLED="false"
+export STRUCTURE_TELEGRAM_ALERTS="true"
+export EARLY_STRUCTURE_TELEGRAM_ALERTS="true"
+export STRUCTURE_ALERT_COOLDOWN_SECONDS="900"
+export EARLY_STRUCTURE_ALERT_COOLDOWN_SECONDS="180"
+```
+
+---
+
+## Telegram Command yang Umum Dipakai
+
+```text
+/price
+/signal
+/m1_signal
+/m5_signal
+/alerts
+/brain
+/methods
+/stats
+/daily_recap
+/market_context
+/market_plan
+/supply_demand
+/fvg
+/ob
+/liquidity
+/ote
+/poi
+/events
+/bot_health
+/chat_id
+/help
+```
+
+Bot juga bisa menjawab pertanyaan bahasa biasa, seperti:
+
+```text
+Enaknya sell atau buy?
+Kenapa?
+Apa itu FVG?
+OB terdekat di mana?
+Liquidity terdekat di mana?
+Support terdekat?
+Resistance terdekat?
+Bias sekarang?
+Market structure sekarang?
+```
+
+---
+
+## Catatan Penting
+
+Bot ini adalah alat bantu mapping dan signal, bukan jaminan profit.
+
+Gunakan tetap dengan:
+
+- SL jelas
+- lot aman
+- risk management
+- validasi manual
+- hindari overtrade
+- jangan entry hanya karena notifikasi
+
+---
+
+## Update Terakhir
+
+README ini disinkronkan dengan kondisi project saat ini:
+
+```text
+AI Telegram OFF
+Local Knowledge Agent aktif
+Signal education satu pintu di local_knowledge_agent.py
+Market structure alert aktif
+Early warning aktif
+Mapping assistant aktif
+Startup message robot aktif
+```
