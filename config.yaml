@@ -31,7 +31,7 @@ trading:
   min_confidence: 65
   preferred_min_confidence: 70
   high_confidence: 80
-  max_signals_per_day: 6
+  max_signals_per_day: 999
   cooldown_minutes_same_direction: 15
   cooldown_minutes_any_signal: 20
 risk:

@@ -2241,6 +2241,58 @@ class BrainEngine:
             'rule': 'controlled_averaging_no_martingale_same_lot',
         }
 
+
+    def _choch_reversal_sell_sl_plan(self, price: float, ctx: Dict[str, Any]) -> Tuple[float, float, float]:
+        """SL khusus METHOD_CHOCH_REVERSAL_SELL.
+
+        Hanya untuk METHOD_CHOCH_REVERSAL_SELL.
+        SL dibuat di atas swing/sweep high + ATR buffer.
+        """
+        struct = ctx.get('structure', {}) or {}
+        atr = max(float(ctx.get('atr') or 2.0), 0.50)
+
+        last_high = float(ctx.get('last_high') or price)
+        prev_high = float(ctx.get('prev_high') or last_high)
+
+        candidates = [last_high, prev_high]
+
+        for key in ('nearest_resistance', 'liquidity_above', 'break_level', 'sweep_extreme'):
+            value = struct.get(key)
+            if value is not None:
+                try:
+                    candidates.append(float(value))
+                except Exception:
+                    pass
+
+        inv_level = struct.get('invalidation_level')
+        inv_label = str(struct.get('invalidation_label') or '').lower()
+        if inv_level is not None and ('lower high' in inv_label or 'high' in inv_label):
+            try:
+                candidates.append(float(inv_level))
+            except Exception:
+                pass
+
+        structure_high = max(candidates) if candidates else last_high
+        buffer_points = max(atr * 0.55, 1.50)
+
+        raw_sl = structure_high + buffer_points
+        min_sl_dist = max(atr * 1.80, 8.00)
+
+        method_cfg = (
+            ((self.config or {}).get('adaptive_brain', {}) or {})
+            .get('method_risk_overrides', {}) or {}
+        ).get('METHOD_CHOCH_REVERSAL_SELL', {}) or {}
+
+        max_sl_dist = float(method_cfg.get('max_sl_points', 14.0))
+        sl_dist = max(raw_sl - float(price), min_sl_dist)
+        sl_dist = min(sl_dist, max_sl_dist)
+
+        sl = float(price) + sl_dist
+        tp1 = float(price) - (sl_dist * self.tp1_rr)
+        tp2 = float(price) - (sl_dist * self.tp2_rr)
+
+        return round(sl, 3), round(tp1, 3), round(tp2, 3)
+
     def _build_signal(self, direction: str, price: float, ctx: Dict[str, Any], confidence: float,
                       reason: str, pattern_key: str, pattern: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # Structural SL and TP based on ICT DOL
@@ -2327,6 +2379,9 @@ class BrainEngine:
                 sl = price + sl_dist
                 tp1 = price - tp1_dist
                 tp2 = price - tp2_dist
+        elif pattern_key == 'METHOD_CHOCH_REVERSAL_SELL':
+            sl, tp1, tp2 = self._choch_reversal_sell_sl_plan(price, ctx)
+
         elif direction == 'BUY':
             # SL is nearest support or swing low
             support = struct.get('nearest_support') or ctx.get('prev_low') or (price - 8.0)
