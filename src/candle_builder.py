@@ -150,7 +150,13 @@ class CandleBuilder:
                 # Close the old candle
                 candle.is_closed = True
                 candle.close_time = candle.open_time + seconds - 1
-                self._save_candle(candle)
+
+                # M15/H1/H4 closed rows must come from closed M5 aggregation,
+                # not from a direct tick fallback candle that may have started mid-bucket.
+                if tf in ['M15', 'H1', 'H4']:
+                    logger.info(f"Skip direct {tf} closed save; HTF DB rows are rebuilt from closed M5.")
+                else:
+                    self._save_candle(candle)
 
                 if tf == 'M5':
                     try:
@@ -260,8 +266,9 @@ class CandleBuilder:
                 # Update existing candle
                 candle.update(price)
 
-            # Save the running (unclosed) candle state
-            if self.current_candles[tf]:
+            # Save the running lower-timeframe candle state.
+            # HTF closed rows are rebuilt from closed M5; avoid trusting direct HTF fallback rows.
+            if self.current_candles[tf] and tf not in ['M15', 'H1', 'H4']:
                 self._save_candle(self.current_candles[tf])
 
     def _save_candle(self, candle):
