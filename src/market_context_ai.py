@@ -4,24 +4,34 @@ import hashlib
 import json
 import os
 import re
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from src.ai_advisor import get_ai_response
 
 
-def _fmt(v):
+def _fmt(v, digits: int = 2):
     try:
-        return f"{float(v):.2f}"
+        return f"{float(v):.{digits}f}"
     except Exception:
         return "N/A"
 
 
-def _c(c: Dict[str, Any], key: str, default: float = 0.0) -> float:
+def _c(candle: Dict[str, Any], key: str, default: float = 0.0) -> float:
     try:
-        return float(c.get(key, default) or default)
+        return float(candle.get(key, default) or default)
     except Exception:
         return default
+
+
+def _ctime(candle: Dict[str, Any]) -> str:
+    return str(
+        candle.get('open_time')
+        or candle.get('time')
+        or candle.get('timestamp')
+        or candle.get('close_time')
+        or '-'
+    )
 
 
 def _bias(candles: List[Dict[str, Any]], lookback: int = 8) -> str:
@@ -40,15 +50,15 @@ def _bias(candles: List[Dict[str, Any]], lookback: int = 8) -> str:
     return "sideways"
 
 
-def _zone_from_candle(c: Dict[str, Any]) -> Dict[str, Any]:
-    o = _c(c, 'open')
-    cl = _c(c, 'close')
-    hi = _c(c, 'high')
-    lo = _c(c, 'low')
+def _zone_from_candle(candle: Dict[str, Any]) -> Dict[str, Any]:
+    o = _c(candle, 'open')
+    cl = _c(candle, 'close')
+    hi = _c(candle, 'high')
+    lo = _c(candle, 'low')
     return {
         'low': round(max(lo, min(o, cl) - 0.20), 3),
         'high': round(min(hi, max(o, cl) + 0.20), 3),
-        'time': c.get('open_time') or c.get('time') or c.get('timestamp') or '-',
+        'time': _ctime(candle),
     }
 
 
@@ -104,7 +114,7 @@ def _db_supply_demand(storage, symbol: str, price: float) -> Dict[str, Any]:
             return 10**9
         if low <= price <= high:
             return 0
-        return min(abs(price-low), abs(price-high))
+        return min(abs(price - low), abs(price - high))
 
     supply_rows = [r for r in rows if 'supply' in str(r.get('zone_type') or '').lower()]
     demand_rows = [r for r in rows if 'demand' in str(r.get('zone_type') or '').lower()]
@@ -118,12 +128,97 @@ def _db_supply_demand(storage, symbol: str, price: float) -> Dict[str, Any]:
     return out
 
 
+def _last_candle_summary(tf: str, candles: List[Dict[str, Any]]) -> Dict[str, Any]:
+    if not candles:
+        return {'timeframe': tf, 'available': False}
+    c = candles[-1]
+    return {
+        'timeframe': tf,
+        'available': True,
+        'time': _ctime(c),
+        'open': _c(c, 'open'),
+        'high': _c(c, 'high'),
+        'low': _c(c, 'low'),
+        'close': _c(c, 'close'),
+        'closed': c.get('is_closed', 1),
+    }
+
+
+def _candle_line(c: Dict[str, Any]) -> str:
+    if not c.get('available'):
+        return f"{c.get('timeframe')}: data belum ada"
+    return (
+        f"{c.get('timeframe')}: {c.get('time')} | "
+        f"O {_fmt(c.get('open'))} H {_fmt(c.get('high'))} "
+        f"L {_fmt(c.get('low'))} C {_fmt(c.get('close'))}"
+    )
+
+
+def _structure_snapshot(m5, m15, h1) -> Dict[str, Any]:
+    try:
+        from src.market_structure import analyze_structure
+        if m5 and m15 and h1:
+            return analyze_structure(m5, m15, h1) or {}
+    except Exception:
+        pass
+    return {}
+
+
+def _decision_from_snapshot(snapshot: Dict[str, Any]) -> Dict[str, str]:
+    b = snapshot.get('bias', {})
+    struct = snapshot.get('structure', {}) or {}
+    m15 = str(b.get('m15') or 'unknown')
+    h1 = str(b.get('h1') or 'unknown')
+    h4 = str(b.get('h4') or 'unknown')
+    phase = str(struct.get('trend') or 'UNKNOWN')
+    break_type = str(struct.get('break_type') or '')
+    sweep_type = str(struct.get('sweep_type') or '')
+    reclaim_valid = bool(struct.get('reclaim_valid'))
+
+    bulls = [x for x in (m15, h1, h4) if x == 'bullish']
+    bears = [x for x in (m15, h1, h4) if x == 'bearish']
+
+    if phase == 'CHOPPY':
+        return {
+            'status': 'WAIT',
+            'bias': 'CHOPPY',
+            'reason': 'Market choppy; raw signal lebih mudah fakeout.',
+            'action': 'Tunggu struktur lebih bersih atau candle displacement.'
+        }
+
+    if len(bulls) >= 2 and m15 != 'bearish':
+        if sweep_type == 'bullish' and reclaim_valid:
+            action = 'WAIT BUY — sweep low + reclaim valid, tunggu area entry dari signal.'
+        elif 'BULLISH' in break_type:
+            action = 'BUY ONLY — struktur bullish, tunggu retest/pullback.'
+        else:
+            action = 'WAIT BUY — HTF condong bullish, jangan sell dulu kecuali struktur rusak.'
+        return {'status': 'WAIT BUY', 'bias': 'BULLISH', 'reason': f'M15/H1/H4: {m15}/{h1}/{h4}.', 'action': action}
+
+    if len(bears) >= 2 and m15 != 'bullish':
+        if sweep_type == 'bearish' and reclaim_valid:
+            action = 'WAIT SELL — sweep high + reclaim valid, tunggu area entry dari signal.'
+        elif 'BEARISH' in break_type:
+            action = 'SELL ONLY — struktur bearish, tunggu retest/pullback.'
+        else:
+            action = 'WAIT SELL — HTF condong bearish, jangan buy dulu kecuali struktur rusak.'
+        return {'status': 'WAIT SELL', 'bias': 'BEARISH', 'reason': f'M15/H1/H4: {m15}/{h1}/{h4}.', 'action': action}
+
+    return {
+        'status': 'CONFLICT / WAIT',
+        'bias': 'MIXED',
+        'reason': f'M15/H1/H4 belum searah: {m15}/{h1}/{h4}.',
+        'action': 'Tunggu salah satu: H1 searah M15, sweep reclaim valid, atau BOS/CHOCH yang clean.'
+    }
+
+
 def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     bot_state = bot_state or {}
     m5 = storage.get_recent_candles(symbol, 'M5', 80)
     m15 = storage.get_recent_candles(symbol, 'M15', 96)
     h1 = storage.get_recent_candles(symbol, 'H1', 72)
     h4 = storage.get_recent_candles(symbol, 'H4', 48)
+    d1 = storage.get_recent_candles(symbol, 'D1', 30)
     price = float(bot_state.get('last_price') or (m5[-1]['close'] if m5 else 0) or 0)
 
     base = m15 if len(m15) >= 20 else m5
@@ -131,29 +226,27 @@ def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, An
     db_sd = _db_supply_demand(storage, symbol, price) if price else {}
     sd.update({k: v for k, v in db_sd.items() if v})
 
-    lv = _nearest_levels(base, price) if price else {}
-    rng_high = lv.get('range_high')
-    rng_low = lv.get('range_low')
+    levels = _nearest_levels(base, price) if price else {}
+    rng_high = levels.get('range_high')
+    rng_low = levels.get('range_low')
     eq = ((rng_high + rng_low) / 2) if rng_high and rng_low else None
     if eq and price:
-        if price > eq:
-            price_position = 'premium'
-        elif price < eq:
-            price_position = 'discount'
-        else:
-            price_position = 'equilibrium'
+        price_position = 'premium' if price > eq else 'discount' if price < eq else 'equilibrium'
     else:
         price_position = 'unknown'
 
     m15_bias = _bias(m15, 8)
     h1_bias = _bias(h1, 8)
     h4_bias = _bias(h4, 6)
+    d1_bias = _bias(d1, 5)
     if m15_bias == h1_bias and m15_bias in ('bullish', 'bearish'):
         intraday_bias = m15_bias
     elif h1_bias in ('bullish', 'bearish'):
         intraday_bias = f"mixed_{h1_bias}_h1"
     else:
         intraday_bias = 'sideways'
+
+    structure = _structure_snapshot(m5, m15, h1)
 
     snapshot = {
         'symbol': symbol,
@@ -163,6 +256,7 @@ def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, An
             'm15': m15_bias,
             'h1': h1_bias,
             'h4': h4_bias,
+            'd1': d1_bias,
             'intraday': intraday_bias,
             'price_position': price_position,
         },
@@ -170,12 +264,20 @@ def build_market_snapshot(storage, symbol: str, bot_state: Optional[Dict[str, An
             'range_high': round(rng_high, 3) if rng_high else None,
             'range_low': round(rng_low, 3) if rng_low else None,
             'equilibrium': round(eq, 3) if eq else None,
-            'liquidity_above': round(lv.get('liquidity_above'), 3) if lv.get('liquidity_above') else None,
-            'liquidity_below': round(lv.get('liquidity_below'), 3) if lv.get('liquidity_below') else None,
+            'liquidity_above': round(levels.get('liquidity_above'), 3) if levels.get('liquidity_above') else None,
+            'liquidity_below': round(levels.get('liquidity_below'), 3) if levels.get('liquidity_below') else None,
         },
         'supply_demand': sd,
+        'structure': structure,
+        'last_candles': {
+            'M5': _last_candle_summary('M5', m5),
+            'M15': _last_candle_summary('M15', m15),
+            'H1': _last_candle_summary('H1', h1),
+            'H4': _last_candle_summary('H4', h4),
+        },
     }
-    payload = json.dumps({k: snapshot[k] for k in ('price', 'bias', 'levels', 'supply_demand')}, sort_keys=True, default=str)
+    snapshot['decision'] = _decision_from_snapshot(snapshot)
+    payload = json.dumps({k: snapshot[k] for k in ('price', 'bias', 'levels', 'supply_demand', 'structure')}, sort_keys=True, default=str)
     snapshot['signature'] = hashlib.sha1(payload.encode()).hexdigest()[:12]
     return snapshot
 
@@ -185,21 +287,36 @@ def format_market_context(storage, symbol: str, bot_state: Optional[Dict[str, An
     sd = s.get('supply_demand', {})
     supply = sd.get('supply') or {}
     demand = sd.get('demand') or {}
-    lv = s.get('levels', {})
-    b = s.get('bias', {})
+    levels = s.get('levels', {})
+    bias = s.get('bias', {})
+    struct = s.get('structure', {}) or {}
+    dec = s.get('decision', {})
+    candles = s.get('last_candles', {})
+
     return (
-        "📊 XAUUSD MARKET CONTEXT\n"
-        "Source: BOT DATA\n\n"
+        "🧭 XAUUSD MARKET DECISION\n"
+        "Source: BOT DATA / SQLite Candle\n\n"
         f"Harga: {_fmt(s.get('price'))}\n"
-        f"Bias intraday: {str(b.get('intraday')).upper()}\n"
-        f"M15: {b.get('m15')} | H1: {b.get('h1')} | H4: {b.get('h4')}\n"
-        f"Posisi harga: {b.get('price_position')}\n\n"
+        f"Status: {dec.get('status')}\n"
+        f"Bias final: {dec.get('bias')}\n"
+        f"Alasan: {dec.get('reason')}\n"
+        f"Action: {dec.get('action')}\n\n"
+        "📊 BIAS DETAIL\n"
+        f"M15: {bias.get('m15')} | H1: {bias.get('h1')} | H4: {bias.get('h4')} | D1: {bias.get('d1')}\n"
+        f"Intraday: {bias.get('intraday')} | Posisi harga: {bias.get('price_position')}\n"
+        f"Phase: {struct.get('trend', 'N/A')} | Break: {struct.get('break_type', 'N/A')} | Sweep: {struct.get('sweep_type', 'N/A')}\n\n"
+        "📍 LEVEL BOT\n"
         f"Supply: {_fmt(supply.get('low'))} - {_fmt(supply.get('high'))}\n"
         f"Demand: {_fmt(demand.get('low'))} - {_fmt(demand.get('high'))}\n"
-        f"EQ: {_fmt(lv.get('equilibrium'))}\n"
-        f"Liquidity atas: {_fmt(lv.get('liquidity_above'))}\n"
-        f"Liquidity bawah: {_fmt(lv.get('liquidity_below'))}\n\n"
-        "Action: tunggu signal valid dari 9 method high-WR."
+        f"EQ: {_fmt(levels.get('equilibrium'))}\n"
+        f"Liquidity atas: {_fmt(levels.get('liquidity_above'))}\n"
+        f"Liquidity bawah: {_fmt(levels.get('liquidity_below'))}\n\n"
+        "🕯 TV CALIBRATION CANDLE\n"
+        f"{_candle_line(candles.get('M5', {}))}\n"
+        f"{_candle_line(candles.get('M15', {}))}\n"
+        f"{_candle_line(candles.get('H1', {}))}\n"
+        f"{_candle_line(candles.get('H4', {}))}\n\n"
+        "Catatan: cocokkan OHLC dan time candle ini dengan TradingView. Kalau OHLC beda, bias/CHOCH/BOS bisa ikut beda."
     )
 
 
@@ -259,9 +376,8 @@ class TelegramMarketAI:
         fallback = self._local_grounded_answer(question, snapshot)
         prompt = (
             "Jawab pertanyaan user Telegram berdasarkan DATA BOT di bawah.\n"
-            "Jangan mengarang angka, gunakan data bot. Jawab dengan gaya natural, santai, dan seperti manusia sungguhan (pakai bahasa Indonesia gaul/casual yang sopan, seperti trader ke trader).\n"
-            "Jangan buat jawaban yang kaku seperti robot. Hindari bullet points kaku jika bisa diceritakan mengalir.\n"
-            "Kalau data belum cukup, katakan saja 'Datanya belum dapet nih bro'.\n\n"
+            "Jangan mengarang angka, gunakan data bot. Jawab natural dan singkat.\n"
+            "Kalau data belum cukup, katakan data belum cukup.\n\n"
             f"PERTANYAAN: {question}\n\n"
             f"DATA BOT:\n{json.dumps(snapshot, ensure_ascii=False, indent=2, default=str)}"
         )
@@ -279,7 +395,6 @@ class TelegramMarketAI:
             'created_at': datetime.now(timezone.utc).isoformat(),
             'snapshot': snapshot,
         }
-        # keep cache small
         if len(cache) > 200:
             items = list(cache.items())[-200:]
             cache = dict(items)
@@ -292,6 +407,7 @@ class TelegramMarketAI:
         sd = snapshot.get('supply_demand', {})
         supply = sd.get('supply') or {}
         demand = sd.get('demand') or {}
+        dec = snapshot.get('decision', {})
         q = question.lower()
         if any(x in q for x in ('supply', 'demand', 'sd', 'zona')):
             return (
@@ -299,14 +415,16 @@ class TelegramMarketAI:
                 f"Demand terdekat: {_fmt(demand.get('low'))} - {_fmt(demand.get('high'))}.\n"
                 f"Harga sekarang: {_fmt(snapshot.get('price'))}."
             )
-        if any(x in q for x in ('bias', 'arah', 'intraday', 'trend')):
+        if any(x in q for x in ('bias', 'arah', 'intraday', 'trend', 'buy', 'sell')):
             return (
-                f"Bias intraday: {str(b.get('intraday')).upper()}.\n"
+                f"Status: {dec.get('status')}.\n"
+                f"Bias final: {dec.get('bias')}.\n"
                 f"M15: {b.get('m15')} | H1: {b.get('h1')} | H4: {b.get('h4')}.\n"
-                f"Harga berada di area {b.get('price_position')} terhadap EQ {_fmt(lv.get('equilibrium'))}."
+                f"Action: {dec.get('action')}"
             )
         return (
             f"Harga: {_fmt(snapshot.get('price'))}.\n"
+            f"Status: {dec.get('status')}.\n"
             f"Bias intraday: {str(b.get('intraday')).upper()}.\n"
             f"Supply: {_fmt(supply.get('low'))} - {_fmt(supply.get('high'))}.\n"
             f"Demand: {_fmt(demand.get('low'))} - {_fmt(demand.get('high'))}.\n"
