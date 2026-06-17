@@ -22,8 +22,9 @@ Source utama       : Local Brain + AI Trainer
 AI Telegram        : OFF
 AI fallback        : OFF secara default
 Edukasi Telegram   : Bot lokal
-Signal             : M1 dan M5 berjalan terpisah
-Market alert       : Aktif
+Signal auto-live   : M5 saat candle close
+Signal manual      : M1 dan M5 via command Telegram/CLI
+Market alert       : Aktif sebagai local memory/context; raw Telegram alert hanya jika diaktifkan
 Knowledge          : Local Knowledge Agent + knowledge_seed.json
 Database           : SQLite lokal
 ```
@@ -50,13 +51,15 @@ Signal utama mencakup:
 - Status signal
 - Result signal
 
-M1 dan M5 berjalan sebagai stream signal yang terpisah.
+Live auto-signal utama berjalan saat candle **M5** close. Signal **M1** dan **M5** juga bisa dicek manual lewat command Telegram/CLI.
 
 ---
 
 ### 2. Market Structure Alert
 
-Bot membaca struktur market dan mengirim alert Telegram untuk kondisi seperti:
+Bot membaca struktur market dan menyimpan konteks market ke local memory. Alert Telegram untuk struktur market dapat muncul jika pengaturan environment/config mengaktifkannya.
+
+Kondisi yang dibaca:
 
 - BOS valid / invalid
 - CHOCH valid / invalid
@@ -92,7 +95,7 @@ Early warning yang tersedia:
 - Trend bullish hampir invalid
 - Trend bearish hampir invalid
 
-Confirmed `VALID / INVALID` tetap dikirim setelah validasi close candle.
+Confirmed `VALID / INVALID` tetap dikirim setelah validasi close candle jika alert Telegram diaktifkan.
 
 ---
 
@@ -248,7 +251,7 @@ src/fvg_mapping.py                   # FVG mapping
 src/market_narrative.py              # Kesimpulan mapping
 scripts/send_mapping_summary.py      # Print/kirim mapping ke Telegram
 data/knowledge_seed.json             # Knowledge edukasi lokal
-data/xauusd_bot.sqlite               # Database utama
+data/xauusd_bot.sqlite               # Database runtime lokal, di-gitignore, dibuat/diisi di perangkat
 ```
 
 ---
@@ -335,6 +338,7 @@ export EARLY_STRUCTURE_ALERT_COOLDOWN_SECONDS="180"
 /events
 /bot_health
 /chat_id
+/ask [pertanyaan]
 /help
 ```
 
@@ -377,7 +381,10 @@ README ini disinkronkan dengan kondisi project saat ini:
 AI Telegram OFF
 Local Knowledge Agent aktif
 Signal education satu pintu di local_knowledge_agent.py
-Market structure alert aktif
+Auto-live signal utama M5
+M1/M5 signal tersedia via command manual
+Market structure context aktif
+Raw Telegram alert tergantung environment/config
 Early warning aktif
 Mapping assistant aktif
 Startup message robot aktif
