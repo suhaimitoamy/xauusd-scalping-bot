@@ -430,10 +430,7 @@ def main():
     alert_engine = MarketAlertEngine(storage, symbol=symbol, config=config)
 
     if telegram_is_configured():
-        send_telegram_message("🤖 BOT AKTIF
-
-Sistem sudah online.
-Silakan kirim pertanyaan di kolom komentar.")
+        send_telegram_message("🤖 BOT AKTIF\n\nSistem sudah online.\nSilakan kirim pertanyaan di kolom komentar.")
 
     def _send_signal_if_allowed(sig):
         if sig and sig.get('direction') != 'NO_TRADE':
