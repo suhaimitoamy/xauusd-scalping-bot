@@ -5,12 +5,33 @@ import subprocess
 import os
 
 if len(sys.argv) < 2:
-    print("Cara penggunaan: python3 run_bulan.py YYYY-MM")
-    print("Contoh: python3 run_bulan.py 2025-01")
-    sys.exit(1)
+    target_month = input("Masukkan bulan backtest (YYYY-MM): ").strip()
+    if not target_month:
+        print("❌ Bulan wajib diisi. Contoh: 2025-01")
+        sys.exit(1)
+else:
+    target_month = sys.argv[1]
 
-target_month = sys.argv[1]
-fair_method = (os.environ.get("FAIR_TEST_METHOD") or os.environ.get("METHOD_UNDER_TEST") or "").strip().upper()
+if len(target_month) == 6 and target_month.isdigit():
+    target_month = f"{target_month[:4]}-{target_month[4:]}"
+
+fair_method = ""
+if len(sys.argv) >= 3:
+    fair_method = sys.argv[2].strip().upper()
+else:
+    fair_method = (os.environ.get("FAIR_TEST_METHOD") or os.environ.get("METHOD_UNDER_TEST") or "").strip().upper()
+    if not fair_method:
+        print("\nPilih mode backtest:")
+        print("- Enter kosong = BT_RESEARCH NON-MAIN")
+        print("- all = semua metode")
+        print("- ketik nama method, contoh: METHOD_M5_BREAK_12_BUY")
+        selected = input("Mode/method [BT_RESEARCH]: ").strip()
+        if selected and selected.lower() not in {"all", "semua"}:
+            fair_method = selected.upper()
+        elif selected.lower() in {"all", "semua"}:
+            fair_method = ""
+            os.environ["BT_RESEARCH"] = "false"
+
 research_mode = not fair_method and os.environ.get("BT_RESEARCH", "true").lower() in {"1", "true", "yes", "on"}
 result_key = (f"{target_month}__BT_RESEARCH_NON_MAIN" if research_mode else (target_month if not fair_method else f"{target_month}__{fair_method}"))
 month_key = target_month.replace('-', '')
@@ -21,6 +42,7 @@ BACKTEST_REPORT_PATH = "reports/BACKTEST_RESULTS_REPORT.md"
 TEMP_CSV = f"data_temp_{month_key}.csv"
 
 print(f"\nMenyiapkan data untuk bulan {target_month}...")
+print("Mode:", "FAIR TEST" if fair_method else ("BT RESEARCH NON-MAIN" if research_mode else "ALL METHODS"))
 if fair_method:
     print(f"FAIR TEST METHOD: {fair_method}")
 
@@ -61,19 +83,30 @@ env = os.environ.copy()
 env["BACKTEST_ALL_METHODS"] = "true"
 env["DRY_RUN"] = "true"
 env["BACKTEST_NEUTRAL_CONFIDENCE"] = "true"
+env["BACKTEST_MATCH_LIVE_CONTEXT"] = "true"
 if research_mode:
     env["BT_RESEARCH"] = "true"
     env.setdefault("BT_RESEARCH_PER_DAY", "24")
     env.setdefault("BT_RESEARCH_SL", "2.0")
     env.setdefault("BT_RESEARCH_TP1", "1.0")
     env.setdefault("BT_RESEARCH_TP2", "2.0")
+else:
+    env["BT_RESEARCH"] = "false"
 if fair_method:
     env["FAIR_TEST"] = "true"
     env["FAIR_TEST_METHOD"] = fair_method
+    env["METHOD_UNDER_TEST"] = fair_method
+else:
+    env.pop("FAIR_TEST", None)
+    env.pop("FAIR_TEST_METHOD", None)
+    env.pop("METHOD_UNDER_TEST", None)
 
 runner_code = (
     "import sys;"
+    "sys.path.insert(0,'.');"
     "sys.path.insert(0,'src');"
+    "from src.backtest_live_context_patch import apply_backtest_live_context_patch;"
+    "apply_backtest_live_context_patch();"
     "from src.backtest_fairness_patch import apply_backtest_fairness_patch;"
     "apply_backtest_fairness_patch();"
     "from src.bt_research_patch import apply_bt_research_patch;"
