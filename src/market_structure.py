@@ -10,7 +10,7 @@ Fokus:
 - Trend invalidation:
   bullish invalid jika Higher Low jebol
   bearish invalid jika Lower High jebol
-- Telegram alert format market structure
+- Telegram alert format market structure dengan arah yang jelas
 """
 import os
 import time
@@ -196,19 +196,156 @@ def _validate_break(direction, level, candle_power, atr_value, choppy, m15_bias,
     return valid, close_distance, reasons[:4]
 
 
+def _arah_text(direction, valid=None, event_type=""):
+    direction = str(direction or "").lower()
+    event_type = str(event_type or "").upper()
+
+    if event_type == "TREND_INVALIDATION":
+        if direction == "bullish":
+            return "BEARISH RUSAK / POTENSI NAIK" if valid else "BEARISH RUSAK ❌ BELUM VALID"
+        if direction == "bearish":
+            return "BULLISH RUSAK / POTENSI TURUN" if valid else "BULLISH RUSAK ❌ BELUM VALID"
+
+    if direction == "bullish":
+        return "VALID NAIK / POTENSI BUY" if valid else "POTENSI NAIK ❌ GAGAL VALID"
+    if direction == "bearish":
+        return "VALID TURUN / POTENSI SELL" if valid else "POTENSI TURUN ❌ GAGAL VALID"
+    return "BELUM JELAS"
+
+
+def _status_text(direction, valid=None, event_type=""):
+    direction = str(direction or "").lower()
+    event_type = str(event_type or "").upper()
+    naik_turun = "NAIK" if direction == "bullish" else "TURUN" if direction == "bearish" else "ARAH"
+
+    if event_type == "TREND_INVALIDATION" and valid:
+        if direction == "bullish":
+            return "✅ VALID NAIK / BEARISH INVALID"
+        if direction == "bearish":
+            return "✅ VALID TURUN / BULLISH INVALID"
+
+    if valid:
+        return f"✅ VALID {naik_turun}"
+    return f"❌ BELUM VALID {naik_turun}"
+
+
+def _action_text(direction, valid=None, event_type=""):
+    direction = str(direction or "").lower()
+    event_type = str(event_type or "").upper()
+
+    if valid:
+        if event_type == "TREND_INVALIDATION":
+            if direction == "bullish":
+                return "Jangan fokus sell dulu. Tunggu retest / setup buy yang valid."
+            if direction == "bearish":
+                return "Jangan fokus buy dulu. Tunggu retest / setup sell yang valid."
+        if direction == "bullish":
+            return "Boleh pantau peluang buy, tetap tunggu setup entry bot."
+        if direction == "bearish":
+            return "Boleh pantau peluang sell, tetap tunggu setup entry bot."
+
+    if direction == "bullish":
+        return "Jangan anggap ini reversal naik dulu. Tunggu konfirmasi berikutnya."
+    if direction == "bearish":
+        return "Jangan anggap ini lanjut turun dulu. Tunggu konfirmasi berikutnya."
+    return "Tunggu struktur lebih jelas."
+
+
+def _conclusion_text(ev, result):
+    event_type = str(ev.get("type") or "").upper()
+    direction = str(ev.get("direction") or "").lower()
+    valid = bool(ev.get("valid"))
+    level = _fmt(ev.get("level"))
+    inv_label = result.get("invalidation_label")
+
+    if event_type == "TREND_INVALIDATION":
+        if direction == "bullish":
+            return f"Lower High {level} sudah ditembus dan trend bearish dianggap rusak."
+        if direction == "bearish":
+            return f"Higher Low {level} sudah ditembus dan trend bullish dianggap rusak."
+
+    if "SWEEP_RECLAIM" in event_type:
+        area = "support" if direction == "bullish" else "resistance"
+        arah = "naik" if direction == "bullish" else "turun"
+        if valid:
+            return f"Harga menyapu {area} lalu berhasil reclaim. Potensi {arah} sudah valid menurut rule."
+        return f"Ada sweep {area}, tapi reclaim-nya belum kuat. Potensi {arah} belum valid."
+
+    if "BULLISH" in event_type:
+        if valid:
+            return f"Break naik di atas level {level} sudah confirm."
+        return f"Harga sempat menembus level {level}, tapi break naiknya belum kuat."
+
+    if "BEARISH" in event_type:
+        if valid:
+            return f"Break turun di bawah level {level} sudah confirm."
+        return f"Harga sempat menembus level {level}, tapi break turunnya belum kuat."
+
+    if inv_label and inv_label != "N/A":
+        return f"Struktur sedang bereaksi di area invalidasi {inv_label}."
+    return "Event struktur terdeteksi, tapi belum cukup kuat untuk dijadikan arah utama."
+
+
+def _early_arah_text(ev, result):
+    event_type = str(ev.get("type") or "").upper()
+    direction = str(ev.get("direction") or "").lower()
+
+    if event_type == "EARLY_TREND_BEARISH_INVALIDATION":
+        return "BEARISH SEDANG DISERANG"
+    if event_type == "EARLY_TREND_BULLISH_INVALIDATION":
+        return "BULLISH SEDANG DISERANG"
+    if direction == "bullish":
+        return "POTENSI NAIK BELUM CONFIRM"
+    if direction == "bearish":
+        return "POTENSI TURUN BELUM CONFIRM"
+    return "BELUM CONFIRM"
+
+
+def _early_conclusion_text(ev):
+    event_type = str(ev.get("type") or "").upper()
+    direction = str(ev.get("direction") or "").lower()
+    level = _fmt(ev.get("level"))
+
+    if event_type == "EARLY_TREND_BEARISH_INVALIDATION":
+        return f"Harga live sudah menembus Lower High {level}, tapi candle belum close."
+    if event_type == "EARLY_TREND_BULLISH_INVALIDATION":
+        return f"Harga live sudah menembus Higher Low {level}, tapi candle belum close."
+    if "SWEEP" in event_type:
+        area = "support" if direction == "bullish" else "resistance"
+        return f"Harga sedang sweep {area}, tapi belum ada close confirm."
+    if direction == "bullish":
+        return f"Harga live sudah di atas level {level}, tapi break naik belum confirm."
+    if direction == "bearish":
+        return f"Harga live sudah di bawah level {level}, tapi break turun belum confirm."
+    return "Harga sedang menyentuh area penting, tapi candle belum close."
+
+
 def _build_telegram_message(result):
     ev = result.get("structure_event") or {}
     if not ev:
         return ""
 
+    valid = bool(ev.get("valid"))
+    direction = ev.get("direction")
+    event_type = ev.get("type")
     status = ev.get("status", "INVALID")
-    icon = "✅" if status == "VALID" else "⚠️"
+    icon = "✅" if valid else "⚠️"
 
     lines = [
-        f"{icon} MARKET STRUCTURE — {status}",
+        f"{icon} MARKET STRUCTURE",
+        "",
+        f"ARAH: {_arah_text(direction, valid, event_type)}",
         f"Event: {ev.get('message', ev.get('type', 'STRUCTURE'))}",
         f"Level: {_fmt(ev.get('level'))}",
-        f"Current Price: {_fmt(result.get('current_price'))}",
+        f"Harga sekarang: {_fmt(result.get('current_price'))}",
+        "",
+        "Kesimpulan:",
+        _conclusion_text(ev, result),
+        "",
+        "Status:",
+        _status_text(direction, valid, event_type),
+        "",
+        "Detail:",
         f"Support: {_fmt(result.get('nearest_support'))}",
         f"Resistance: {_fmt(result.get('nearest_resistance'))}",
         f"M15 Bias: {result.get('m15_bias')}",
@@ -222,9 +359,15 @@ def _build_telegram_message(result):
 
     reasons = ev.get("reasons") or []
     if reasons:
-        lines.append("Alasan: " + "; ".join(reasons))
+        lines.extend(["", "Alasan:"])
+        lines.extend([f"- {reason}" for reason in reasons])
 
-    lines.append(f"Retest Mode: {result.get('retest_mode')}")
+    lines.extend([
+        "",
+        "Action:",
+        _action_text(direction, valid, event_type),
+        f"Retest Mode: {result.get('retest_mode')}",
+    ])
 
     return "\n".join(lines)
 
@@ -234,28 +377,57 @@ def _build_early_telegram_message(result):
     if not ev:
         return ""
 
+    direction = ev.get("direction")
     lines = [
-        "👀 MARKET STRUCTURE — EARLY WARNING",
+        "👀 EARLY WARNING",
+        "",
+        f"ARAH: {_early_arah_text(ev, result)}",
         f"Event: {ev.get('message', ev.get('type', 'EARLY_WARNING'))}",
         f"Level: {_fmt(ev.get('level'))}",
-        f"Current Price: {_fmt(result.get('current_price'))}",
+        f"Harga sekarang: {_fmt(result.get('current_price'))}",
+        "",
+        "Kesimpulan:",
+        _early_conclusion_text(ev),
+        "",
+        "Status:",
+        "⏳ BELUM CONFIRM",
+        "",
+        "Kemungkinan:",
+    ]
+
+    if direction == "bullish":
+        lines.append("Jika candle close di atas level = valid naik.")
+        lines.append("Jika candle close balik ke bawah level = naik gagal valid.")
+    elif direction == "bearish":
+        lines.append("Jika candle close di bawah level = valid turun.")
+        lines.append("Jika candle close balik ke atas level = turun gagal valid.")
+    else:
+        lines.append("Tunggu close candle untuk menentukan arah valid / gagal.")
+
+    lines.extend([
+        "",
+        "Detail:",
         f"Support: {_fmt(result.get('nearest_support'))}",
         f"Resistance: {_fmt(result.get('nearest_resistance'))}",
         f"M15 Bias: {result.get('m15_bias')}",
         f"H1 Bias: {result.get('h1_bias')}",
         f"Phase Now: {result.get('trend')}",
         f"Invalidasi: {result.get('invalidation_label')} di {_fmt(result.get('invalidation_level'))}",
-        "Status: BELUM CONFIRM",
-    ]
+    ])
 
     if ev.get("distance") is not None:
         lines.append(f"Live Distance: {_fmt(ev.get('distance'))}")
 
     reasons = ev.get("reasons") or []
     if reasons:
-        lines.append("Catatan: " + "; ".join(reasons))
+        lines.extend(["", "Catatan:"])
+        lines.extend([f"- {reason}" for reason in reasons])
 
-    lines.append("Tunggu close candle untuk VALID / INVALID final.")
+    lines.extend([
+        "",
+        "Action:",
+        "Tunggu close candle untuk VALID / GAGAL VALID final.",
+    ])
 
     return "\n".join(lines)
 
@@ -420,7 +592,6 @@ def analyze_structure(m5_candles, m15_candles, h1_candles):
     result["invalidation_label"] = invalidation_label
 
     main_bias = h1_bias if h1_bias in ("bullish", "bearish") else m15_bias
-
     early_threshold = max(atr_value * 0.04, 0.10)
 
     # EARLY WARNING: trend invalidation sebelum close final.
