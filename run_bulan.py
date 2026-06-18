@@ -105,6 +105,8 @@ runner_code = (
     "import sys;"
     "sys.path.insert(0,'.');"
     "sys.path.insert(0,'src');"
+    "from src.backtest_timestamp_patch import apply_backtest_timestamp_patch;"
+    "apply_backtest_timestamp_patch();"
     "from src.backtest_live_context_patch import apply_backtest_live_context_patch;"
     "apply_backtest_live_context_patch();"
     "from src.backtest_fairness_patch import apply_backtest_fairness_patch;"
